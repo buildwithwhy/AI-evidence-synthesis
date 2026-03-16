@@ -1,0 +1,42 @@
+{
+  "Donners_2021": {
+    "P": "Patients receiving immunosuppressive therapy (e.g., transplant recipients, autoimmune disease patients)",
+    "I": "Therapeutic drug monitoring or pharmacokinetic analysis of immunosuppressive drugs",
+    "C": "Standard dosing without therapeutic drug monitoring",
+    "O": "Drug efficacy, toxicity, graft survival, clinical outcomes",
+    "S": "Clinical trials, observational studies, pharmacokinetic studies",
+    "E": "Animal studies, in-vitro studies, reviews, editorials, case reports with n<5"
+  },
+  "Menon_2022": {
+    "P": "Adults or children with clinical conditions requiring intervention",
+    "I": "Any clinical intervention studied in a systematic review or meta-analysis context",
+    "C": "Placebo, standard care, or alternative interventions",
+    "O": "Clinical effectiveness outcomes, adverse events, quality of life",
+    "S": "Systematic reviews, meta-analyses, randomized controlled trials",
+    "E": "Non-systematic reviews, narrative reviews, protocols without results"
+  },
+  "Sep_2021": {
+    "P": "Adults with mental health conditions (depression, anxiety, PTSD)",
+    "I": "Psychological interventions, psychotherapy, cognitive behavioral therapy",
+    "C": "Waitlist, treatment as usual, placebo, other active treatments",
+    "O": "Mental health symptom improvement, remission, quality of life, functioning",
+    "S": "Randomized controlled trials, controlled clinical trials",
+    "E": "Uncontrolled studies, case studies, qualitative-only studies, animal studies"
+  },
+  "Meijboom_2021": {
+    "P": "Patients with specific health conditions in primary or secondary care",
+    "I": "Health interventions, diagnostics, or treatments under review",
+    "C": "Standard care, alternative treatments, no treatment",
+    "O": "Health outcomes, diagnostic accuracy, treatment effectiveness",
+    "S": "Original research studies with empirical data",
+    "E": "Editorials, commentaries, letters, conference abstracts without full data"
+  },
+  "Nelson_2002": {
+    "P": "Patients with clinical conditions requiring screening or preventive intervention",
+    "I": "Screening tests, preventive treatments, clinical interventions",
+    "C": "No screening, standard care, alternative screening methods",
+    "O": "Disease detection rates, morbidity, mortality, harms of screening",
+    "S": "Randomized controlled trials, cohort studies, diagnostic accuracy studies",
+    "E": "Non-English studies, animal studies, modeling studies without clinical data"
+  }
+}

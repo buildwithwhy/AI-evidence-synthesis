@@ -1,13 +1,24 @@
-# Ignore virtual environment
+# Environment
 venv/
 .env
+.streamlit/secrets.toml
 
-# Ignore python compiled files
+# Python
 __pycache__/
 *.pyc
 
-# Ignore Mac system files
+# Node
+node_modules/
+dist/
+
+# Database
+*.db
+
+# OS
 .DS_Store
 
-# Ignore the passkey
-.streamlit/secrets.toml
+# Eval results (data is committed, results are generated)
+eval/results/
+
+# Synergy cache
+synergy_dataset/
