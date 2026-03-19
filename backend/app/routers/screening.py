@@ -1,4 +1,5 @@
 import io
+from typing import Optional, List
 from fastapi import APIRouter, Depends, UploadFile, File, Form, HTTPException
 from app.dependencies import get_current_user
 from app.services.ai_provider import get_ai_provider
@@ -19,7 +20,7 @@ async def analyze_study(
     pico_o: str = Form(""),
     pico_s: str = Form(""),
     pico_e: str = Form(""),
-    file: UploadFile | None = File(None),
+    file: Optional[UploadFile] = File(None),
     user: dict = Depends(get_current_user),
 ):
     """Analyze a single study against PICO criteria."""
@@ -94,7 +95,7 @@ async def analyze_batch(
     pico_o: str = Form(""),
     pico_s: str = Form(""),
     pico_e: str = Form(""),
-    files: list[UploadFile] = File(...),
+    files: List[UploadFile] = File(...),
     user: dict = Depends(get_current_user),
 ):
     """Batch analyze multiple PDF files."""

@@ -1,3 +1,4 @@
+from typing import Optional
 from fastapi import APIRouter, Depends, UploadFile, File, Form, HTTPException
 from app.dependencies import get_current_user
 from app.services.ai_provider import get_ai_provider
@@ -9,7 +10,7 @@ router = APIRouter(prefix="/api/pico", tags=["pico"])
 @router.post("/extract")
 async def extract_pico(
     text: str = Form(""),
-    file: UploadFile | None = File(None),
+    file: Optional[UploadFile] = File(None),
     user: dict = Depends(get_current_user),
 ):
     """Extract PICO criteria from protocol text or PDF."""
