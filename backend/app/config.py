@@ -5,9 +5,8 @@ from functools import lru_cache
 
 class Settings(BaseSettings):
     SUPABASE_URL: str = ""
-    SUPABASE_SERVICE_KEY: str = ""
-    SUPABASE_ANON_KEY: str = ""
-    SUPABASE_JWT_SECRET: str = ""  # From Supabase Dashboard > Settings > API > JWT Secret
+    SUPABASE_SECRET_KEY: str = ""  # sb_secret_... (replaces legacy service_role key)
+    SUPABASE_JWT_SECRET: str = ""  # From Dashboard > Settings > Signing Keys
     OPENAI_API_KEY: str = ""
     AI_PROVIDER: str = "openai"
     AI_MODEL_LEVEL1: str = "gpt-4o-mini"
