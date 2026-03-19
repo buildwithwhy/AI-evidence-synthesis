@@ -5,8 +5,7 @@ from functools import lru_cache
 
 class Settings(BaseSettings):
     SUPABASE_URL: str = ""
-    SUPABASE_SECRET_KEY: str = ""  # sb_secret_... (replaces legacy service_role key)
-    SUPABASE_JWT_SECRET: str = ""  # From Dashboard > Settings > Signing Keys
+    SUPABASE_SECRET_KEY: str = ""  # sb_secret_... (for server-side Supabase operations if needed)
     OPENAI_API_KEY: str = ""
     AI_PROVIDER: str = "openai"
     AI_MODEL_LEVEL1: str = "gpt-4o-mini"
@@ -19,8 +18,8 @@ class Settings(BaseSettings):
     @model_validator(mode="after")
     def validate_required(self):
         missing = []
-        if not self.SUPABASE_JWT_SECRET:
-            missing.append("SUPABASE_JWT_SECRET")
+        if not self.SUPABASE_URL:
+            missing.append("SUPABASE_URL")
         if not self.OPENAI_API_KEY:
             missing.append("OPENAI_API_KEY")
         if missing:

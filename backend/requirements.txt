@@ -6,4 +6,4 @@ openai
 pymupdf
 pandas
 supabase
-python-jose[cryptography]
+PyJWT[crypto]
