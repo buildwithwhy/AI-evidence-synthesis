@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '../api/supabase'
+import PublicNav from '../components/PublicNav'
 import { Beaker } from 'lucide-react'
 
 export default function LoginPage() {
@@ -52,7 +53,9 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-slate-50">
+      <PublicNav />
+      <div className="flex items-center justify-center px-4 pt-12 pb-16">
       <div className="w-full max-w-md">
         {/* Branding */}
         <div className="text-center mb-8">
@@ -168,6 +171,7 @@ export default function LoginPage() {
             </button>
           </form>
         </div>
+      </div>
       </div>
     </div>
   )
