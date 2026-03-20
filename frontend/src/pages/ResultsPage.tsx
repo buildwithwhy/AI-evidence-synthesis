@@ -31,10 +31,11 @@ export default function ResultsPage() {
     setLoading(true)
     const { data } = await supabase
       .from('screening_results')
-      .select('*')
+      .select('id,project_id,level,title,abstract,decision,ai_decision,reason,confidence,p_check,i_check,c_check,o_check,s_check,e_check,p_reas,i_reas,c_reas,o_reas,s_reas,e_reas,source,override_history,created_at')
       .eq('project_id', projectId)
       .eq('level', level)
       .order('created_at', { ascending: true })
+      .limit(5000)
     setResults(data || [])
     setLoading(false)
   }

@@ -50,7 +50,29 @@ create table screening_results (
 create index idx_projects_user on projects(user_id);
 create index idx_results_project on screening_results(project_id);
 create index idx_results_level on screening_results(project_id, level);
+create index idx_results_decision on screening_results(project_id, decision);
+create index idx_results_created on screening_results(project_id, created_at);
 create index idx_results_overridden on screening_results(project_id) where override_history != '[]'::jsonb;
+create index idx_results_disagreed on screening_results(project_id) where ai_decision != decision;
+
+-- ============================================
+-- Immutability: prevent ai_decision from being changed after insert
+-- ============================================
+
+create or replace function prevent_ai_decision_update()
+returns trigger as $$
+begin
+  if OLD.ai_decision is distinct from NEW.ai_decision then
+    raise exception 'ai_decision column is immutable — it preserves the original AI decision for audit purposes';
+  end if;
+  return NEW;
+end;
+$$ language plpgsql;
+
+create trigger enforce_ai_decision_immutability
+  before update on screening_results
+  for each row
+  execute function prevent_ai_decision_update();
 
 -- ============================================
 -- Row Level Security (RLS)

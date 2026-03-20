@@ -198,19 +198,35 @@ export default function ScreeningPage() {
         apiFailed = data.failed
       }
 
-      // Save to Supabase one by one, tracking progress
+      // Batch insert to Supabase (single round trip instead of N)
       setBatchTotal(apiResults.length)
-      let saveErrors = 0
       const source = level === 1 ? 'Batch CSV' : 'Batch PDF'
 
-      for (let i = 0; i < apiResults.length; i++) {
-        const r = apiResults[i]
-        const { error: saveErr } = await saveResultToSupabase(
-          { ...r, title: r.title, abstract: r.abstract || '' },
-          source
-        )
-        if (saveErr) saveErrors++
-        setBatchProgress(i + 1)
+      const rows = apiResults.map((r: any) => ({
+        project_id: projectId,
+        level,
+        title: r.title || 'Untitled',
+        abstract: r.abstract || '',
+        decision: r.decision,
+        ai_decision: r.decision,
+        reason: r.reason,
+        confidence: r.confidence,
+        p_check: r.p_check, i_check: r.i_check, c_check: r.c_check,
+        o_check: r.o_check, s_check: r.s_check, e_check: r.e_check,
+        p_reas: r.p_reas, i_reas: r.i_reas, c_reas: r.c_reas,
+        o_reas: r.o_reas, s_reas: r.s_reas, e_reas: r.e_reas,
+        source,
+        override_history: [],
+      }))
+
+      // Insert in chunks of 500 to avoid payload limits
+      let saveErrors = 0
+      const chunkSize = 500
+      for (let i = 0; i < rows.length; i += chunkSize) {
+        const chunk = rows.slice(i, i + chunkSize)
+        const { error: saveErr } = await supabase.from('screening_results').insert(chunk)
+        if (saveErr) saveErrors += chunk.length
+        setBatchProgress(Math.min(i + chunkSize, rows.length))
       }
 
       setBatchDone({ processed: apiResults.length, failed: apiFailed, saveErrors })
