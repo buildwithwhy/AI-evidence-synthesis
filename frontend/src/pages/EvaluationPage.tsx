@@ -1,6 +1,6 @@
 import PublicNav from '../components/PublicNav'
 import { Link } from 'react-router-dom'
-import { CheckCircle, AlertTriangle } from 'lucide-react'
+import { CheckCircle, AlertTriangle, Info } from 'lucide-react'
 
 export default function EvaluationPage() {
   return (
@@ -9,9 +9,20 @@ export default function EvaluationPage() {
 
       <div className="max-w-4xl mx-auto px-6 py-16">
         <h1 className="text-3xl font-bold text-slate-900 mb-3">Evaluation</h1>
-        <p className="text-slate-500 mb-10">
+        <p className="text-slate-500 mb-4">
           How we test our screening engine, what datasets we use, and what the results mean.
         </p>
+
+        {/* Placeholder banner */}
+        <div className="border border-blue-200 bg-blue-50 rounded-lg p-4 mb-10">
+          <div className="flex items-start gap-3">
+            <Info className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
+            <p className="text-sm text-blue-700">
+              This page describes our evaluation methodology and framework.
+              Benchmark results will be published here once evaluations are complete.
+            </p>
+          </div>
+        </div>
 
         {/* Methodology */}
         <section className="mb-12">
@@ -63,6 +74,12 @@ export default function EvaluationPage() {
                 critical: false,
               },
               {
+                name: 'F1 Score',
+                target: 'Varies',
+                desc: 'The harmonic mean of precision and sensitivity. Balances the trade-off between catching all relevant studies (sensitivity) and not overwhelming reviewers with false positives (precision). Ranges from 0 to 1, where 1 is perfect.',
+                critical: false,
+              },
+              {
                 name: 'Work Saved',
                 target: '> 40%',
                 desc: 'The percentage of studies reviewers can skip because the AI excluded them. Only meaningful when sensitivity is above threshold.',
@@ -86,6 +103,61 @@ export default function EvaluationPage() {
           </div>
         </section>
 
+        {/* Deference-Aware Evaluation */}
+        <section className="mb-12">
+          <h2 className="text-xl font-semibold text-slate-800 mb-4">Deference-Aware Evaluation</h2>
+          <div className="bg-slate-50 border border-slate-200 rounded-lg p-6 space-y-4 text-sm text-slate-600">
+            <p>
+              Standard evaluation metrics treat AI uncertainty as an error. If the AI
+              says "I'm not sure" about a study, traditional metrics penalise this
+              the same as a wrong answer. We believe this is fundamentally flawed
+              for any AI system operating with human oversight.
+            </p>
+            <p>
+              In high-stakes domains — evidence synthesis, clinical decision support,
+              legal review, safety-critical systems — AI is not replacing human judgment.
+              It is augmenting it. When an AI correctly identifies that a case is ambiguous
+              and defers to a human expert, it has <strong>behaved correctly</strong>.
+              Penalising appropriate uncertainty creates incentives for overconfident AI,
+              which is precisely what you do not want when the consequences of a wrong
+              answer are severe.
+            </p>
+            <p>
+              We report both frameworks side by side:
+            </p>
+            <div className="space-y-3 mt-4">
+              <div className="bg-white border border-slate-200 rounded-md p-4">
+                <h4 className="font-semibold text-slate-700 mb-1">Standard Metrics</h4>
+                <p className="text-xs text-slate-500">
+                  UNCLEAR counts as wrong. Comparable to existing literature.
+                  Useful for apples-to-apples comparison with other screening tools.
+                </p>
+              </div>
+              <div className="bg-white border border-blue-200 rounded-md p-4">
+                <h4 className="font-semibold text-blue-700 mb-1">Deference-Aware Metrics</h4>
+                <p className="text-xs text-slate-500 mb-2">
+                  UNCLEAR counts as correct deference. Reflects actual system safety.
+                </p>
+                <ul className="text-xs text-slate-500 space-y-1">
+                  <li><strong>Safe sensitivity:</strong> Only "hard misses" count as failures — cases where the AI confidently said EXCLUDE on a study that should have been included. Deferred studies are not penalised.</li>
+                  <li><strong>Decided accuracy:</strong> How accurate the AI is on the subset of studies where it made a confident call.</li>
+                  <li><strong>Deference rate:</strong> What percentage of studies the AI flagged for human review rather than deciding autonomously.</li>
+                  <li><strong>Effective coverage:</strong> What percentage of screening the AI can handle without human intervention.</li>
+                  <li><strong>Hard misses:</strong> The only true failures — confident wrong answers on included studies.</li>
+                </ul>
+              </div>
+            </div>
+            <p className="mt-4 text-slate-500 italic">
+              This framework applies beyond systematic reviews. Any domain where AI operates
+              under human oversight — clinical decision support, legal document review,
+              safety-critical engineering, financial audit — benefits from evaluation
+              methods that reward appropriate uncertainty rather than penalising it.
+              A forthcoming white paper will formalise this as a general evaluation
+              framework for human-in-the-loop AI systems.
+            </p>
+          </div>
+        </section>
+
         {/* Datasets */}
         <section className="mb-12">
           <h2 className="text-xl font-semibold text-slate-800 mb-4">Benchmark Datasets</h2>
@@ -97,8 +169,8 @@ export default function EvaluationPage() {
               </div>
               <p className="text-sm text-slate-600 mb-3">
                 26 systematic reviews containing 169,288 studies with 2,834 confirmed
-                inclusions (1.67% inclusion rate). Covers mental health, pharmacology,
-                clinical interventions, and software engineering domains.
+                inclusions (1.67% inclusion rate). Covers pharmacology, preclinical research,
+                clinical interventions, and other domains.
               </p>
               <div className="flex gap-6 text-xs text-slate-400">
                 <span>26 reviews</span>
@@ -138,13 +210,13 @@ export default function EvaluationPage() {
               },
               {
                 tier: 'Tier 2: Core Evaluation',
-                studies: '500 studies',
-                desc: 'Sampled from 5 diverse SYNERGY reviews across pharmacology, clinical, and psychology domains. Primary validation dataset.',
+                studies: '1,345 studies',
+                desc: 'Complete screening sets from 3 verified reviews with PICO criteria extracted from published papers. Covers human pharmacology, preclinical research, and clinical biosimilars.',
               },
               {
                 tier: 'Tier 3: Full Benchmark',
                 studies: '169K studies',
-                desc: 'Complete SYNERGY dataset across all 26 reviews. For publishable metrics and cross-domain robustness testing.',
+                desc: 'Complete SYNERGY dataset across all 26 reviews. For aggregate statistics and cross-domain robustness testing.',
               },
             ].map(({ tier, studies, desc }) => (
               <div key={tier} className="flex gap-4 p-4 bg-slate-50 rounded-lg border border-slate-100">
@@ -169,16 +241,16 @@ export default function EvaluationPage() {
               <div>
                 <h3 className="font-semibold text-amber-800 text-sm mb-1">Benchmarks in Progress</h3>
                 <p className="text-sm text-amber-700">
-                  We are currently running systematic evaluations across multiple LLM models
-                  including Llama 3.3, Mistral, DeepSeek, GPT-4o, and Claude. Results will
-                  be published here with full methodology once complete.
+                  We are currently running systematic evaluations across multiple LLM models.
+                  Results will be published here with both standard and deference-aware
+                  metrics once complete.
                 </p>
               </div>
             </div>
           </div>
         </section>
 
-        {/* Multi-model comparison (placeholder for future results) */}
+        {/* Multi-model comparison */}
         <section className="mb-12">
           <h2 className="text-xl font-semibold text-slate-800 mb-4">Models Under Evaluation</h2>
           <div className="border border-slate-200 rounded-lg overflow-hidden">
@@ -186,26 +258,27 @@ export default function EvaluationPage() {
               <thead className="bg-slate-50 border-b border-slate-200">
                 <tr>
                   <th className="text-left px-4 py-3 font-medium text-slate-600">Model</th>
-                  <th className="text-left px-4 py-3 font-medium text-slate-600">Provider</th>
+                  <th className="text-left px-4 py-3 font-medium text-slate-600">Developer</th>
                   <th className="text-left px-4 py-3 font-medium text-slate-600">Sensitivity</th>
-                  <th className="text-left px-4 py-3 font-medium text-slate-600">Specificity</th>
+                  <th className="text-left px-4 py-3 font-medium text-slate-600">Safe Sensitivity</th>
                   <th className="text-left px-4 py-3 font-medium text-slate-600">F1</th>
                   <th className="text-left px-4 py-3 font-medium text-slate-600">Status</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {[
-                  { model: 'Llama 3.3 70B', provider: 'Venice AI' },
-                  { model: 'Mistral 3.1 24B', provider: 'Venice AI' },
-                  { model: 'DeepSeek R1', provider: 'Venice AI' },
-                  { model: 'GPT-4o', provider: 'OpenAI / Venice AI' },
-                  { model: 'Claude Sonnet 4.6', provider: 'Anthropic / Venice AI' },
-                  { model: 'Qwen 3.5', provider: 'Venice AI' },
-                  { model: 'Gemini 3 Pro', provider: 'Venice AI' },
-                ].map(({ model, provider }) => (
+                  { model: 'Llama 3.3 70B', developer: 'Meta' },
+                  { model: 'Mistral 3.1 24B', developer: 'Mistral AI' },
+                  { model: 'DeepSeek R1', developer: 'DeepSeek' },
+                  { model: 'GPT-4o', developer: 'OpenAI' },
+                  { model: 'Claude Sonnet 4.6', developer: 'Anthropic' },
+                  { model: 'Qwen 3.5', developer: 'Alibaba Cloud' },
+                  { model: 'Gemini 3 Pro', developer: 'Google' },
+                  { model: 'Grok 4.1', developer: 'xAI' },
+                ].map(({ model, developer }) => (
                   <tr key={model} className="hover:bg-slate-50">
                     <td className="px-4 py-3 font-medium text-slate-800">{model}</td>
-                    <td className="px-4 py-3 text-slate-500">{provider}</td>
+                    <td className="px-4 py-3 text-slate-500">{developer}</td>
                     <td className="px-4 py-3 text-slate-400">--</td>
                     <td className="px-4 py-3 text-slate-400">--</td>
                     <td className="px-4 py-3 text-slate-400">--</td>
@@ -220,8 +293,9 @@ export default function EvaluationPage() {
             </table>
           </div>
           <p className="text-xs text-slate-400 mt-3">
-            Results will be updated as benchmarks complete. All evaluations use the
-            SYNERGY Tier 2 dataset (500 studies across 5 reviews).
+            All models accessed via Venice AI. Results will be updated as benchmarks
+            complete. Evaluations use the SYNERGY Tier 2 dataset (1,345 studies
+            across 3 verified reviews with complete screening sets).
           </p>
         </section>
 
