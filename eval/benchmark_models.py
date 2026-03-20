@@ -44,7 +44,7 @@ RESULTS_DIR = Path(__file__).parent / "results"
 RESULTS_DIR.mkdir(exist_ok=True)
 
 # Import shared eval logic
-from run_eval import compute_metrics, print_metrics, load_protocols
+from run_eval import compute_standard_metrics, compute_deference_metrics, load_protocols
 
 
 # ============================================================
@@ -308,77 +308,90 @@ def run_benchmark(csv_path: Path, model_names: list[str], protocols: dict,
 
         # Filter out errors for metrics
         valid = result_df[result_df["ai_decision"] != "ERROR"]
-        metrics = compute_metrics(valid) if len(valid) > 0 else {}
+        standard = compute_standard_metrics(valid) if len(valid) > 0 else {}
+        deference = compute_deference_metrics(valid) if len(valid) > 0 else {}
 
-        metrics["model"] = model_name
-        metrics["provider"] = config["provider"]
-        metrics["model_id"] = config["model"]
-        metrics["elapsed_seconds"] = round(elapsed, 1)
-        metrics["seconds_per_study"] = round(elapsed / len(df), 2) if len(df) > 0 else 0
-        metrics["errors"] = errors
-        metrics["cost_estimate"] = round(
-            config.get("cost_per_1k_input", 0) * len(df) * 0.5 +  # ~500 tokens input avg
-            config.get("cost_per_1k_output", 0) * len(df) * 0.3,   # ~300 tokens output avg
-            4
-        )
+        meta = {
+            "model": model_name,
+            "provider": config["provider"],
+            "model_id": config["model"],
+            "elapsed_seconds": round(elapsed, 1),
+            "seconds_per_study": round(elapsed / len(df), 2) if len(df) > 0 else 0,
+            "errors": errors,
+            "cost_estimate": round(
+                config.get("cost_per_1k_input", 0) * len(df) * 0.5 +
+                config.get("cost_per_1k_output", 0) * len(df) * 0.3,
+                4
+            ),
+        }
 
         all_results[model_name] = {
-            "metrics": metrics,
+            "standard": {**standard, **meta},
+            "deference": {**deference, **meta},
             "details": result_df,
         }
 
-        print(f"    Done in {elapsed:.0f}s | Sensitivity: {metrics.get('sensitivity_recall', 'N/A')} | "
-              f"Specificity: {metrics.get('specificity', 'N/A')} | Errors: {errors}")
+        print(f"    Done in {elapsed:.0f}s | Std Sens: {standard.get('sensitivity', 'N/A')} | "
+              f"Safe Sens: {deference.get('safe_sensitivity', 'N/A')} | "
+              f"Deferred: {deference.get('deference_rate_pct', 0)}% | Errors: {errors}")
 
     return all_results
 
 
 def print_comparison(all_results: dict):
-    """Print a comparison table across all models."""
+    """Print dual-framework comparison table across all models."""
     if not all_results:
         print("No results to compare.")
         return
 
-    print(f"\n{'='*100}")
-    print(f"  MODEL COMPARISON")
-    print(f"{'='*100}")
-
-    header = f"{'Model':<20} {'Sensitivity':>11} {'Specificity':>11} {'Precision':>9} {'F1':>6} {'Accuracy':>8} {'Work Saved':>10} {'Speed':>8} {'Cost':>8} {'Errors':>6}"
+    # Standard metrics table
+    print(f"\n{'='*110}")
+    print(f"  STANDARD METRICS (UNCLEAR = wrong)")
+    print(f"{'='*110}")
+    header = f"{'Model':<20} {'Sensitivity':>11} {'Specificity':>11} {'Precision':>9} {'F1':>6} {'Accuracy':>8} {'Work Saved':>10} {'Speed':>8} {'Cost':>8}"
     print(header)
-    print("-" * 100)
+    print("-" * 110)
 
-    rows = []
     for name, data in all_results.items():
-        m = data["metrics"]
-        row = {
-            "model": name,
-            "sensitivity": m.get("sensitivity_recall", 0),
-            "specificity": m.get("specificity", 0),
-            "precision": m.get("precision", 0),
-            "f1": m.get("f1_score", 0),
-            "accuracy": m.get("accuracy", 0),
-            "work_saved": m.get("work_saved_pct", 0),
-            "speed": m.get("seconds_per_study", 0),
-            "cost": m.get("cost_estimate", 0),
-            "errors": m.get("errors", 0),
-        }
-        rows.append(row)
-        print(f"{name:<20} {row['sensitivity']:>10.1%} {row['specificity']:>10.1%} "
-              f"{row['precision']:>8.1%} {row['f1']:>5.1%} {row['accuracy']:>7.1%} "
-              f"{row['work_saved']:>9.1f}% {row['speed']:>6.1f}s ${row['cost']:>6.4f} {row['errors']:>6}")
+        s = data["standard"]
+        print(f"{name:<20} {s.get('sensitivity',0):>10.1%} {s.get('specificity',0):>10.1%} "
+              f"{s.get('precision',0):>8.1%} {s.get('f1_score',0):>5.1%} {s.get('accuracy',0):>7.1%} "
+              f"{s.get('work_saved_pct',0):>9.1f}% {s.get('seconds_per_study',0):>6.1f}s "
+              f"${s.get('cost_estimate',0):>6.4f}")
 
-    print("-" * 100)
+    # Deference-aware metrics table
+    print(f"\n{'='*110}")
+    print(f"  DEFERENCE-AWARE METRICS (UNCLEAR = correct deference)")
+    print(f"{'='*110}")
+    header = f"{'Model':<20} {'Safe Sens':>10} {'Dec Sens':>9} {'Dec Spec':>9} {'Dec F1':>7} {'Def-Acc':>8} {'Deferred':>9} {'Hard Miss':>10} {'Coverage':>9}"
+    print(header)
+    print("-" * 110)
 
-    # Highlight best model
-    if rows:
-        best = max(rows, key=lambda r: (r["sensitivity"], r["f1"]))
-        print(f"\n  Best overall: {best['model']} "
-              f"(sensitivity={best['sensitivity']:.1%}, F1={best['f1']:.1%})")
+    for name, data in all_results.items():
+        d = data["deference"]
+        print(f"{name:<20} {d.get('safe_sensitivity',0):>9.1%} {d.get('decided_sensitivity',0):>8.1%} "
+              f"{d.get('decided_specificity',0):>8.1%} {d.get('decided_f1',0):>6.1%} "
+              f"{d.get('deference_aware_accuracy',0):>7.1%} {d.get('deference_rate_pct',0):>7.1f}% "
+              f"{d.get('hard_misses',0):>10} {d.get('effective_coverage_pct',0):>7.1f}%")
 
-        cheapest = min(rows, key=lambda r: r["cost"] if r["cost"] > 0 else float("inf"))
-        if cheapest["cost"] > 0:
-            print(f"  Most cost-effective: {cheapest['model']} "
-                  f"(${cheapest['cost']:.4f}/run, sensitivity={cheapest['sensitivity']:.1%})")
+    print("-" * 110)
+
+    # Best model analysis
+    models = list(all_results.keys())
+    if models:
+        # Safest model (highest safe sensitivity)
+        safest = max(models, key=lambda n: all_results[n]["deference"].get("safe_sensitivity", 0))
+        sd = all_results[safest]["deference"]
+        print(f"\n  Safest: {safest} (safe sensitivity={sd['safe_sensitivity']:.1%}, "
+              f"{sd['hard_misses']} hard misses)")
+
+        # Best when it decides (highest decided F1 with >50% coverage)
+        deciders = [n for n in models if all_results[n]["deference"].get("effective_coverage_pct", 0) > 50]
+        if deciders:
+            best_decider = max(deciders, key=lambda n: all_results[n]["deference"].get("decided_f1", 0))
+            bd = all_results[best_decider]["deference"]
+            print(f"  Best decider: {best_decider} (decided F1={bd['decided_f1']:.1%}, "
+                  f"covers {bd['effective_coverage_pct']:.0f}% autonomously)")
 
     print()
 
@@ -390,21 +403,33 @@ def save_comparison(all_results: dict, tier_label: str):
     # Summary JSON
     summary = []
     for name, data in all_results.items():
-        m = data["metrics"]
+        s = data["standard"]
+        d = data["deference"]
         summary.append({
             "model": name,
-            "model_id": m.get("model_id", ""),
-            "provider": m.get("provider", ""),
-            "sensitivity": m.get("sensitivity_recall", 0),
-            "specificity": m.get("specificity", 0),
-            "precision": m.get("precision", 0),
-            "f1_score": m.get("f1_score", 0),
-            "accuracy": m.get("accuracy", 0),
-            "work_saved_pct": m.get("work_saved_pct", 0),
-            "seconds_per_study": m.get("seconds_per_study", 0),
-            "cost_estimate": m.get("cost_estimate", 0),
-            "total_studies": m.get("total", 0),
-            "errors": m.get("errors", 0),
+            "model_id": s.get("model_id", ""),
+            "provider": s.get("provider", ""),
+            # Standard metrics
+            "std_sensitivity": s.get("sensitivity", 0),
+            "std_specificity": s.get("specificity", 0),
+            "std_precision": s.get("precision", 0),
+            "std_f1": s.get("f1_score", 0),
+            "std_accuracy": s.get("accuracy", 0),
+            "work_saved_pct": s.get("work_saved_pct", 0),
+            # Deference-aware metrics
+            "safe_sensitivity": d.get("safe_sensitivity", 0),
+            "decided_sensitivity": d.get("decided_sensitivity", 0),
+            "decided_specificity": d.get("decided_specificity", 0),
+            "decided_f1": d.get("decided_f1", 0),
+            "deference_aware_accuracy": d.get("deference_aware_accuracy", 0),
+            "deference_rate_pct": d.get("deference_rate_pct", 0),
+            "hard_misses": d.get("hard_misses", 0),
+            "effective_coverage_pct": d.get("effective_coverage_pct", 0),
+            # Meta
+            "seconds_per_study": s.get("seconds_per_study", 0),
+            "cost_estimate": s.get("cost_estimate", 0),
+            "total_studies": s.get("total", 0),
+            "errors": s.get("errors", 0),
         })
 
     out_path = RESULTS_DIR / f"benchmark_{tier_label}_{timestamp}.json"
