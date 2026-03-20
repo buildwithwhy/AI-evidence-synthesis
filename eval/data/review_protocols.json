@@ -1,42 +1,44 @@
 {
   "Donners_2021": {
-    "P": "Patients receiving immunosuppressive therapy (e.g., transplant recipients, autoimmune disease patients)",
-    "I": "Therapeutic drug monitoring or pharmacokinetic analysis of immunosuppressive drugs",
-    "C": "Standard dosing without therapeutic drug monitoring",
-    "O": "Drug efficacy, toxicity, graft survival, clinical outcomes",
-    "S": "Clinical trials, observational studies, pharmacokinetic studies",
-    "E": "Animal studies, in-vitro studies, reviews, editorials, case reports with n<5"
-  },
-  "Menon_2022": {
-    "P": "Adults or children with clinical conditions requiring intervention",
-    "I": "Any clinical intervention studied in a systematic review or meta-analysis context",
-    "C": "Placebo, standard care, or alternative interventions",
-    "O": "Clinical effectiveness outcomes, adverse events, quality of life",
-    "S": "Systematic reviews, meta-analyses, randomized controlled trials",
-    "E": "Non-systematic reviews, narrative reviews, protocols without results"
+    "_review_title": "Pharmacokinetics and Associated Efficacy of Emicizumab in Humans: A Systematic Review",
+    "_review_doi": "https://doi.org/10.1007/s40262-021-01042-w",
+    "_source": "Extracted from published paper (PMC8585815). Verified criteria.",
+    "_total_screened": 258,
+    "_total_included": 15,
+    "_complete_set": true,
+    "P": "Humans (healthy volunteers or people with hemophilia A)",
+    "I": "Emicizumab (bispecific antibody mimicking factor VIII)",
+    "C": "Not required (any comparator or no comparator accepted)",
+    "O": "Original pharmacokinetic (PK) data, modeled PK data, or PK/pharmacodynamic (PD) relationships",
+    "S": "Any study design providing original PK data (clinical trials, pharmacometric analyses, case reports)",
+    "E": "Non-human studies; studies without PK or PK/PD data; non-English language; abstract or full text not accessible; duplicate reports of the same subject population"
   },
   "Sep_2021": {
-    "P": "Adults with mental health conditions (depression, anxiety, PTSD)",
-    "I": "Psychological interventions, psychotherapy, cognitive behavioral therapy",
-    "C": "Waitlist, treatment as usual, placebo, other active treatments",
-    "O": "Mental health symptom improvement, remission, quality of life, functioning",
-    "S": "Randomized controlled trials, controlled clinical trials",
-    "E": "Uncontrolled studies, case studies, qualitative-only studies, animal studies"
+    "_review_title": "The rodent object-in-context task: A systematic review and meta-analysis of important variables",
+    "_review_doi": "https://doi.org/10.1371/journal.pone.0249102",
+    "_source": "Extracted from published paper (PMC8284613). Verified criteria.",
+    "_total_screened": 271,
+    "_total_included": 40,
+    "_complete_set": true,
+    "P": "Rodents (rats or mice, including genetically modified strains)",
+    "I": "Object-in-context (OIC) recognition memory task",
+    "C": "Control animals (no treatment, saline injection, or sham operation)",
+    "O": "Context-dependent object recognition memory performance (discrimination ratio with standard error)",
+    "S": "Original research articles in English with a control group",
+    "E": "Non-English articles; non-rodent species; modified versions of the OIC task (e.g., context-location combinations, odor-based context memory, classical fear conditioning, operant conditioning); studies without a control group; studies not reporting sample size or discrimination ratio"
   },
   "Meijboom_2021": {
-    "P": "Patients with specific health conditions in primary or secondary care",
-    "I": "Health interventions, diagnostics, or treatments under review",
-    "C": "Standard care, alternative treatments, no treatment",
-    "O": "Health outcomes, diagnostic accuracy, treatment effectiveness",
-    "S": "Original research studies with empirical data",
-    "E": "Editorials, commentaries, letters, conference abstracts without full data"
-  },
-  "Nelson_2002": {
-    "P": "Patients with clinical conditions requiring screening or preventive intervention",
-    "I": "Screening tests, preventive treatments, clinical interventions",
-    "C": "No screening, standard care, alternative screening methods",
-    "O": "Disease detection rates, morbidity, mortality, harms of screening",
-    "S": "Randomized controlled trials, cohort studies, diagnostic accuracy studies",
-    "E": "Non-English studies, animal studies, modeling studies without clinical data"
+    "_review_title": "Patients Retransitioning from Biosimilar TNF-alpha Inhibitor to the Corresponding Originator: A Systematic Review",
+    "_review_doi": "https://doi.org/10.1007/s40259-021-00508-4",
+    "_source": "Extracted from published paper (PMC8847209). Verified criteria.",
+    "_total_screened": 882,
+    "_total_included": 37,
+    "_complete_set": true,
+    "P": "Patients who transitioned from an originator TNF-alpha inhibitor to a biosimilar and then retransitioned back to the originator",
+    "I": "Retransitioning from biosimilar TNF-alpha inhibitor back to the originator biologic",
+    "C": "Not required (descriptive studies of retransitioning outcomes accepted)",
+    "O": "Baseline characteristics of retransitioned patients, reasons for retransitioning, clinical outcomes after retransitioning",
+    "S": "Original research articles published in peer-reviewed journals",
+    "E": "Studies not reporting on retransitioning (originator to biosimilar and back); studies without baseline characteristics of transitioned patients; non-peer-reviewed publications"
   }
 }
