@@ -136,14 +136,22 @@ export default function EvaluationPage() {
               <div className="bg-white border border-blue-200 rounded-md p-4">
                 <h4 className="font-semibold text-blue-700 mb-1">Deference-Aware Metrics</h4>
                 <p className="text-xs text-slate-500 mb-2">
-                  UNCLEAR counts as correct deference. Reflects actual system safety.
+                  UNSURE counts as correct. The only failures are confident wrong
+                  answers in either direction. The logic is symmetric:
                 </p>
+                <div className="text-xs text-slate-500 mb-3 bg-slate-50 rounded p-3 font-mono">
+                  <div>AI says INCLUDE, truth is INCLUDE → Correct</div>
+                  <div>AI says EXCLUDE, truth is EXCLUDE → Correct</div>
+                  <div>AI says UNSURE (either truth) → <span className="text-blue-600 font-semibold">Correct (deferred)</span></div>
+                  <div>AI says INCLUDE, truth is EXCLUDE → <span className="text-red-600 font-semibold">Incorrect</span></div>
+                  <div>AI says EXCLUDE, truth is INCLUDE → <span className="text-red-600 font-semibold">Incorrect</span></div>
+                </div>
                 <ul className="text-xs text-slate-500 space-y-1">
-                  <li><strong>Safe sensitivity:</strong> Only "hard misses" count as failures — cases where the AI confidently said EXCLUDE on a study that should have been included. Deferred studies are not penalised.</li>
-                  <li><strong>Decided accuracy:</strong> How accurate the AI is on the subset of studies where it made a confident call.</li>
+                  <li><strong>DA Sensitivity:</strong> Of all studies that should be included, how many did the AI either correctly include OR defer to a human? Only confident exclusions of included studies count as failures.</li>
+                  <li><strong>DA Specificity:</strong> Of all studies that should be excluded, how many did the AI either correctly exclude OR defer? Only confident inclusions of excluded studies count as failures.</li>
+                  <li><strong>Confident errors:</strong> The total count of confident wrong answers in either direction — the only true failures in a HITL system.</li>
                   <li><strong>Deference rate:</strong> What percentage of studies the AI flagged for human review rather than deciding autonomously.</li>
                   <li><strong>Effective coverage:</strong> What percentage of screening the AI can handle without human intervention.</li>
-                  <li><strong>Hard misses:</strong> The only true failures — confident wrong answers on included studies.</li>
                 </ul>
               </div>
             </div>
@@ -259,8 +267,8 @@ export default function EvaluationPage() {
                 <tr>
                   <th className="text-left px-4 py-3 font-medium text-slate-600">Model</th>
                   <th className="text-left px-4 py-3 font-medium text-slate-600">Developer</th>
-                  <th className="text-left px-4 py-3 font-medium text-slate-600">Sensitivity</th>
-                  <th className="text-left px-4 py-3 font-medium text-slate-600">Safe Sensitivity</th>
+                  <th className="text-left px-4 py-3 font-medium text-slate-600">Std Sensitivity</th>
+                  <th className="text-left px-4 py-3 font-medium text-slate-600">DA Sensitivity</th>
                   <th className="text-left px-4 py-3 font-medium text-slate-600">F1</th>
                   <th className="text-left px-4 py-3 font-medium text-slate-600">Status</th>
                 </tr>

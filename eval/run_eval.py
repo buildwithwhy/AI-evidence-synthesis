@@ -112,26 +112,33 @@ def compute_standard_metrics(df: pd.DataFrame) -> dict:
 # ============================================================
 
 def compute_deference_metrics(df: pd.DataFrame) -> dict:
-    """Deference-aware metrics where UNCLEAR counts as CORRECT.
+    """Deference-aware metrics where UNSURE counts as CORRECT.
 
-    In a human-in-the-loop system, when the AI says "I'm not sure,
-    a human should look at this", it has behaved correctly regardless
-    of the ground truth. The AI's job is to:
-      1. Correctly classify studies it IS confident about
-      2. Correctly identify when it SHOULD defer
+    The logic is simple and symmetric:
+      - AI says INCLUDE, truth is INCLUDE → Correct
+      - AI says EXCLUDE, truth is EXCLUDE → Correct
+      - AI says UNSURE (either truth)     → Correct (deferred to human)
+      - AI says INCLUDE, truth is EXCLUDE → Incorrect (confident wrong answer)
+      - AI says EXCLUDE, truth is INCLUDE → Incorrect (confident wrong answer)
 
-    Penalising UNCLEAR creates incentives for overconfident AI —
-    exactly what you don't want in systematic reviews.
+    The ONLY failures are confident wrong answers in either direction.
+    Appropriate uncertainty is never penalised.
 
-    Metrics computed on the "decided" subset (INCLUDE/EXCLUDE only):
-      - Decided sensitivity: of included studies the AI made a call on, how many did it get right?
-      - Decided specificity: of excluded studies the AI made a call on, how many did it get right?
-      - Deference rate: what % of studies did the AI defer on?
-      - Appropriate deference: of deferred studies, what % were genuinely ambiguous
-        (approximated by confidence score)?
-      - Effective coverage: what % of the screening can the AI handle autonomously?
+    Deference-aware sensitivity:
+      Of all studies that should be INCLUDED, how many did the AI get right
+      (either by including them OR by deferring)?
+      = (TP + deferred_included) / total_included
+      = 1 - (hard_misses / total_included)
 
-    Combined score: the AI is correct if it either (a) made the right call or (b) deferred.
+    Deference-aware specificity:
+      Of all studies that should be EXCLUDED, how many did the AI get right
+      (either by excluding them OR by deferring)?
+      = (TN + deferred_excluded) / total_excluded
+      = 1 - (false_includes / total_excluded)
+
+    This applies to any high-stakes HITL domain: clinical decision support,
+    legal review, safety-critical systems — anywhere human oversight is
+    required and AI uncertainty is a feature, not a bug.
     """
     total = len(df)
     deferred = df[df["ai_decision"] == "UNCLEAR"]
@@ -141,40 +148,42 @@ def compute_deference_metrics(df: pd.DataFrame) -> dict:
     n_decided = len(decided)
     deference_rate = n_deferred / total if total > 0 else 0
 
-    # Metrics on the DECIDED subset only
-    if n_decided > 0:
-        d_tp = len(decided[(decided["ai_decision"] == "INCLUDE") & (decided["ground_truth"] == "INCLUDE")])
-        d_fn = len(decided[(decided["ai_decision"] == "EXCLUDE") & (decided["ground_truth"] == "INCLUDE")])
-        d_fp = len(decided[(decided["ai_decision"] == "INCLUDE") & (decided["ground_truth"] == "EXCLUDE")])
-        d_tn = len(decided[(decided["ai_decision"] == "EXCLUDE") & (decided["ground_truth"] == "EXCLUDE")])
+    # Counts on the decided subset
+    d_tp = len(decided[(decided["ai_decision"] == "INCLUDE") & (decided["ground_truth"] == "INCLUDE")])
+    d_fn = len(decided[(decided["ai_decision"] == "EXCLUDE") & (decided["ground_truth"] == "INCLUDE")])
+    d_fp = len(decided[(decided["ai_decision"] == "INCLUDE") & (decided["ground_truth"] == "EXCLUDE")])
+    d_tn = len(decided[(decided["ai_decision"] == "EXCLUDE") & (decided["ground_truth"] == "EXCLUDE")])
 
-        decided_accuracy = (d_tp + d_tn) / n_decided
-        decided_sensitivity = d_tp / (d_tp + d_fn) if (d_tp + d_fn) > 0 else 0
-        decided_specificity = d_tn / (d_tn + d_fp) if (d_tn + d_fp) > 0 else 0
-        decided_precision = d_tp / (d_tp + d_fp) if (d_tp + d_fp) > 0 else 0
-        decided_f1 = (2 * decided_precision * decided_sensitivity /
-                      (decided_precision + decided_sensitivity)
-                      if (decided_precision + decided_sensitivity) > 0 else 0)
-    else:
-        d_tp = d_fn = d_fp = d_tn = 0
-        decided_accuracy = decided_sensitivity = decided_specificity = 0
-        decided_precision = decided_f1 = 0
+    # Deferred breakdown
+    deferred_included = len(deferred[deferred["ground_truth"] == "INCLUDE"])
+    deferred_excluded = len(deferred[deferred["ground_truth"] == "EXCLUDE"])
+
+    # Ground truth totals
+    total_should_include = len(df[df["ground_truth"] == "INCLUDE"])
+    total_should_exclude = len(df[df["ground_truth"] == "EXCLUDE"])
+
+    # Confident wrong answers — the ONLY failures
+    hard_misses = d_fn      # AI said EXCLUDE on an included study
+    false_includes = d_fp   # AI said INCLUDE on an excluded study
+    total_confident_errors = hard_misses + false_includes
 
     # Deference-aware accuracy: correct = right call OR deferred
-    correct_decisions = d_tp + d_tn
-    deference_aware_accuracy = (correct_decisions + n_deferred) / total if total > 0 else 0
+    deference_aware_accuracy = (d_tp + d_tn + n_deferred) / total if total > 0 else 0
 
-    # Of deferred studies, how were they split in ground truth?
-    # This tells us if the AI is deferring on genuinely mixed cases
-    deferred_would_be_include = len(deferred[deferred["ground_truth"] == "INCLUDE"]) if n_deferred > 0 else 0
-    deferred_would_be_exclude = len(deferred[deferred["ground_truth"] == "EXCLUDE"]) if n_deferred > 0 else 0
+    # Deference-aware sensitivity: INCLUDE or DEFER on included studies = correct
+    da_sensitivity = (d_tp + deferred_included) / total_should_include if total_should_include > 0 else 0
 
-    # Critical safety metric: of studies that SHOULD be included,
-    # how many did the AI either correctly include OR defer?
-    # (Only a hard EXCLUDE on a truly included study is a real failure)
-    total_should_include = len(df[df["ground_truth"] == "INCLUDE"])
-    hard_misses = d_fn  # AI said EXCLUDE on a study that should be INCLUDE
-    safe_sensitivity = 1 - (hard_misses / total_should_include) if total_should_include > 0 else 0
+    # Deference-aware specificity: EXCLUDE or DEFER on excluded studies = correct
+    da_specificity = (d_tn + deferred_excluded) / total_should_exclude if total_should_exclude > 0 else 0
+
+    # Decided-subset metrics (how good is the AI when it IS confident?)
+    decided_accuracy = (d_tp + d_tn) / n_decided if n_decided > 0 else 0
+    decided_sensitivity = d_tp / (d_tp + d_fn) if (d_tp + d_fn) > 0 else 0
+    decided_specificity = d_tn / (d_tn + d_fp) if (d_tn + d_fp) > 0 else 0
+    decided_precision = d_tp / (d_tp + d_fp) if (d_tp + d_fp) > 0 else 0
+    decided_f1 = (2 * decided_precision * decided_sensitivity /
+                  (decided_precision + decided_sensitivity)
+                  if (decided_precision + decided_sensitivity) > 0 else 0)
 
     return {
         "framework": "deference_aware",
@@ -182,21 +191,25 @@ def compute_deference_metrics(df: pd.DataFrame) -> dict:
         "n_decided": n_decided,
         "n_deferred": n_deferred,
         "deference_rate_pct": round(deference_rate * 100, 1),
-        # On decided subset
+        # Deference-aware (UNSURE = correct)
+        "da_accuracy": round(deference_aware_accuracy, 4),
+        "da_sensitivity": round(da_sensitivity, 4),
+        "da_specificity": round(da_specificity, 4),
+        # Confident wrong answers
+        "hard_misses": hard_misses,
+        "false_includes": false_includes,
+        "total_confident_errors": total_confident_errors,
+        # Decided subset (when AI IS confident, how good is it?)
         "decided_tp": d_tp, "decided_fn": d_fn, "decided_fp": d_fp, "decided_tn": d_tn,
         "decided_accuracy": round(decided_accuracy, 4),
         "decided_sensitivity": round(decided_sensitivity, 4),
         "decided_specificity": round(decided_specificity, 4),
         "decided_precision": round(decided_precision, 4),
         "decided_f1": round(decided_f1, 4),
-        # Combined
-        "deference_aware_accuracy": round(deference_aware_accuracy, 4),
-        "safe_sensitivity": round(safe_sensitivity, 4),
-        "hard_misses": hard_misses,
         # Deferred breakdown
-        "deferred_would_include": deferred_would_be_include,
-        "deferred_would_exclude": deferred_would_be_exclude,
-        # Effective automation
+        "deferred_included": deferred_included,
+        "deferred_excluded": deferred_excluded,
+        # Coverage
         "effective_coverage_pct": round((n_decided / total) * 100, 1) if total > 0 else 0,
     }
 
@@ -215,48 +228,55 @@ def print_dual_metrics(standard: dict, deference: dict, label: str = "Overall"):
     print(f"\n  {'METRIC':<35} {'STANDARD':>12} {'DEFERENCE-AWARE':>16}")
     print(f"  {'-'*35} {'-'*12} {'-'*16}")
 
-    print(f"  {'Accuracy':<35} {standard['accuracy']:>11.1%} {deference['deference_aware_accuracy']:>15.1%}")
-    print(f"  {'Sensitivity (Recall)':<35} {standard['sensitivity']:>11.1%} {deference['safe_sensitivity']:>15.1%}")
-    print(f"  {'  -> on decided subset':<35} {'':>12} {deference['decided_sensitivity']:>15.1%}")
-    print(f"  {'Specificity':<35} {standard['specificity']:>11.1%} {deference['decided_specificity']:>15.1%}")
-    print(f"  {'Precision':<35} {standard['precision']:>11.1%} {deference['decided_precision']:>15.1%}")
-    print(f"  {'F1 Score':<35} {standard['f1_score']:>11.1%} {deference['decided_f1']:>15.1%}")
-    print(f"  {'Work Saved':<35} {standard['work_saved_pct']:>10.1f}% {'N/A':>16}")
+    print(f"  {'Accuracy':<35} {standard['accuracy']:>11.1%} {deference['da_accuracy']:>15.1%}")
+    print(f"  {'Sensitivity':<35} {standard['sensitivity']:>11.1%} {deference['da_sensitivity']:>15.1%}")
+    print(f"  {'Specificity':<35} {standard['specificity']:>11.1%} {deference['da_specificity']:>15.1%}")
+    print(f"  {'Precision (decided only)':<35} {standard['precision']:>11.1%} {deference['decided_precision']:>15.1%}")
+    print(f"  {'F1 (decided only)':<35} {standard['f1_score']:>11.1%} {deference['decided_f1']:>15.1%}")
+    print(f"  {'Work Saved':<35} {standard['work_saved_pct']:>10.1f}%")
 
     print(f"\n  {'DEFERENCE ANALYSIS':<35}")
     print(f"  {'-'*55}")
     print(f"  {'Deference rate':<35} {deference['deference_rate_pct']:>10.1f}%")
     print(f"  {'Effective coverage (AI handles)':<35} {deference['effective_coverage_pct']:>10.1f}%")
-    print(f"  {'Hard misses (EXCLUDE on included)':<35} {deference['hard_misses']:>10}")
-    print(f"  {'Deferred -> would be INCLUDE':<35} {deference['deferred_would_include']:>10}")
-    print(f"  {'Deferred -> would be EXCLUDE':<35} {deference['deferred_would_exclude']:>10}")
+    print(f"  {'Confident errors (total)':<35} {deference['total_confident_errors']:>10}")
+    print(f"    {'EXCLUDE on included (hard miss)':<33} {deference['hard_misses']:>10}")
+    print(f"    {'INCLUDE on excluded (false incl)':<33} {deference['false_includes']:>10}")
+    print(f"  {'Deferred -> ground truth INCLUDE':<35} {deference['deferred_included']:>10}")
+    print(f"  {'Deferred -> ground truth EXCLUDE':<35} {deference['deferred_excluded']:>10}")
 
     # Interpretation
     print(f"\n  INTERPRETATION:")
-    safe_sens = deference['safe_sensitivity']
+    da_sens = deference['da_sensitivity']
+    da_spec = deference['da_specificity']
     std_sens = standard['sensitivity']
-    if safe_sens > std_sens:
-        delta = safe_sens - std_sens
-        print(f"  Standard metrics UNDERSTATE safety by {delta:.1%}.")
-        print(f"  The AI correctly deferred on uncertain included studies rather than")
-        print(f"  confidently excluding them — this is safer behavior that standard")
-        print(f"  metrics penalise.")
-    if deference['hard_misses'] == 0:
-        print(f"  ZERO hard misses: every included study was either correctly included")
-        print(f"  or flagged for human review. No relevant studies were lost.")
-    elif deference['hard_misses'] > 0:
-        print(f"  {deference['hard_misses']} hard miss(es): the AI confidently excluded studies")
-        print(f"  that should have been included. These are the only true failures.")
+    std_spec = standard['specificity']
+
+    if da_sens > std_sens or da_spec > std_spec:
+        print(f"  Standard metrics understate performance:")
+        if da_sens > std_sens:
+            print(f"    Sensitivity: {std_sens:.1%} (standard) vs {da_sens:.1%} (deference-aware) — delta {da_sens - std_sens:.1%}")
+        if da_spec > std_spec:
+            print(f"    Specificity: {std_spec:.1%} (standard) vs {da_spec:.1%} (deference-aware) — delta {da_spec - std_spec:.1%}")
+        print(f"  The gap represents cases where the AI correctly deferred rather than")
+        print(f"  guessing wrong — safer behavior that standard metrics penalise.")
+
+    if deference['total_confident_errors'] == 0:
+        print(f"  ZERO confident errors. Every wrong answer was caught by deference.")
+    else:
+        print(f"  {deference['total_confident_errors']} confident error(s): {deference['hard_misses']} hard miss(es), "
+              f"{deference['false_includes']} false include(s).")
     print(f"{'=' * 80}")
 
 
 def print_missed_studies(df: pd.DataFrame):
-    """Print studies the AI hard-missed (said EXCLUDE when ground truth is INCLUDE)."""
+    """Print all confident errors and correctly deferred studies."""
     hard_missed = df[(df["ai_decision"] == "EXCLUDE") & (df["ground_truth"] == "INCLUDE")]
+    false_included = df[(df["ai_decision"] == "INCLUDE") & (df["ground_truth"] == "EXCLUDE")]
     deferred_included = df[(df["ai_decision"] == "UNCLEAR") & (df["ground_truth"] == "INCLUDE")]
 
     if not hard_missed.empty:
-        print(f"\n  HARD MISSES — AI said EXCLUDE on included studies ({len(hard_missed)}):")
+        print(f"\n  CONFIDENT ERRORS: AI said EXCLUDE on included studies ({len(hard_missed)}):")
         print(f"  {'-' * 56}")
         for _, row in hard_missed.iterrows():
             title = row["title"][:70] if pd.notna(row["title"]) else "No title"
@@ -264,8 +284,22 @@ def print_missed_studies(df: pd.DataFrame):
             print(f"  - [EXCLUDE conf:{conf}%] {title}...")
         print()
 
+    if not false_included.empty and len(false_included) <= 20:
+        print(f"  CONFIDENT ERRORS: AI said INCLUDE on excluded studies ({len(false_included)}):")
+        print(f"  {'-' * 56}")
+        for _, row in false_included.head(10).iterrows():
+            title = row["title"][:70] if pd.notna(row["title"]) else "No title"
+            conf = row.get("ai_confidence", "?")
+            print(f"  - [INCLUDE conf:{conf}%] {title}...")
+        if len(false_included) > 10:
+            print(f"  ... and {len(false_included) - 10} more")
+        print()
+    elif not false_included.empty:
+        print(f"  CONFIDENT ERRORS: {len(false_included)} false includes (too many to list)")
+        print()
+
     if not deferred_included.empty:
-        print(f"  CORRECTLY DEFERRED — AI flagged included studies for human review ({len(deferred_included)}):")
+        print(f"  CORRECTLY DEFERRED: AI flagged included studies for human review ({len(deferred_included)}):")
         print(f"  {'-' * 56}")
         for _, row in deferred_included.head(10).iterrows():
             title = row["title"][:70] if pd.notna(row["title"]) else "No title"
@@ -401,14 +435,15 @@ def main():
     # Per-review breakdown
     if valid["review"].nunique() > 1:
         print("\nPER-REVIEW BREAKDOWN:")
-        print(f"  {'Review':<20} {'Std Sens':>9} {'Safe Sens':>10} {'Deferred':>9} {'Hard Miss':>10}")
-        print(f"  {'-'*20} {'-'*9} {'-'*10} {'-'*9} {'-'*10}")
+        print(f"  {'Review':<20} {'Std Sens':>9} {'DA Sens':>8} {'Std Spec':>9} {'DA Spec':>8} {'Deferred':>9} {'Errors':>7}")
+        print(f"  {'-'*20} {'-'*9} {'-'*8} {'-'*9} {'-'*8} {'-'*9} {'-'*7}")
         for review in valid["review"].unique():
             rdf = valid[valid["review"] == review]
             s = compute_standard_metrics(rdf)
             d = compute_deference_metrics(rdf)
-            print(f"  {review:<20} {s['sensitivity']:>8.1%} {d['safe_sensitivity']:>9.1%} "
-                  f"{d['deference_rate_pct']:>7.1f}% {d['hard_misses']:>10}")
+            print(f"  {review:<20} {s['sensitivity']:>8.1%} {d['da_sensitivity']:>7.1%} "
+                  f"{s['specificity']:>8.1%} {d['da_specificity']:>7.1%} "
+                  f"{d['deference_rate_pct']:>7.1f}% {d['total_confident_errors']:>7}")
 
     # Save results
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")

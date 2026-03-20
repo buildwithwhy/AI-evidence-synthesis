@@ -332,8 +332,9 @@ def run_benchmark(csv_path: Path, model_names: list[str], protocols: dict,
         }
 
         print(f"    Done in {elapsed:.0f}s | Std Sens: {standard.get('sensitivity', 'N/A')} | "
-              f"Safe Sens: {deference.get('safe_sensitivity', 'N/A')} | "
-              f"Deferred: {deference.get('deference_rate_pct', 0)}% | Errors: {errors}")
+              f"DA Sens: {deference.get('da_sensitivity', 'N/A')} | "
+              f"Deferred: {deference.get('deference_rate_pct', 0)}% | "
+              f"Confident errors: {deference.get('total_confident_errors', '?')}")
 
     return all_results
 
@@ -363,27 +364,27 @@ def print_comparison(all_results: dict):
     print(f"\n{'='*110}")
     print(f"  DEFERENCE-AWARE METRICS (UNCLEAR = correct deference)")
     print(f"{'='*110}")
-    header = f"{'Model':<20} {'Safe Sens':>10} {'Dec Sens':>9} {'Dec Spec':>9} {'Dec F1':>7} {'Def-Acc':>8} {'Deferred':>9} {'Hard Miss':>10} {'Coverage':>9}"
+    header = f"{'Model':<20} {'DA Sens':>8} {'DA Spec':>8} {'DA Acc':>7} {'Dec F1':>7} {'Deferred':>9} {'Errors':>7} {'Coverage':>9}"
     print(header)
     print("-" * 110)
 
     for name, data in all_results.items():
         d = data["deference"]
-        print(f"{name:<20} {d.get('safe_sensitivity',0):>9.1%} {d.get('decided_sensitivity',0):>8.1%} "
-              f"{d.get('decided_specificity',0):>8.1%} {d.get('decided_f1',0):>6.1%} "
-              f"{d.get('deference_aware_accuracy',0):>7.1%} {d.get('deference_rate_pct',0):>7.1f}% "
-              f"{d.get('hard_misses',0):>10} {d.get('effective_coverage_pct',0):>7.1f}%")
+        print(f"{name:<20} {d.get('da_sensitivity',0):>7.1%} {d.get('da_specificity',0):>7.1%} "
+              f"{d.get('da_accuracy',0):>6.1%} {d.get('decided_f1',0):>6.1%} "
+              f"{d.get('deference_rate_pct',0):>7.1f}% "
+              f"{d.get('total_confident_errors',0):>7} {d.get('effective_coverage_pct',0):>7.1f}%")
 
     print("-" * 110)
 
     # Best model analysis
     models = list(all_results.keys())
     if models:
-        # Safest model (highest safe sensitivity)
-        safest = max(models, key=lambda n: all_results[n]["deference"].get("safe_sensitivity", 0))
+        # Safest model (fewest confident errors)
+        safest = min(models, key=lambda n: all_results[n]["deference"].get("total_confident_errors", 999))
         sd = all_results[safest]["deference"]
-        print(f"\n  Safest: {safest} (safe sensitivity={sd['safe_sensitivity']:.1%}, "
-              f"{sd['hard_misses']} hard misses)")
+        print(f"\n  Safest: {safest} (DA sensitivity={sd['da_sensitivity']:.1%}, "
+              f"{sd['total_confident_errors']} confident errors)")
 
         # Best when it decides (highest decided F1 with >50% coverage)
         deciders = [n for n in models if all_results[n]["deference"].get("effective_coverage_pct", 0) > 50]
@@ -417,13 +418,16 @@ def save_comparison(all_results: dict, tier_label: str):
             "std_accuracy": s.get("accuracy", 0),
             "work_saved_pct": s.get("work_saved_pct", 0),
             # Deference-aware metrics
-            "safe_sensitivity": d.get("safe_sensitivity", 0),
+            "da_sensitivity": d.get("da_sensitivity", 0),
+            "da_specificity": d.get("da_specificity", 0),
+            "da_accuracy": d.get("da_accuracy", 0),
             "decided_sensitivity": d.get("decided_sensitivity", 0),
             "decided_specificity": d.get("decided_specificity", 0),
             "decided_f1": d.get("decided_f1", 0),
-            "deference_aware_accuracy": d.get("deference_aware_accuracy", 0),
             "deference_rate_pct": d.get("deference_rate_pct", 0),
             "hard_misses": d.get("hard_misses", 0),
+            "false_includes": d.get("false_includes", 0),
+            "total_confident_errors": d.get("total_confident_errors", 0),
             "effective_coverage_pct": d.get("effective_coverage_pct", 0),
             # Meta
             "seconds_per_study": s.get("seconds_per_study", 0),
