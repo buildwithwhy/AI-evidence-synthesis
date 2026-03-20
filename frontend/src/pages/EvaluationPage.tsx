@@ -35,17 +35,33 @@ export default function EvaluationPage() {
               by the original review team.
             </p>
             <p>
-              Our primary metric is <strong>sensitivity (recall)</strong> — the percentage
-              of truly relevant studies that the AI correctly identifies for inclusion.
-              In systematic reviews, this is the critical metric: missing a relevant
-              study undermines the entire review. The Cochrane standard requires
-              sensitivity above 95%.
+              In traditional automated screening evaluation, sensitivity is treated as
+              the dominant metric — missing a relevant study is the worst error.
+              We argue that in a human-in-the-loop system, <strong>all three core metrics
+              matter equally</strong>:
             </p>
+            <ul className="space-y-3 ml-1">
+              <li>
+                <strong>Sensitivity</strong> matters because missing a relevant study
+                undermines the review.
+              </li>
+              <li>
+                <strong>Specificity</strong> matters because if the AI fails to filter
+                out irrelevant studies, it floods the human reviewer with noise. Reviewer
+                fatigue from wading through false positives leads to less careful review
+                of each study — defeating the purpose of human oversight.
+              </li>
+              <li>
+                <strong>Precision</strong> matters for the same reason: if most of what
+                the AI marks as INCLUDE is actually irrelevant, reviewers learn to distrust
+                the AI's INCLUDE decisions and either rubber-stamp them (introducing errors)
+                or re-screen everything manually (negating the efficiency gain).
+              </li>
+            </ul>
             <p>
-              Our secondary metric is <strong>specificity</strong> — the percentage
-              of irrelevant studies correctly excluded. This determines how much manual
-              screening work the AI saves. Higher specificity means reviewers spend
-              less time on studies that don't belong.
+              A tool that catches every relevant study but also marks half the irrelevant
+              ones as INCLUDE has not meaningfully helped the reviewer. All three metrics
+              must be high for the system to deliver real value.
             </p>
           </div>
         </section>
@@ -58,31 +74,31 @@ export default function EvaluationPage() {
               {
                 name: 'Sensitivity (Recall)',
                 target: '> 95%',
-                desc: 'Of all studies that SHOULD be included, what percentage did the AI catch? This is the most important metric — missing relevant studies is the worst error.',
+                desc: 'Of all studies that SHOULD be included, what percentage did the AI catch? Missing relevant studies undermines the entire review.',
                 critical: true,
               },
               {
                 name: 'Specificity',
-                target: '> 50%',
-                desc: 'Of all irrelevant studies, what percentage did the AI correctly filter out? This determines work saved for reviewers.',
-                critical: false,
+                target: '> 80%',
+                desc: 'Of all irrelevant studies, what percentage did the AI correctly filter out? Low specificity floods reviewers with noise, causing fatigue and less careful assessment.',
+                critical: true,
               },
               {
                 name: 'Precision',
-                target: 'Varies',
-                desc: 'Of the studies the AI said INCLUDE, what percentage were actually relevant? Low precision means more false positives (extra work but not dangerous).',
-                critical: false,
+                target: '> 50%',
+                desc: 'Of the studies the AI said INCLUDE, what percentage were actually relevant? Low precision erodes reviewer trust — they either rubber-stamp decisions or re-screen everything.',
+                critical: true,
               },
               {
                 name: 'F1 Score',
                 target: 'Varies',
-                desc: 'The harmonic mean of precision and sensitivity. Balances the trade-off between catching all relevant studies (sensitivity) and not overwhelming reviewers with false positives (precision). Ranges from 0 to 1, where 1 is perfect.',
+                desc: 'The harmonic mean of precision and sensitivity. Balances the trade-off between catching all relevant studies and not overwhelming reviewers with false positives. Ranges from 0 to 1, where 1 is perfect.',
                 critical: false,
               },
               {
                 name: 'Work Saved',
                 target: '> 40%',
-                desc: 'The percentage of studies reviewers can skip because the AI excluded them. Only meaningful when sensitivity is above threshold.',
+                desc: 'The percentage of studies reviewers can skip because the AI excluded them. Only meaningful when all three core metrics are above threshold.',
                 critical: false,
               },
             ].map(({ name, target, desc, critical }) => (
@@ -91,7 +107,7 @@ export default function EvaluationPage() {
                   <h3 className="font-semibold text-slate-800 text-sm">{name}</h3>
                   <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${
                     critical
-                      ? 'bg-red-50 text-red-600 border border-red-200'
+                      ? 'bg-blue-50 text-blue-600 border border-blue-200'
                       : 'bg-slate-50 text-slate-500 border border-slate-200'
                   }`}>
                     Target: {target}
