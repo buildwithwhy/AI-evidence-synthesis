@@ -1,4 +1,5 @@
 import PublicNav from '../components/PublicNav'
+import Footer from '../components/Footer'
 import { Link } from 'react-router-dom'
 
 export default function AboutPage() {
@@ -103,16 +104,7 @@ export default function AboutPage() {
         </div>
       </div>
 
-      {/* Footer */}
-      <footer className="border-t border-slate-200 bg-white">
-        <div className="max-w-5xl mx-auto px-6 py-6 flex items-center justify-between text-xs text-slate-400">
-          <span>AI Evidence Synthesis</span>
-          <div className="flex gap-4">
-            <Link to="/about" className="hover:text-slate-600">About</Link>
-            <Link to="/evaluation" className="hover:text-slate-600">Evaluation</Link>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   )
 }
