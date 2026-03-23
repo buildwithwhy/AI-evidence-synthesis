@@ -198,6 +198,56 @@ MODEL_CONFIGS = {
         "cost_per_1k_input": 0.003,
         "cost_per_1k_output": 0.015,
     },
+    "or-deepseek-r1-32b": {
+        "provider": "openrouter",
+        "model": "deepseek/deepseek-r1-distill-qwen-32b",
+        "developer": "DeepSeek",
+        "open_source": True,
+        "env_key": "OPENROUTER_API_KEY",
+        "base_url": "https://openrouter.ai/api/v1",
+        "cost_per_1k_input": 0.00012,
+        "cost_per_1k_output": 0.0003,
+    },
+    "or-mistral-24b": {
+        "provider": "openrouter",
+        "model": "mistralai/mistral-small-3.1-24b-instruct",
+        "developer": "Mistral AI",
+        "open_source": True,
+        "env_key": "OPENROUTER_API_KEY",
+        "base_url": "https://openrouter.ai/api/v1",
+        "cost_per_1k_input": 0.0001,
+        "cost_per_1k_output": 0.0003,
+    },
+    "or-gemma-27b": {
+        "provider": "openrouter",
+        "model": "google/gemma-3-27b-it",
+        "developer": "Google",
+        "open_source": True,
+        "env_key": "OPENROUTER_API_KEY",
+        "base_url": "https://openrouter.ai/api/v1",
+        "cost_per_1k_input": 0.0001,
+        "cost_per_1k_output": 0.0002,
+    },
+    "or-llama-70b": {
+        "provider": "openrouter",
+        "model": "meta-llama/llama-3.3-70b-instruct",
+        "developer": "Meta",
+        "open_source": True,
+        "env_key": "OPENROUTER_API_KEY",
+        "base_url": "https://openrouter.ai/api/v1",
+        "cost_per_1k_input": 0.00035,
+        "cost_per_1k_output": 0.0004,
+    },
+    "or-gpt-4o": {
+        "provider": "openrouter",
+        "model": "openai/gpt-4o",
+        "developer": "OpenAI",
+        "open_source": False,
+        "env_key": "OPENROUTER_API_KEY",
+        "base_url": "https://openrouter.ai/api/v1",
+        "cost_per_1k_input": 0.0025,
+        "cost_per_1k_output": 0.01,
+    },
 }
 
 
@@ -438,14 +488,14 @@ def print_comparison(all_results: dict):
     print(f"\n{'='*110}")
     print(f"  DEFERENCE-AWARE METRICS (UNCLEAR = correct deference)")
     print(f"{'='*110}")
-    header = f"{'Model':<20} {'DA Sens':>8} {'DA Spec':>8} {'DA Acc':>7} {'Dec F1':>7} {'Deferred':>9} {'Errors':>7} {'Coverage':>9}"
+    header = f"{'Model':<20} {'DA Sens':>8} {'DA Spec':>8} {'DA F1':>7} {'DA Acc':>7} {'Deferred':>9} {'Errors':>7} {'Coverage':>9}"
     print(header)
     print("-" * 110)
 
     for name, data in all_results.items():
         d = data["deference"]
         print(f"{name:<20} {d.get('da_sensitivity',0):>7.1%} {d.get('da_specificity',0):>7.1%} "
-              f"{d.get('da_accuracy',0):>6.1%} {d.get('decided_f1',0):>6.1%} "
+              f"{d.get('da_f1',0):>6.1%} {d.get('da_accuracy',0):>6.1%} "
               f"{d.get('deference_rate_pct',0):>7.1f}% "
               f"{d.get('total_confident_errors',0):>7} {d.get('effective_coverage_pct',0):>7.1f}%")
 
@@ -493,6 +543,7 @@ def save_comparison(all_results: dict, tier_label: str):
             "da_sensitivity": d.get("da_sensitivity", 0),
             "da_specificity": d.get("da_specificity", 0),
             "da_accuracy": d.get("da_accuracy", 0),
+            "da_f1": d.get("da_f1", 0),
             "decided_sensitivity": d.get("decided_sensitivity", 0),
             "decided_specificity": d.get("decided_specificity", 0),
             "decided_f1": d.get("decided_f1", 0),

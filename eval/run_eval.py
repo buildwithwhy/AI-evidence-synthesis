@@ -185,6 +185,14 @@ def compute_deference_metrics(df: pd.DataFrame) -> dict:
                   (decided_precision + decided_sensitivity)
                   if (decided_precision + decided_sensitivity) > 0 else 0)
 
+    # DA F1: harmonic mean of DA sensitivity and decided precision
+    # DA sensitivity = did you catch included studies (or defer)?
+    # Decided precision = when you said INCLUDE, were you right?
+    # UNCLEAR doesn't inflate precision (it's not an INCLUDE call)
+    da_f1 = (2 * da_sensitivity * decided_precision /
+             (da_sensitivity + decided_precision)
+             if (da_sensitivity + decided_precision) > 0 else 0)
+
     return {
         "framework": "deference_aware",
         "total": total,
@@ -195,6 +203,7 @@ def compute_deference_metrics(df: pd.DataFrame) -> dict:
         "da_accuracy": round(deference_aware_accuracy, 4),
         "da_sensitivity": round(da_sensitivity, 4),
         "da_specificity": round(da_specificity, 4),
+        "da_f1": round(da_f1, 4),
         # Confident wrong answers
         "hard_misses": hard_misses,
         "false_includes": false_includes,
@@ -232,7 +241,7 @@ def print_dual_metrics(standard: dict, deference: dict, label: str = "Overall"):
     print(f"  {'Sensitivity':<35} {standard['sensitivity']:>11.1%} {deference['da_sensitivity']:>15.1%}")
     print(f"  {'Specificity':<35} {standard['specificity']:>11.1%} {deference['da_specificity']:>15.1%}")
     print(f"  {'Precision (decided only)':<35} {standard['precision']:>11.1%} {deference['decided_precision']:>15.1%}")
-    print(f"  {'F1 (decided only)':<35} {standard['f1_score']:>11.1%} {deference['decided_f1']:>15.1%}")
+    print(f"  {'F1':<35} {standard['f1_score']:>11.1%} {deference['da_f1']:>15.1%}")
     print(f"  {'Work Saved':<35} {standard['work_saved_pct']:>10.1f}%")
 
     print(f"\n  {'DEFERENCE ANALYSIS':<35}")
