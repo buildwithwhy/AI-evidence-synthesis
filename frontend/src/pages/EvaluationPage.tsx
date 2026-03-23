@@ -282,9 +282,14 @@ export default function EvaluationPage() {
                 desc: 'Complete screening sets from 3 verified reviews with PICO criteria extracted from published papers. Covers human pharmacology, preclinical research, and clinical biosimilars.',
               },
               {
-                tier: 'Tier 3: Full Benchmark',
+                tier: 'Tier 3a: Full Benchmark',
                 studies: '169K studies',
-                desc: 'Complete SYNERGY dataset across all 26 reviews. For aggregate statistics and cross-domain robustness testing.',
+                desc: 'Complete SYNERGY dataset across all 26 reviews. Single-model evaluation for aggregate statistics and cross-domain robustness testing.',
+              },
+              {
+                tier: 'Tier 3b: Mixed-Model Consensus',
+                studies: 'Tier 2 dataset',
+                desc: 'Instead of running the same model twice (homogeneous consensus), pair two different models — one optimised for sensitivity, one for specificity. Agreement = confident decision. Disagreement = defer to human. This exploits complementary strengths: the high-sensitivity model catches what the high-specificity model misses, and vice versa. Open source model pairs could match or exceed single proprietary model performance at a fraction of the cost.',
               },
             ].map(({ tier, studies, desc }) => (
               <div key={tier} className="flex gap-4 p-4 bg-slate-50 rounded-lg border border-slate-100">
@@ -334,12 +339,23 @@ export default function EvaluationPage() {
                 </div>
               </div>
               <div className="flex gap-3">
-                <span className="text-blue-600 font-bold mt-0.5">3.</span>
+                <span className="text-blue-600 font-bold mt-0.5">3a.</span>
                 <div>
-                  <strong>Dual-run consensus (winning model):</strong> The best model
+                  <strong>Same-model consensus (winning model):</strong> The best model
                   from Tier 2 is run through the production dual-run consensus system
-                  to measure how consensus screening improves the metrics — particularly
-                  the deference rate and confident error count.
+                  (same model, two passes) to measure how consensus screening improves
+                  the metrics — particularly the deference rate and confident error count.
+                </div>
+              </div>
+              <div className="flex gap-3">
+                <span className="text-blue-600 font-bold mt-0.5">3b.</span>
+                <div>
+                  <strong>Mixed-model consensus (model pairs):</strong> Pair two different
+                  models with complementary strengths — e.g., a high-sensitivity open source
+                  model with a high-specificity one. If both agree, accept the decision.
+                  If they disagree, defer to human review. This tests whether cheaper
+                  open source model pairs can match the safety profile of a single expensive
+                  proprietary model through complementary expertise.
                 </div>
               </div>
             </div>
