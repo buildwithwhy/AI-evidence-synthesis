@@ -327,20 +327,21 @@ export default function EvaluationPage() {
                   <th className="text-right px-4 py-3 font-medium text-slate-600">Specificity</th>
                   <th className="text-right px-4 py-3 font-medium text-slate-600">F1</th>
                   <th className="text-right px-4 py-3 font-medium text-slate-600">DA Sens</th>
+                  <th className="text-right px-4 py-3 font-medium text-slate-600">DA Spec</th>
                   <th className="text-right px-4 py-3 font-medium text-slate-600">Errors</th>
                   <th className="text-left px-4 py-3 font-medium text-slate-600">Tier 2</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {[
-                  { model: 'Mistral 3.1 24B', dev: 'Mistral AI', oss: true, sens: '100%', spec: '60%', f1: '83%', da: '100%', err: 2, tier2: true },
-                  { model: 'Gemma 3 27B', dev: 'Google', oss: true, sens: '100%', spec: '40%', f1: '77%', da: '100%', err: 3, tier2: true },
-                  { model: 'Claude Sonnet 4.6', dev: 'Anthropic', oss: false, sens: '60%', spec: '100%', f1: '75%', da: '80%', err: 1, tier2: true },
-                  { model: 'GPT-4o', dev: 'OpenAI', oss: false, sens: '60%', spec: '100%', f1: '75%', da: '60%', err: 2, tier2: true },
-                  { model: 'Llama 3.3 70B', dev: 'Meta', oss: true, sens: '80%', spec: '20%', f1: '62%', da: '80%', err: 5, tier2: false },
-                  { model: 'Kimi k2', dev: 'Moonshot AI', oss: true, sens: '100%*', spec: '100%*', f1: '100%*', da: '100%*', err: 0, tier2: false },
-                  { model: 'DeepSeek v3', dev: 'DeepSeek', oss: true, sens: '--', spec: '--', f1: '--', da: '--', err: null, tier2: false },
-                ].map(({ model, dev, oss, sens, spec, f1, da, err, tier2 }) => (
+                  { model: 'Mistral 3.1 24B', dev: 'Mistral AI', oss: true, sens: '100%', spec: '60%', f1: '83%', da_s: '100%', da_sp: '60%', err: 2, tier2: true },
+                  { model: 'Gemma 3 27B', dev: 'Google', oss: true, sens: '100%', spec: '40%', f1: '77%', da_s: '100%', da_sp: '40%', err: 3, tier2: true },
+                  { model: 'Claude Sonnet 4.6', dev: 'Anthropic', oss: false, sens: '60%', spec: '100%', f1: '75%', da_s: '80%', da_sp: '100%', err: 1, tier2: true },
+                  { model: 'GPT-4o', dev: 'OpenAI', oss: false, sens: '60%', spec: '100%', f1: '75%', da_s: '60%', da_sp: '100%', err: 2, tier2: true },
+                  { model: 'Llama 3.3 70B', dev: 'Meta', oss: true, sens: '80%', spec: '20%', f1: '62%', da_s: '80%', da_sp: '20%', err: 5, tier2: false },
+                  { model: 'Kimi k2', dev: 'Moonshot AI', oss: true, sens: '100%*', spec: '100%*', f1: '100%*', da_s: '100%*', da_sp: '100%*', err: 0, tier2: false },
+                  { model: 'DeepSeek v3', dev: 'DeepSeek', oss: true, sens: '--', spec: '--', f1: '--', da_s: '--', da_sp: '--', err: null, tier2: false },
+                ].map(({ model, dev, oss, sens, spec, f1, da_s, da_sp, err, tier2 }) => (
                   <tr key={model} className={`hover:bg-slate-50 ${tier2 ? '' : 'opacity-60'}`}>
                     <td className="px-4 py-3 font-medium text-slate-800">{model}</td>
                     <td className="px-4 py-3 text-slate-500">
@@ -350,7 +351,8 @@ export default function EvaluationPage() {
                     <td className="px-4 py-3 text-right text-slate-700">{sens}</td>
                     <td className="px-4 py-3 text-right text-slate-700">{spec}</td>
                     <td className="px-4 py-3 text-right text-slate-700">{f1}</td>
-                    <td className="px-4 py-3 text-right text-slate-700">{da}</td>
+                    <td className="px-4 py-3 text-right text-slate-700">{da_s}</td>
+                    <td className="px-4 py-3 text-right text-slate-700">{da_sp}</td>
                     <td className="px-4 py-3 text-right text-slate-700">{err !== null ? err : '--'}</td>
                     <td className="px-4 py-3">
                       {tier2 ? (
