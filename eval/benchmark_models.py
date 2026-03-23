@@ -44,7 +44,7 @@ RESULTS_DIR = Path(__file__).parent / "results"
 RESULTS_DIR.mkdir(exist_ok=True)
 
 # Import shared eval logic
-from run_eval import compute_standard_metrics, compute_deference_metrics, load_protocols
+from run_eval import compute_forced_binary_metrics, compute_standard_metrics, compute_deference_metrics, load_protocols
 
 
 # ============================================================
@@ -432,6 +432,7 @@ def run_benchmark(csv_path: Path, model_names: list[str], protocols: dict,
 
         # Filter out errors for metrics
         valid = result_df[result_df["ai_decision"] != "ERROR"]
+        forced = compute_forced_binary_metrics(valid) if len(valid) > 0 else {}
         standard = compute_standard_metrics(valid) if len(valid) > 0 else {}
         deference = compute_deference_metrics(valid) if len(valid) > 0 else {}
 
@@ -450,6 +451,7 @@ def run_benchmark(csv_path: Path, model_names: list[str], protocols: dict,
         }
 
         all_results[model_name] = {
+            "forced": {**forced, **meta},
             "standard": {**standard, **meta},
             "deference": {**deference, **meta},
             "details": result_df,
@@ -469,11 +471,27 @@ def print_comparison(all_results: dict):
         print("No results to compare.")
         return
 
-    # Standard metrics table
+    # Forced binary table
     print(f"\n{'='*110}")
-    print(f"  STANDARD METRICS (UNCLEAR = wrong)")
+    print(f"  FORCED BINARY (no UNCLEAR option — traditional baseline)")
     print(f"{'='*110}")
-    header = f"{'Model':<20} {'Sensitivity':>11} {'Specificity':>11} {'Precision':>9} {'F1':>6} {'Accuracy':>8} {'Work Saved':>10} {'Speed':>8} {'Cost':>8}"
+    header = f"{'Model':<20} {'Sensitivity':>11} {'Specificity':>11} {'Precision':>9} {'F1':>6} {'Accuracy':>8} {'Speed':>8} {'Cost':>8}"
+    print(header)
+    print("-" * 110)
+
+    for name, data in all_results.items():
+        fb = data["forced"]
+        s = data["standard"]
+        print(f"{name:<20} {fb.get('sensitivity',0):>10.1%} {fb.get('specificity',0):>10.1%} "
+              f"{fb.get('precision',0):>8.1%} {fb.get('f1_score',0):>5.1%} {fb.get('accuracy',0):>7.1%} "
+              f"{s.get('seconds_per_study',0):>6.1f}s "
+              f"${s.get('cost_estimate',0):>6.4f}")
+
+    # Three-class table
+    print(f"\n{'='*110}")
+    print(f"  THREE-CLASS (UNCLEAR exists but penalised)")
+    print(f"{'='*110}")
+    header = f"{'Model':<20} {'Sensitivity':>11} {'Specificity':>11} {'Precision':>9} {'F1':>6} {'Accuracy':>8} {'UNCLEAR%':>9}"
     print(header)
     print("-" * 110)
 
@@ -481,8 +499,7 @@ def print_comparison(all_results: dict):
         s = data["standard"]
         print(f"{name:<20} {s.get('sensitivity',0):>10.1%} {s.get('specificity',0):>10.1%} "
               f"{s.get('precision',0):>8.1%} {s.get('f1_score',0):>5.1%} {s.get('accuracy',0):>7.1%} "
-              f"{s.get('work_saved_pct',0):>9.1f}% {s.get('seconds_per_study',0):>6.1f}s "
-              f"${s.get('cost_estimate',0):>6.4f}")
+              f"{s.get('unclear_pct',0):>7.1f}%")
 
     # Deference-aware metrics table
     print(f"\n{'='*110}")
@@ -526,12 +543,17 @@ def save_comparison(all_results: dict, tier_label: str):
     # Summary JSON
     summary = []
     for name, data in all_results.items():
+        fb = data["forced"]
         s = data["standard"]
         d = data["deference"]
         summary.append({
             "model": name,
             "model_id": s.get("model_id", ""),
             "provider": s.get("provider", ""),
+            # Forced binary metrics
+            "fb_sensitivity": fb.get("sensitivity", 0),
+            "fb_specificity": fb.get("specificity", 0),
+            "fb_f1": fb.get("f1_score", 0),
             # Standard metrics
             "std_sensitivity": s.get("sensitivity", 0),
             "std_specificity": s.get("specificity", 0),
