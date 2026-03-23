@@ -363,52 +363,50 @@ export default function EvaluationPage() {
           </p>
 
           <div className="border border-slate-200 rounded-lg overflow-hidden mb-4 overflow-x-auto">
-            <table className="w-full text-sm">
+            <table className="w-full text-sm min-w-[900px]">
               <thead className="bg-slate-50 border-b border-slate-200">
                 <tr>
-                  <th className="text-left px-3 py-3 font-medium text-slate-600">Model</th>
-                  <th className="text-left px-3 py-3 font-medium text-slate-600">Developer</th>
-                  <th className="text-right px-3 py-3 font-medium text-slate-500 bg-slate-50" colSpan={3}>Forced Binary / Three-Class</th>
-                  <th className="text-right px-3 py-3 font-medium text-blue-600 bg-blue-50/50" colSpan={3}>Deference-Aware</th>
-                  <th className="text-right px-3 py-3 font-medium text-slate-600">Errors</th>
-                  <th className="text-right px-3 py-3 font-medium text-slate-600">Deferred</th>
-                  <th className="text-left px-3 py-3 font-medium text-slate-600">Tier 2</th>
+                  <th className="text-left px-3 py-3 font-medium text-slate-600" rowSpan={2}>Model</th>
+                  <th className="text-left px-3 py-3 font-medium text-slate-600" rowSpan={2}>Developer</th>
+                  <th className="text-center px-3 py-2 font-medium text-slate-500 bg-slate-100 border-b border-slate-200" colSpan={3}>Forced Binary (F1)</th>
+                  <th className="text-center px-3 py-2 font-medium text-blue-600 bg-blue-50 border-b border-blue-100" colSpan={3}>Deference-Aware (F3)</th>
+                  <th className="text-right px-3 py-3 font-medium text-slate-600" rowSpan={2}>Errors</th>
+                  <th className="text-right px-3 py-3 font-medium text-slate-600" rowSpan={2}>Deferred</th>
+                  <th className="text-left px-3 py-3 font-medium text-slate-600" rowSpan={2}>Tier 2</th>
                 </tr>
-                <tr className="bg-slate-50 border-b border-slate-200">
-                  <th className="px-3 py-1" colSpan={2}></th>
-                  <th className="text-right px-3 py-1 text-xs text-slate-400">Sens</th>
-                  <th className="text-right px-3 py-1 text-xs text-slate-400">Spec</th>
-                  <th className="text-right px-3 py-1 text-xs text-slate-400">F1</th>
-                  <th className="text-right px-3 py-1 text-xs text-blue-400">Sens</th>
-                  <th className="text-right px-3 py-1 text-xs text-blue-400">Spec</th>
-                  <th className="text-right px-3 py-1 text-xs text-blue-400">F1</th>
-                  <th className="px-3 py-1" colSpan={3}></th>
+                <tr>
+                  <th className="text-right px-3 py-1 text-xs text-slate-400 bg-slate-100">Sens</th>
+                  <th className="text-right px-3 py-1 text-xs text-slate-400 bg-slate-100">Spec</th>
+                  <th className="text-right px-3 py-1 text-xs text-slate-400 bg-slate-100">F1</th>
+                  <th className="text-right px-3 py-1 text-xs text-blue-400 bg-blue-50">Sens</th>
+                  <th className="text-right px-3 py-1 text-xs text-blue-400 bg-blue-50">Spec</th>
+                  <th className="text-right px-3 py-1 text-xs text-blue-400 bg-blue-50">F1</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {[
-                  { model: 'Claude Sonnet 4.6', dev: 'Anthropic', oss: false, sens: '60%', spec: '100%', f1: '75%', da_s: '100%', da_sp: '100%', da_f1: '100%', err: 0, def: '40%', tier2: true },
-                  { model: 'Kimi k2', dev: 'Moonshot AI', oss: true, sens: '60%', spec: '80%', f1: '67%', da_s: '80%', da_sp: '80%', da_f1: '77%', err: 2, def: '10%', tier2: true },
-                  { model: 'Llama 3.3 70B', dev: 'Meta', oss: true, sens: '80%', spec: '60%', f1: '73%', da_s: '80%', da_sp: '60%', da_f1: '73%', err: 3, def: '0%', tier2: true },
-                  { model: 'Mistral 3.1 24B', dev: 'Mistral AI', oss: true, sens: '60%', spec: '60%', f1: '60%', da_s: '80%', da_sp: '60%', da_f1: '69%', err: 3, def: '10%', tier2: true },
-                  { model: 'DeepSeek v3', dev: 'DeepSeek', oss: true, sens: '60%', spec: '80%', f1: '67%', da_s: '60%', da_sp: '80%', da_f1: '67%', err: 3, def: '0%', tier2: true },
-                  { model: 'Gemma 3 27B', dev: 'Google', oss: true, sens: '80%', spec: '40%', f1: '67%', da_s: '80%', da_sp: '40%', da_f1: '67%', err: 4, def: '0%', tier2: false },
-                  { model: 'GPT-4o', dev: 'OpenAI', oss: false, sens: '60%', spec: '60%', f1: '60%', da_s: '60%', da_sp: '60%', da_f1: '60%', err: 4, def: '0%', tier2: false },
-                  { model: 'Qwen 3 235B', dev: 'Alibaba Cloud', oss: true, sens: '60%', spec: '60%', f1: '60%', da_s: '60%', da_sp: '60%', da_f1: '60%', err: 4, def: '0%', tier2: false },
-                  { model: 'DeepSeek R1 32B', dev: 'DeepSeek', oss: true, sens: '80%', spec: '20%', f1: '62%', da_s: '80%', da_sp: '20%', da_f1: '62%', err: 5, def: '0%', tier2: false },
-                ].map(({ model, dev, oss, sens, spec, f1, da_s, da_sp, da_f1, err, def: deferred, tier2 }) => (
+                  { model: 'Claude Sonnet 4.6', dev: 'Anthropic', oss: false, fb_s: '60%', fb_sp: '100%', fb_f1: '75%', da_s: '100%', da_sp: '100%', da_f1: '100%', err: 0, def: '40%', tier2: true },
+                  { model: 'DeepSeek v3', dev: 'DeepSeek', oss: true, fb_s: '80%', fb_sp: '80%', fb_f1: '80%', da_s: '80%', da_sp: '80%', da_f1: '80%', err: 2, def: '0%', tier2: true },
+                  { model: 'Kimi k2', dev: 'Moonshot AI', oss: true, fb_s: '60%', fb_sp: '80%', fb_f1: '67%', da_s: '80%', da_sp: '80%', da_f1: '77%', err: 2, def: '10%', tier2: true },
+                  { model: 'Llama 3.3 70B', dev: 'Meta', oss: true, fb_s: '80%', fb_sp: '60%', fb_f1: '73%', da_s: '80%', da_sp: '60%', da_f1: '73%', err: 3, def: '10%', tier2: true },
+                  { model: 'Mistral 3.1 24B', dev: 'Mistral AI', oss: true, fb_s: '60%', fb_sp: '60%', fb_f1: '60%', da_s: '80%', da_sp: '60%', da_f1: '69%', err: 3, def: '10%', tier2: true },
+                  { model: 'Gemma 3 27B', dev: 'Google', oss: true, fb_s: '80%', fb_sp: '40%', fb_f1: '67%', da_s: '80%', da_sp: '40%', da_f1: '67%', err: 4, def: '0%', tier2: true },
+                  { model: 'GPT-4o', dev: 'OpenAI', oss: false, fb_s: '60%', fb_sp: '60%', fb_f1: '60%', da_s: '60%', da_sp: '60%', da_f1: '60%', err: 4, def: '0%', tier2: false },
+                  { model: 'Qwen 3 235B', dev: 'Alibaba Cloud', oss: true, fb_s: '60%', fb_sp: '60%', fb_f1: '60%', da_s: '60%', da_sp: '60%', da_f1: '60%', err: 4, def: '0%', tier2: false },
+                  { model: 'DeepSeek R1 32B', dev: 'DeepSeek', oss: true, fb_s: '80%', fb_sp: '20%', fb_f1: '62%', da_s: '80%', da_sp: '20%', da_f1: '62%', err: 5, def: '0%', tier2: false },
+                ].map(({ model, dev, oss, fb_s, fb_sp, fb_f1, da_s, da_sp, da_f1, err, def: deferred, tier2 }) => (
                   <tr key={model} className={`hover:bg-slate-50 ${tier2 ? '' : 'opacity-60'}`}>
                     <td className="px-3 py-3 font-medium text-slate-800">{model}</td>
                     <td className="px-3 py-3 text-slate-500">
                       {dev}
                       {oss && <span className="ml-2 text-xs bg-green-50 text-green-600 px-1.5 py-0.5 rounded">OS</span>}
                     </td>
-                    <td className="px-3 py-3 text-right text-slate-700">{sens}</td>
-                    <td className="px-3 py-3 text-right text-slate-700">{spec}</td>
-                    <td className="px-3 py-3 text-right text-slate-700">{f1}</td>
-                    <td className="px-3 py-3 text-right text-slate-700">{da_s}</td>
-                    <td className="px-3 py-3 text-right text-slate-700">{da_sp}</td>
-                    <td className="px-3 py-3 text-right text-slate-700">{da_f1}</td>
+                    <td className="px-3 py-3 text-right text-slate-700 bg-slate-50/50">{fb_s}</td>
+                    <td className="px-3 py-3 text-right text-slate-700 bg-slate-50/50">{fb_sp}</td>
+                    <td className="px-3 py-3 text-right text-slate-700 bg-slate-50/50">{fb_f1}</td>
+                    <td className="px-3 py-3 text-right text-blue-700 bg-blue-50/30">{da_s}</td>
+                    <td className="px-3 py-3 text-right text-blue-700 bg-blue-50/30">{da_sp}</td>
+                    <td className="px-3 py-3 text-right text-blue-700 bg-blue-50/30">{da_f1}</td>
                     <td className="px-3 py-3 text-right text-slate-700">{err}</td>
                     <td className="px-3 py-3 text-right text-slate-700">{deferred}</td>
                     <td className="px-3 py-3">
@@ -426,11 +424,11 @@ export default function EvaluationPage() {
 
           <div className="text-xs text-slate-400 space-y-1 mb-6">
             <p>
-              All models accessed via OpenRouter. Sorted by DA F1.
-              For single-run benchmarks, forced binary and three-class metrics are
-              equivalent (UNCLEAR maps to EXCLUDE in both). The deference-aware column
-              shows the impact of treating UNCLEAR as correct — the gap only appears
-              for models that actually deferred (Claude, Kimi, Mistral).
+              All models accessed via OpenRouter. Reporting Frameworks 1 (Forced Binary)
+              and 3 (Deference-Aware) side by side. The gap between F1 and F3 metrics shows
+              the safety gained by allowing deference. Deference rate and coverage make the
+              workload trade-off explicit. Top 6 models selected for Tier 2 based on
+              DA F1 and deference behavior.
             </p>
           </div>
 
@@ -471,14 +469,24 @@ export default function EvaluationPage() {
                 </p>
               </div>
               <div>
+                <h4 className="font-semibold text-slate-700 mb-1">DeepSeek v3 was the strongest non-deferring model</h4>
+                <p>
+                  Among models that never deferred, DeepSeek v3 achieved the best
+                  balanced performance: 80% sensitivity, 80% specificity, 80% F1 with
+                  only 2 confident errors. This makes it the best open source option
+                  for a forced-binary deployment where deference is not available.
+                </p>
+              </div>
+              <div>
                 <h4 className="font-semibold text-slate-700 mb-1">Model selection for Tier 2</h4>
                 <p>
-                  We selected 5 models for deeper evaluation: Claude Sonnet 4.6
-                  (zero errors, unique deference), Kimi k2 (best open source with
-                  deference), Llama 3.3 70B (highest open source standard F1),
-                  Mistral 3.1 24B (deference behavior), and DeepSeek v3 (strong
-                  specificity). Models with F1 below 67% or more than 4 confident
-                  errors were eliminated.
+                  We selected 6 models for deeper evaluation: Claude Sonnet 4.6
+                  (zero errors, highest deference), Kimi k2 (best open source with
+                  deference), Llama 3.3 70B (highest open source forced-binary
+                  sensitivity), Mistral 3.1 24B (deference behavior), DeepSeek v3
+                  (strongest balanced non-deferring model), and Gemma 3 27B (high
+                  forced-binary sensitivity). GPT-4o, Qwen, and DeepSeek R1 were
+                  eliminated due to higher error counts.
                 </p>
               </div>
             </div>
@@ -497,8 +505,8 @@ export default function EvaluationPage() {
           </p>
           <div className="border border-amber-200 bg-amber-50 rounded-lg p-3 mb-4">
             <p className="text-xs text-amber-700">
-              Tier 2 is being rerun via OpenRouter with an expanded model set (5 models).
-              Results below are from the initial Venice AI run (4 models). Updated results forthcoming.
+              Tier 2 is being rerun via OpenRouter with 6 models and raw decision tracking
+              for accurate forced binary metrics. Updated results forthcoming.
             </p>
           </div>
 
