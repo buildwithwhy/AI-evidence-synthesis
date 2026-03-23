@@ -256,6 +256,59 @@ export default function EvaluationPage() {
           </div>
         </section>
 
+        {/* Model Selection Process */}
+        <section className="mb-12">
+          <h2 className="text-xl font-semibold text-slate-800 mb-4">Model Selection Process</h2>
+          <div className="bg-slate-50 border border-slate-200 rounded-lg p-6 space-y-4 text-sm text-slate-600">
+            <p>
+              We evaluate models through a progressive narrowing process rather than
+              running all models on the full dataset. This is both cost-effective and
+              methodologically sound — it mirrors how practitioners would actually
+              select a model for their workflow.
+            </p>
+            <div className="space-y-3">
+              <div className="flex gap-3">
+                <span className="text-blue-600 font-bold mt-0.5">1.</span>
+                <div>
+                  <strong>Tier 1 screening (all candidate models):</strong> Run every
+                  available model on the 10-study smoke test. This takes minutes per
+                  model and immediately reveals which models can follow the JSON output
+                  format, handle the PICO criteria, and produce reasonable confidence
+                  scores. Models that error out or show clearly random performance are
+                  eliminated.
+                </div>
+              </div>
+              <div className="flex gap-3">
+                <span className="text-blue-600 font-bold mt-0.5">2.</span>
+                <div>
+                  <strong>Tier 2 deep evaluation (top models only):</strong> The best
+                  performers from Tier 1 — typically 3-5 models — are run on the full
+                  Donners_2021 review (250 studies, complete screening set). This produces
+                  statistically meaningful metrics and reveals patterns invisible in 10
+                  studies: consistency across study types, calibration of confidence
+                  scores, and deference behavior.
+                </div>
+              </div>
+              <div className="flex gap-3">
+                <span className="text-blue-600 font-bold mt-0.5">3.</span>
+                <div>
+                  <strong>Dual-run consensus (winning model):</strong> The best model
+                  from Tier 2 is run through the production dual-run consensus system
+                  to measure how consensus screening improves the metrics — particularly
+                  the deference rate and confident error count.
+                </div>
+              </div>
+            </div>
+            <p>
+              We intentionally include both open-source models (Llama, Mistral,
+              DeepSeek, Qwen, Gemma) and proprietary models (GPT-4o, Claude, Gemini)
+              in the evaluation. For institutions that require data sovereignty or
+              on-premise deployment, knowing which open-source models perform competitively
+              is critical.
+            </p>
+          </div>
+        </section>
+
         {/* Results Placeholder */}
         <section className="mb-12">
           <h2 className="text-xl font-semibold text-slate-800 mb-4">Results</h2>
@@ -265,9 +318,9 @@ export default function EvaluationPage() {
               <div>
                 <h3 className="font-semibold text-amber-800 text-sm mb-1">Benchmarks in Progress</h3>
                 <p className="text-sm text-amber-700">
-                  We are currently running systematic evaluations across multiple LLM models.
-                  Results will be published here with both standard and deference-aware
-                  metrics once complete.
+                  We are currently running Tier 1 evaluations across 9 LLM models.
+                  Initial results show meaningful differences in deference behavior
+                  between models. Full Tier 2 results will be published here once complete.
                 </p>
               </div>
             </div>
@@ -291,18 +344,23 @@ export default function EvaluationPage() {
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {[
-                  { model: 'Llama 3.3 70B', developer: 'Meta' },
-                  { model: 'Mistral 3.1 24B', developer: 'Mistral AI' },
-                  { model: 'DeepSeek R1', developer: 'DeepSeek' },
-                  { model: 'GPT-4o', developer: 'OpenAI' },
-                  { model: 'Claude Sonnet 4.6', developer: 'Anthropic' },
-                  { model: 'Qwen 3.5', developer: 'Alibaba Cloud' },
-                  { model: 'Gemini 3 Pro', developer: 'Google' },
-                  { model: 'Grok 4.1', developer: 'xAI' },
-                ].map(({ model, developer }) => (
+                  { model: 'Llama 3.3 70B', developer: 'Meta', oss: true },
+                  { model: 'Mistral 3.1 24B', developer: 'Mistral AI', oss: true },
+                  { model: 'DeepSeek v3', developer: 'DeepSeek', oss: true },
+                  { model: 'Qwen 3 235B', developer: 'Alibaba Cloud', oss: true },
+                  { model: 'Gemma 3 27B', developer: 'Google', oss: true },
+                  { model: 'Kimi k2', developer: 'Moonshot AI', oss: true },
+                  { model: 'GPT-4o', developer: 'OpenAI', oss: false },
+                  { model: 'Claude Sonnet 4.6', developer: 'Anthropic', oss: false },
+                  { model: 'Gemini 3 Pro', developer: 'Google', oss: false },
+                  { model: 'Grok 4.1', developer: 'xAI', oss: false },
+                ].map(({ model, developer, oss }) => (
                   <tr key={model} className="hover:bg-slate-50">
                     <td className="px-4 py-3 font-medium text-slate-800">{model}</td>
-                    <td className="px-4 py-3 text-slate-500">{developer}</td>
+                    <td className="px-4 py-3 text-slate-500">
+                      {developer}
+                      {oss && <span className="ml-2 text-xs bg-green-50 text-green-600 px-1.5 py-0.5 rounded">open source</span>}
+                    </td>
                     <td className="px-4 py-3 text-slate-400">--</td>
                     <td className="px-4 py-3 text-slate-400">--</td>
                     <td className="px-4 py-3 text-slate-400">--</td>

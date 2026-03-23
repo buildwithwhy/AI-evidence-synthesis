@@ -106,6 +106,16 @@ MODEL_CONFIGS = {
         "cost_per_1k_input": 0.0003,
         "cost_per_1k_output": 0.0012,
     },
+    "kimi-k2": {
+        "provider": "venice",
+        "model": "kimi-k2-5",
+        "developer": "Moonshot AI",
+        "open_source": True,
+        "env_key": "AI_API_KEY",
+        "base_url": VENICE_BASE_URL,
+        "cost_per_1k_input": 0.0006,
+        "cost_per_1k_output": 0.0024,
+    },
     # --- Proprietary models (via Venice AI) ---
     "gpt-4o": {
         "provider": "venice",
