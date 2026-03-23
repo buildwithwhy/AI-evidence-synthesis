@@ -1,5 +1,6 @@
 import { NavLink, Outlet, useNavigate, useParams } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
+import { useUsage } from '../hooks/useUsage'
 import {
   FolderOpen,
   LayoutDashboard,
@@ -16,6 +17,7 @@ export default function Layout() {
   const { user, signOut } = useAuth()
   const navigate = useNavigate()
   const { projectId } = useParams()
+  const { usage } = useUsage()
 
   const handleSignOut = async () => {
     await signOut()
@@ -28,6 +30,9 @@ export default function Layout() {
         ? 'bg-slate-100 text-slate-900'
         : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50'
     }`
+
+  const usagePct = usage.userLimit > 0 ? (usage.userCount / usage.userLimit) * 100 : 0
+  const usageColor = usagePct >= 100 ? 'bg-red-500' : usagePct >= 80 ? 'bg-amber-500' : 'bg-blue-500'
 
   return (
     <div className="flex min-h-screen bg-slate-50">
@@ -82,6 +87,33 @@ export default function Layout() {
             </>
           )}
         </nav>
+
+        {/* Usage meter */}
+        {!usage.loading && (
+          <div className="px-4 py-3 border-t border-slate-100">
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-xs text-slate-400">Screenings this month</span>
+              <span className="text-xs font-medium text-slate-600">
+                {usage.userCount}/{usage.userLimit}
+              </span>
+            </div>
+            <div className="w-full bg-slate-100 rounded-full h-1.5">
+              <div
+                className={`${usageColor} h-1.5 rounded-full transition-all`}
+                style={{ width: `${Math.min(usagePct, 100)}%` }}
+              />
+            </div>
+            {usage.userRemaining <= 5 && usage.userRemaining > 0 && (
+              <p className="text-xs text-amber-600 mt-1">{usage.userRemaining} screenings remaining</p>
+            )}
+            {usage.userRemaining === 0 && (
+              <p className="text-xs text-red-600 mt-1">
+                Limit reached.{' '}
+                <a href="mailto:hello@kallidao.com" className="underline">Contact us</a> to upgrade.
+              </p>
+            )}
+          </div>
+        )}
 
         {/* User */}
         <div className="border-t border-slate-100 px-3 py-3">

@@ -170,6 +170,13 @@ export default function LoginPage() {
               {loading ? 'Please wait...' : mode === 'login' ? 'Sign In' : 'Create Account'}
             </button>
           </form>
+
+          {mode === 'register' && (
+            <p className="text-xs text-slate-400 text-center mt-4">
+              Free plan includes 20 AI screenings per month.{' '}
+              <a href="mailto:hello@kallidao.com" className="underline">Contact us</a> for institutional access.
+            </p>
+          )}
         </div>
       </div>
       </div>

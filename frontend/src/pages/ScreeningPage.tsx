@@ -6,13 +6,15 @@ import FileUpload from '../components/FileUpload'
 import DecisionBadge from '../components/DecisionBadge'
 import PicoScorecard from '../components/PicoScorecard'
 import ConfidenceBar from '../components/ConfidenceBar'
-import { AlertCircle } from 'lucide-react'
+import { AlertCircle, Lock } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
+import { useUsage } from '../hooks/useUsage'
 import type { PicoData, ScreeningResponse } from '../types'
 
 export default function ScreeningPage() {
   const { projectId } = useParams()
   const { user } = useAuth()
+  const { usage, incrementAndCheck } = useUsage()
   const [searchParams] = useSearchParams()
   const level = parseInt(searchParams.get('level') || '1')
 
@@ -77,7 +79,21 @@ export default function ScreeningPage() {
     return { id: data?.id ?? null, error }
   }
 
+  const limitMessage = (reason: string) =>
+    reason === 'user_limit'
+      ? 'You have reached your free plan limit of 20 AI screenings this month. Contact hello@kallidao.com for institutional access.'
+      : reason === 'global_limit'
+      ? 'The free tier screening quota has been reached for this month. Contact hello@kallidao.com for access.'
+      : 'Usage limit reached. Contact hello@kallidao.com for access.'
+
   const handleScreen = async () => {
+    // Check usage limit
+    const check = await incrementAndCheck(1)
+    if (!check.allowed) {
+      setError(limitMessage(check.reason))
+      return
+    }
+
     setScreening(true)
     setResult(null)
     setError(null)
@@ -159,6 +175,14 @@ export default function ScreeningPage() {
   }
 
   const handleBatch = async () => {
+    // Check if user has enough remaining screenings
+    // For batch, we check against remaining quota (we don't know exact count yet for CSV,
+    // but we can at least check they have SOME remaining)
+    if (!usage.allowed) {
+      setBatchError(limitMessage(usage.reason))
+      return
+    }
+
     setBatchRunning(true)
     setBatchDone(null)
     setBatchError(null)
@@ -196,6 +220,14 @@ export default function ScreeningPage() {
         const { data } = await client.post('/api/screening/analyze/batch', formData)
         apiResults = data.results
         apiFailed = data.failed
+      }
+
+      // Increment usage for the batch
+      const batchCheck = await incrementAndCheck(apiResults.length)
+      if (!batchCheck.allowed) {
+        setBatchError(limitMessage(batchCheck.reason))
+        setBatchRunning(false)
+        return
       }
 
       // Batch insert to Supabase (single round trip instead of N)
@@ -249,6 +281,26 @@ export default function ScreeningPage() {
           </p>
         </div>
       </div>
+
+      {/* Usage limit banner */}
+      {!usage.loading && !usage.allowed && (
+        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3">
+          <Lock className="w-5 h-5 text-red-500 mt-0.5 flex-shrink-0" />
+          <div>
+            <h3 className="font-semibold text-red-800 text-sm mb-1">
+              {usage.reason === 'user_limit' ? 'Monthly screening limit reached' : 'Free tier quota full'}
+            </h3>
+            <p className="text-sm text-red-700">
+              {usage.reason === 'user_limit'
+                ? `You have used all ${usage.userLimit} free AI screenings for this month. `
+                : 'The platform-wide free tier screening quota has been reached for this month. '}
+              For continued access, contact us at{' '}
+              <a href="mailto:hello@kallidao.com" className="underline font-medium">hello@kallidao.com</a>
+              {' '}for institutional pricing.
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* Tabs */}
       <div className="flex border-b border-slate-200 mb-6">
