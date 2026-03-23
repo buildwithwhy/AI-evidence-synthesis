@@ -344,15 +344,18 @@ def screen_with_model(text: str, pico: dict, config: dict) -> dict:
     else:
         return _error_result(f"Unknown provider: {provider}")
 
-    # Normalize the result
-    decision = result.get("ScreeningDecision", "UNCLEAR")
+    # Normalize the result — store BOTH raw and thresholded decision
+    raw_decision = result.get("ScreeningDecision", "UNCLEAR")
     confidence = int(result.get("Confidence_Score", 0))
 
-    if confidence < 85 and decision != "UNCLEAR":
-        decision = "UNCLEAR"
+    # Thresholded decision: low-confidence non-UNCLEAR becomes UNCLEAR
+    thresholded_decision = raw_decision
+    if confidence < 85 and raw_decision != "UNCLEAR":
+        thresholded_decision = "UNCLEAR"
 
     return {
-        "decision": decision,
+        "decision": thresholded_decision,     # Three-class / deference-aware
+        "raw_decision": raw_decision,          # Forced binary (model's actual call)
         "confidence": confidence,
         "reason": result.get("Reasoning_Summary", ""),
         "p_check": bool(result.get("Population_Check", False)),
@@ -427,6 +430,7 @@ def run_benchmark(csv_path: Path, model_names: list[str], protocols: dict,
         # Build results DataFrame
         result_df = df.copy()
         result_df["ai_decision"] = [r["decision"] for r in model_decisions]
+        result_df["ai_raw_decision"] = [r.get("raw_decision", r["decision"]) for r in model_decisions]
         result_df["ai_confidence"] = [r["confidence"] for r in model_decisions]
         result_df["ai_reason"] = [r["reason"] for r in model_decisions]
 

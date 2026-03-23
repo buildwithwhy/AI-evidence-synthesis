@@ -119,36 +119,33 @@ def _compute_binary_metrics(decisions, ground_truth) -> dict:
 
 
 def compute_forced_binary_metrics(df: pd.DataFrame) -> dict:
-    """Framework 1: Forced binary. No UNCLEAR — use raw model decision.
+    """Framework 1: Forced binary. No UNCLEAR — use the model's raw decision.
 
-    For studies where the model output UNCLEAR, we use the underlying
-    confidence to force a decision: if the model leaned INCLUDE (any
-    PICO checks passed), treat as INCLUDE, otherwise EXCLUDE.
+    If the DataFrame has an 'ai_raw_decision' column (the model's original
+    INCLUDE/EXCLUDE before confidence thresholding), use that. This is the
+    true forced binary — what the model would have decided if we never
+    introduced the UNCLEAR option.
 
-    In practice, since our benchmark script records the raw decision
-    before confidence thresholding, we can reconstruct this from the
-    ai_decision and ai_confidence columns. If ai_decision is UNCLEAR
-    and confidence >= 50, we force INCLUDE; otherwise EXCLUDE.
+    If 'ai_raw_decision' is not available (older data), fall back to
+    treating UNCLEAR as EXCLUDE.
 
-    This is the true traditional baseline — comparable to any binary
-    screening tool in the literature.
+    This is the traditional baseline — comparable to any binary screening
+    tool in the literature.
     """
-    # For studies that were UNCLEAR, force a binary decision
-    # The raw model already gave INCLUDE/EXCLUDE before confidence
-    # thresholding turned it into UNCLEAR. We approximate by using
-    # the confidence score: >= 50 suggests the model leaned INCLUDE.
-    forced = df.copy()
-    # For non-UNCLEAR studies, keep as-is
-    # For UNCLEAR studies: since we don't have the pre-threshold decision
-    # in the benchmark data, we treat UNCLEAR as EXCLUDE (conservative)
-    # This slightly penalises models that defer, which is the point —
-    # forced binary shows what happens without deference.
-    forced_decisions = forced["ai_decision"].apply(
-        lambda d: "EXCLUDE" if d == "UNCLEAR" else d
-    )
+    if "ai_raw_decision" in df.columns:
+        # Use the model's actual pre-threshold decision
+        forced_decisions = df["ai_raw_decision"].apply(
+            lambda d: "EXCLUDE" if d == "UNCLEAR" or d == "ERROR" else d
+        )
+    else:
+        # Fallback: treat UNCLEAR as EXCLUDE
+        forced_decisions = df["ai_decision"].apply(
+            lambda d: "EXCLUDE" if d == "UNCLEAR" or d == "ERROR" else d
+        )
 
-    m = _compute_binary_metrics(forced_decisions, forced["ground_truth"])
+    m = _compute_binary_metrics(forced_decisions, df["ground_truth"])
     m["framework"] = "forced_binary"
+    m["has_raw_decisions"] = "ai_raw_decision" in df.columns
     m["work_saved_pct"] = round((m["tn"] + m["fn"]) / m["total"] * 100, 1) if m["total"] > 0 else 0
     return m
 
