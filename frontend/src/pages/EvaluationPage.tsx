@@ -119,46 +119,65 @@ export default function EvaluationPage() {
           </div>
         </section>
 
-        {/* Three Evaluation Frameworks */}
+        {/* Evaluation Frameworks */}
         <section className="mb-12">
-          <h2 className="text-xl font-semibold text-slate-800 mb-4">Three Evaluation Frameworks</h2>
+          <h2 className="text-xl font-semibold text-slate-800 mb-4">Evaluation Frameworks</h2>
           <div className="bg-slate-50 border border-slate-200 rounded-lg p-6 space-y-4 text-sm text-slate-600">
             <p>
-              Traditional screening tools force a binary decision: INCLUDE or EXCLUDE.
-              We introduce a third output class — <strong>UNSURE</strong> — triggered when
-              the AI's confidence falls below a threshold (default 85%, tunable per domain).
-              This is itself an innovation: most evaluation frameworks do not account for
-              the possibility that the AI can and should decline to answer.
-            </p>
-            <p>
-              To evaluate this properly, we define three frameworks and report all three
-              side by side:
+              When AI can express uncertainty, how should that uncertainty be evaluated?
+              We identify three approaches — one traditional, one mainstream but flawed,
+              and one that we propose as a better alternative for human-in-the-loop systems.
             </p>
 
             <div className="space-y-3 mt-4">
               <div className="bg-white border border-slate-200 rounded-md p-4">
-                <h4 className="font-semibold text-slate-700 mb-1">1. Forced Binary</h4>
+                <h4 className="font-semibold text-slate-700 mb-2">Framework 1: Forced Binary Classification</h4>
                 <p className="text-xs text-slate-500">
-                  No UNSURE option. Every study gets INCLUDE or EXCLUDE regardless of
-                  confidence. This is the traditional baseline, directly comparable to
-                  all existing screening tool literature. It measures raw model capability
-                  without any safety net.
+                  The AI produces only INCLUDE or EXCLUDE, evaluated on standard sensitivity,
+                  specificity, and F1. This is the appropriate baseline for fully automated
+                  systems. It does not fragment the evaluation — it simply excludes the
+                  possibility of uncertainty entirely. The limitation is the assumption that
+                  every case must receive a confident decision regardless of how certain the
+                  AI actually is.
                 </p>
               </div>
-              <div className="bg-white border border-slate-300 rounded-md p-4">
-                <h4 className="font-semibold text-slate-700 mb-1">2. Three-Class (UNSURE penalised)</h4>
-                <p className="text-xs text-slate-500">
-                  UNSURE exists as a third output (triggered below the confidence threshold),
-                  but is treated as wrong for metric computation. This shows what happens
-                  when you add uncertainty to the output but evaluate traditionally. Models
-                  that defer will appear to perform worse than models that guess.
-                </p>
-              </div>
-              <div className="bg-white border border-blue-200 rounded-md p-4">
-                <h4 className="font-semibold text-blue-700 mb-1">3. Deference-Aware (UNSURE = correct)</h4>
+
+              <div className="bg-white border border-amber-200 rounded-md p-4">
+                <h4 className="font-semibold text-amber-700 mb-2">
+                  Framework 2: Three-Class with Partial Evaluation
+                  <span className="ml-2 text-xs font-normal text-amber-500">(mainstream but flawed)</span>
+                </h4>
                 <p className="text-xs text-slate-500 mb-2">
-                  UNSURE counts as correct. The only failures are confident wrong
-                  answers in either direction:
+                  The AI can output UNSURE, but existing approaches handle it in ways that
+                  fragment the evaluation:
+                </p>
+                <ul className="text-xs text-slate-500 space-y-2">
+                  <li>
+                    <strong>Coverage/risk evaluation</strong> (the mainstream in selective prediction):
+                    abstentions are excluded from the denominator and the system is scored only
+                    on cases it chose to answer confidently. This hides deferred workload — a
+                    system deferring 80% of inputs and getting 99% accuracy on the rest scores
+                    well, but the 80% still need to be resolved by someone.
+                  </li>
+                  <li>
+                    <strong>Siloed abstention evaluation</strong> (as in AbstentionBench):
+                    abstention capability and task accuracy are measured by separate judges
+                    and reported as two disconnected scores.
+                  </li>
+                </ul>
+                <p className="text-xs text-slate-500 mt-2">
+                  Both variants share the same core failure: <strong>they evaluate the AI's
+                  slice in isolation and tell you nothing about how well the full human-AI
+                  system performs.</strong>
+                </p>
+              </div>
+
+              <div className="bg-white border border-blue-200 rounded-md p-4">
+                <h4 className="font-semibold text-blue-700 mb-2">Framework 3: Deference-Aware Evaluation</h4>
+                <p className="text-xs text-slate-500 mb-2">
+                  UNSURE is scored within the primary task metrics as correct, producing a
+                  single unified quality signal that covers confident decisions and appropriate
+                  deferrals together. The only failures are confident wrong answers:
                 </p>
                 <div className="text-xs text-slate-500 mb-3 bg-slate-50 rounded p-3 font-mono">
                   <div>AI says INCLUDE, truth is INCLUDE → Correct</div>
@@ -167,12 +186,16 @@ export default function EvaluationPage() {
                   <div>AI says INCLUDE, truth is EXCLUDE → <span className="text-red-600 font-semibold">Incorrect</span></div>
                   <div>AI says EXCLUDE, truth is INCLUDE → <span className="text-red-600 font-semibold">Incorrect</span></div>
                 </div>
+                <p className="text-xs text-slate-500 mb-2">
+                  Deferred workload is made visible through explicitly reported deference
+                  rate and effective coverage, rather than hidden in the denominator.
+                </p>
                 <ul className="text-xs text-slate-500 space-y-1">
                   <li><strong>DA Sensitivity:</strong> Of all studies that should be included, how many did the AI either correctly include OR defer? Only confident exclusions of included studies count as failures.</li>
                   <li><strong>DA Specificity:</strong> Of all studies that should be excluded, how many did the AI either correctly exclude OR defer? Only confident inclusions of excluded studies count as failures.</li>
                   <li><strong>DA F1:</strong> Harmonic mean of DA sensitivity and decided precision. Balances safety (catching included studies or deferring) with quality (when you say INCLUDE, being right).</li>
                   <li><strong>Confident errors:</strong> The total count of confident wrong answers — the only true failures in a HITL system.</li>
-                  <li><strong>Deference rate:</strong> What percentage of studies the AI flagged for human review.</li>
+                  <li><strong>Deference rate:</strong> What percentage of studies the AI flagged for human review — making workload visible.</li>
                   <li><strong>Effective coverage:</strong> What percentage of screening the AI handles autonomously.</li>
                 </ul>
               </div>
@@ -185,15 +208,17 @@ export default function EvaluationPage() {
                 not a fixed standard. Lower thresholds mean more autonomous decisions and
                 higher risk. Higher thresholds mean more deference, lower risk, and more
                 human workload. The right threshold depends on the domain, the stakes of
-                the decision, and the available human oversight capacity.
+                the decision, and the available human oversight capacity. Notably, some
+                models (such as Claude) also output UNSURE on their own initiative regardless
+                of the threshold, when they judge a case to be genuinely ambiguous.
               </p>
             </div>
 
             <p className="mt-4 text-slate-500 italic">
-              These three frameworks together tell the complete story: forced binary shows
-              raw capability, three-class shows the cost of adding uncertainty under
-              traditional evaluation, and deference-aware shows the actual safety of the
-              system when human oversight is in place. This applies to any domain where
+              We report Framework 1 and Framework 3 side by side in our results.
+              The gap between them shows exactly how much safety is gained by allowing
+              deference — and the deference rate and coverage metrics make the workload
+              trade-off explicit rather than hiding it. This applies to any domain where
               AI operates under human oversight — not just systematic reviews. A forthcoming
               white paper will formalise this as a general evaluation framework for
               human-in-the-loop AI systems.
