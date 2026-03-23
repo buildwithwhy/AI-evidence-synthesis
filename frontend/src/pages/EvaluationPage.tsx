@@ -119,41 +119,46 @@ export default function EvaluationPage() {
           </div>
         </section>
 
-        {/* Deference-Aware Evaluation */}
+        {/* Three Evaluation Frameworks */}
         <section className="mb-12">
-          <h2 className="text-xl font-semibold text-slate-800 mb-4">Deference-Aware Evaluation</h2>
+          <h2 className="text-xl font-semibold text-slate-800 mb-4">Three Evaluation Frameworks</h2>
           <div className="bg-slate-50 border border-slate-200 rounded-lg p-6 space-y-4 text-sm text-slate-600">
             <p>
-              Standard evaluation metrics treat AI uncertainty as an error. If the AI
-              says "I'm not sure" about a study, traditional metrics penalise this
-              the same as a wrong answer. We believe this is fundamentally flawed
-              for any AI system operating with human oversight.
+              Traditional screening tools force a binary decision: INCLUDE or EXCLUDE.
+              We introduce a third output class — <strong>UNSURE</strong> — triggered when
+              the AI's confidence falls below a threshold (default 85%, tunable per domain).
+              This is itself an innovation: most evaluation frameworks do not account for
+              the possibility that the AI can and should decline to answer.
             </p>
             <p>
-              In high-stakes domains — evidence synthesis, clinical decision support,
-              legal review, safety-critical systems — AI is not replacing human judgment.
-              It is augmenting it. When an AI correctly identifies that a case is ambiguous
-              and defers to a human expert, it has <strong>behaved correctly</strong>.
-              Penalising appropriate uncertainty creates incentives for overconfident AI,
-              which is precisely what you do not want when the consequences of a wrong
-              answer are severe.
+              To evaluate this properly, we define three frameworks and report all three
+              side by side:
             </p>
-            <p>
-              We report both frameworks side by side:
-            </p>
+
             <div className="space-y-3 mt-4">
               <div className="bg-white border border-slate-200 rounded-md p-4">
-                <h4 className="font-semibold text-slate-700 mb-1">Standard Metrics</h4>
+                <h4 className="font-semibold text-slate-700 mb-1">1. Forced Binary</h4>
                 <p className="text-xs text-slate-500">
-                  UNCLEAR counts as wrong. Comparable to existing literature.
-                  Useful for apples-to-apples comparison with other screening tools.
+                  No UNSURE option. Every study gets INCLUDE or EXCLUDE regardless of
+                  confidence. This is the traditional baseline, directly comparable to
+                  all existing screening tool literature. It measures raw model capability
+                  without any safety net.
+                </p>
+              </div>
+              <div className="bg-white border border-slate-300 rounded-md p-4">
+                <h4 className="font-semibold text-slate-700 mb-1">2. Three-Class (UNSURE penalised)</h4>
+                <p className="text-xs text-slate-500">
+                  UNSURE exists as a third output (triggered below the confidence threshold),
+                  but is treated as wrong for metric computation. This shows what happens
+                  when you add uncertainty to the output but evaluate traditionally. Models
+                  that defer will appear to perform worse than models that guess.
                 </p>
               </div>
               <div className="bg-white border border-blue-200 rounded-md p-4">
-                <h4 className="font-semibold text-blue-700 mb-1">Deference-Aware Metrics</h4>
+                <h4 className="font-semibold text-blue-700 mb-1">3. Deference-Aware (UNSURE = correct)</h4>
                 <p className="text-xs text-slate-500 mb-2">
                   UNSURE counts as correct. The only failures are confident wrong
-                  answers in either direction. The logic is symmetric:
+                  answers in either direction:
                 </p>
                 <div className="text-xs text-slate-500 mb-3 bg-slate-50 rounded p-3 font-mono">
                   <div>AI says INCLUDE, truth is INCLUDE → Correct</div>
@@ -163,21 +168,35 @@ export default function EvaluationPage() {
                   <div>AI says EXCLUDE, truth is INCLUDE → <span className="text-red-600 font-semibold">Incorrect</span></div>
                 </div>
                 <ul className="text-xs text-slate-500 space-y-1">
-                  <li><strong>DA Sensitivity:</strong> Of all studies that should be included, how many did the AI either correctly include OR defer to a human? Only confident exclusions of included studies count as failures.</li>
+                  <li><strong>DA Sensitivity:</strong> Of all studies that should be included, how many did the AI either correctly include OR defer? Only confident exclusions of included studies count as failures.</li>
                   <li><strong>DA Specificity:</strong> Of all studies that should be excluded, how many did the AI either correctly exclude OR defer? Only confident inclusions of excluded studies count as failures.</li>
-                  <li><strong>Confident errors:</strong> The total count of confident wrong answers in either direction — the only true failures in a HITL system.</li>
-                  <li><strong>Deference rate:</strong> What percentage of studies the AI flagged for human review rather than deciding autonomously.</li>
-                  <li><strong>Effective coverage:</strong> What percentage of screening the AI can handle without human intervention.</li>
+                  <li><strong>DA F1:</strong> Harmonic mean of DA sensitivity and decided precision. Balances safety (catching included studies or deferring) with quality (when you say INCLUDE, being right).</li>
+                  <li><strong>Confident errors:</strong> The total count of confident wrong answers — the only true failures in a HITL system.</li>
+                  <li><strong>Deference rate:</strong> What percentage of studies the AI flagged for human review.</li>
+                  <li><strong>Effective coverage:</strong> What percentage of screening the AI handles autonomously.</li>
                 </ul>
               </div>
             </div>
+
+            <div className="mt-4 p-3 bg-white border border-slate-200 rounded-md">
+              <h4 className="font-semibold text-slate-700 text-xs mb-1">On the confidence threshold</h4>
+              <p className="text-xs text-slate-500">
+                The threshold that triggers UNSURE (default 85%) is a tunable parameter,
+                not a fixed standard. Lower thresholds mean more autonomous decisions and
+                higher risk. Higher thresholds mean more deference, lower risk, and more
+                human workload. The right threshold depends on the domain, the stakes of
+                the decision, and the available human oversight capacity.
+              </p>
+            </div>
+
             <p className="mt-4 text-slate-500 italic">
-              This framework applies beyond systematic reviews. Any domain where AI operates
-              under human oversight — clinical decision support, legal document review,
-              safety-critical engineering, financial audit — benefits from evaluation
-              methods that reward appropriate uncertainty rather than penalising it.
-              A forthcoming white paper will formalise this as a general evaluation
-              framework for human-in-the-loop AI systems.
+              These three frameworks together tell the complete story: forced binary shows
+              raw capability, three-class shows the cost of adding uncertainty under
+              traditional evaluation, and deference-aware shows the actual safety of the
+              system when human oversight is in place. This applies to any domain where
+              AI operates under human oversight — not just systematic reviews. A forthcoming
+              white paper will formalise this as a general evaluation framework for
+              human-in-the-loop AI systems.
             </p>
           </div>
         </section>
