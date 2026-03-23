@@ -309,76 +309,138 @@ export default function EvaluationPage() {
           </div>
         </section>
 
-        {/* Results Placeholder */}
+        {/* Tier 1 Results */}
         <section className="mb-12">
-          <h2 className="text-xl font-semibold text-slate-800 mb-4">Results</h2>
-          <div className="border border-amber-200 bg-amber-50 rounded-lg p-6">
-            <div className="flex items-start gap-3">
-              <AlertTriangle className="w-5 h-5 text-amber-600 mt-0.5 flex-shrink-0" />
-              <div>
-                <h3 className="font-semibold text-amber-800 text-sm mb-1">Benchmarks in Progress</h3>
-                <p className="text-sm text-amber-700">
-                  We are currently running Tier 1 evaluations across 9 LLM models.
-                  Initial results show meaningful differences in deference behavior
-                  between models. Full Tier 2 results will be published here once complete.
-                </p>
-              </div>
-            </div>
-          </div>
-        </section>
+          <h2 className="text-xl font-semibold text-slate-800 mb-4">Tier 1 Results: Smoke Test</h2>
+          <p className="text-sm text-slate-500 mb-4">
+            10 studies from the Donners et al. 2021 systematic review on emicizumab
+            pharmacokinetics (5 include, 5 exclude). Single-run per model, no dual consensus.
+          </p>
 
-        {/* Multi-model comparison */}
-        <section className="mb-12">
-          <h2 className="text-xl font-semibold text-slate-800 mb-4">Models Under Evaluation</h2>
-          <div className="border border-slate-200 rounded-lg overflow-hidden">
+          <div className="border border-slate-200 rounded-lg overflow-hidden mb-4">
             <table className="w-full text-sm">
               <thead className="bg-slate-50 border-b border-slate-200">
                 <tr>
                   <th className="text-left px-4 py-3 font-medium text-slate-600">Model</th>
                   <th className="text-left px-4 py-3 font-medium text-slate-600">Developer</th>
-                  <th className="text-left px-4 py-3 font-medium text-slate-600">Std Sensitivity</th>
-                  <th className="text-left px-4 py-3 font-medium text-slate-600">DA Sensitivity</th>
-                  <th className="text-left px-4 py-3 font-medium text-slate-600">F1</th>
-                  <th className="text-left px-4 py-3 font-medium text-slate-600">Status</th>
+                  <th className="text-right px-4 py-3 font-medium text-slate-600">Sensitivity</th>
+                  <th className="text-right px-4 py-3 font-medium text-slate-600">Specificity</th>
+                  <th className="text-right px-4 py-3 font-medium text-slate-600">F1</th>
+                  <th className="text-right px-4 py-3 font-medium text-slate-600">DA Sens</th>
+                  <th className="text-right px-4 py-3 font-medium text-slate-600">Errors</th>
+                  <th className="text-left px-4 py-3 font-medium text-slate-600">Tier 2</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {[
-                  { model: 'Llama 3.3 70B', developer: 'Meta', oss: true },
-                  { model: 'Mistral 3.1 24B', developer: 'Mistral AI', oss: true },
-                  { model: 'DeepSeek v3', developer: 'DeepSeek', oss: true },
-                  { model: 'Qwen 3 235B', developer: 'Alibaba Cloud', oss: true },
-                  { model: 'Gemma 3 27B', developer: 'Google', oss: true },
-                  { model: 'Kimi k2', developer: 'Moonshot AI', oss: true },
-                  { model: 'GPT-4o', developer: 'OpenAI', oss: false },
-                  { model: 'Claude Sonnet 4.6', developer: 'Anthropic', oss: false },
-                  { model: 'Gemini 3 Pro', developer: 'Google', oss: false },
-                  { model: 'Grok 4.1', developer: 'xAI', oss: false },
-                ].map(({ model, developer, oss }) => (
-                  <tr key={model} className="hover:bg-slate-50">
+                  { model: 'Mistral 3.1 24B', dev: 'Mistral AI', oss: true, sens: '100%', spec: '60%', f1: '83%', da: '100%', err: 2, tier2: true },
+                  { model: 'Gemma 3 27B', dev: 'Google', oss: true, sens: '100%', spec: '40%', f1: '77%', da: '100%', err: 3, tier2: true },
+                  { model: 'Claude Sonnet 4.6', dev: 'Anthropic', oss: false, sens: '60%', spec: '100%', f1: '75%', da: '80%', err: 1, tier2: true },
+                  { model: 'GPT-4o', dev: 'OpenAI', oss: false, sens: '60%', spec: '100%', f1: '75%', da: '60%', err: 2, tier2: true },
+                  { model: 'Llama 3.3 70B', dev: 'Meta', oss: true, sens: '80%', spec: '20%', f1: '62%', da: '80%', err: 5, tier2: false },
+                  { model: 'Kimi k2', dev: 'Moonshot AI', oss: true, sens: '100%*', spec: '100%*', f1: '100%*', da: '100%*', err: 0, tier2: false },
+                  { model: 'DeepSeek v3', dev: 'DeepSeek', oss: true, sens: '--', spec: '--', f1: '--', da: '--', err: null, tier2: false },
+                ].map(({ model, dev, oss, sens, spec, f1, da, err, tier2 }) => (
+                  <tr key={model} className={`hover:bg-slate-50 ${tier2 ? '' : 'opacity-60'}`}>
                     <td className="px-4 py-3 font-medium text-slate-800">{model}</td>
                     <td className="px-4 py-3 text-slate-500">
-                      {developer}
-                      {oss && <span className="ml-2 text-xs bg-green-50 text-green-600 px-1.5 py-0.5 rounded">open source</span>}
+                      {dev}
+                      {oss && <span className="ml-2 text-xs bg-green-50 text-green-600 px-1.5 py-0.5 rounded">OS</span>}
                     </td>
-                    <td className="px-4 py-3 text-slate-400">--</td>
-                    <td className="px-4 py-3 text-slate-400">--</td>
-                    <td className="px-4 py-3 text-slate-400">--</td>
+                    <td className="px-4 py-3 text-right text-slate-700">{sens}</td>
+                    <td className="px-4 py-3 text-right text-slate-700">{spec}</td>
+                    <td className="px-4 py-3 text-right text-slate-700">{f1}</td>
+                    <td className="px-4 py-3 text-right text-slate-700">{da}</td>
+                    <td className="px-4 py-3 text-right text-slate-700">{err !== null ? err : '--'}</td>
                     <td className="px-4 py-3">
-                      <span className="text-xs bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full">
-                        Pending
-                      </span>
+                      {tier2 ? (
+                        <span className="text-xs bg-blue-50 text-blue-600 px-1.5 py-0.5 rounded-full">Selected</span>
+                      ) : (
+                        <span className="text-xs bg-slate-100 text-slate-400 px-1.5 py-0.5 rounded-full">Eliminated</span>
+                      )}
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
-          <p className="text-xs text-slate-400 mt-3">
-            All models accessed via Venice AI. Results will be updated as benchmarks
-            complete. Evaluations use the SYNERGY Tier 2 dataset (1,345 studies
-            across 3 verified reviews with complete screening sets).
-          </p>
+
+          <div className="text-xs text-slate-400 space-y-1 mb-6">
+            <p>All models accessed via Venice AI. * Kimi k2 scored perfectly on 3/10 studies but returned unparseable output for the other 7 (70% JSON error rate). DeepSeek v3 exceeded practical response time limits ({'>'}10 min/study).</p>
+          </div>
+
+          {/* Collapsible findings */}
+          <details className="border border-slate-200 rounded-lg">
+            <summary className="px-5 py-3 cursor-pointer text-sm font-semibold text-slate-700 hover:bg-slate-50">
+              Key Findings from Tier 1
+            </summary>
+            <div className="px-5 py-4 border-t border-slate-100 space-y-4 text-sm text-slate-600">
+              <div>
+                <h4 className="font-semibold text-slate-700 mb-1">Open source models favour inclusion</h4>
+                <p>
+                  Mistral and Gemma achieved 100% sensitivity — they caught every
+                  relevant study. However, they also incorrectly included 2-3 irrelevant
+                  studies, resulting in lower specificity. This is a common pattern:
+                  when uncertain, open source models tend to err on the side of inclusion.
+                </p>
+              </div>
+              <div>
+                <h4 className="font-semibold text-slate-700 mb-1">Proprietary models favour exclusion</h4>
+                <p>
+                  GPT-4o and Claude both achieved 100% specificity — every study they
+                  excluded was correctly excluded. But they also missed 2 relevant
+                  studies each (60% sensitivity). When uncertain, proprietary models
+                  tend to err on the side of exclusion.
+                </p>
+              </div>
+              <div>
+                <h4 className="font-semibold text-slate-700 mb-1">Claude was the only model to defer</h4>
+                <p>
+                  Of all models tested, Claude Sonnet 4.6 was the only one that
+                  used the UNCLEAR option — flagging 2 studies (22%) for human review
+                  rather than committing to a potentially wrong answer. One of these
+                  was the HAVEN 3 clinical trial, which Claude correctly identified as
+                  an efficacy study (not a pharmacokinetic study) and flagged rather
+                  than guessing. This resulted in Claude having the fewest confident
+                  errors (just 1) and the highest deference-aware accuracy (88.9%).
+                  Under standard metrics, this deference is penalised — Claude's
+                  standard sensitivity (60%) understates its actual safety (DA
+                  sensitivity 80%).
+                </p>
+              </div>
+              <div>
+                <h4 className="font-semibold text-slate-700 mb-1">Model selection for Tier 2</h4>
+                <p>
+                  Based on these results, we selected four models for deeper evaluation
+                  on the full Donners_2021 review (250 studies): Mistral 3.1 (best
+                  open source sensitivity), Gemma 3 27B (second open source option),
+                  Claude Sonnet 4.6 (unique deference behavior), and GPT-4o (proprietary
+                  baseline). Llama 3.3 was eliminated due to poor specificity (20%).
+                  Kimi k2 was eliminated due to unreliable JSON output. DeepSeek v3
+                  was eliminated due to impractical response times.
+                </p>
+              </div>
+            </div>
+          </details>
+        </section>
+
+        {/* Tier 2 status */}
+        <section className="mb-12">
+          <h2 className="text-xl font-semibold text-slate-800 mb-4">Tier 2 Results: Core Evaluation</h2>
+          <div className="border border-amber-200 bg-amber-50 rounded-lg p-6">
+            <div className="flex items-start gap-3">
+              <AlertTriangle className="w-5 h-5 text-amber-600 mt-0.5 flex-shrink-0" />
+              <div>
+                <h3 className="font-semibold text-amber-800 text-sm mb-1">In Progress</h3>
+                <p className="text-sm text-amber-700">
+                  Tier 2 evaluation is currently running on the complete Donners et al.
+                  2021 screening set (250 studies) across the four selected models.
+                  Results with both standard and deference-aware metrics will be
+                  published here once complete.
+                </p>
+              </div>
+            </div>
+          </div>
         </section>
 
         {/* Dual-run explanation */}
