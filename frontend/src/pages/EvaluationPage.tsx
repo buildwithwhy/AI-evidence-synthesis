@@ -343,15 +343,21 @@ export default function EvaluationPage() {
                 <tr>
                   <th className="text-left px-3 py-3 font-medium text-slate-600">Model</th>
                   <th className="text-left px-3 py-3 font-medium text-slate-600">Developer</th>
-                  <th className="text-right px-3 py-3 font-medium text-slate-600">Sens</th>
-                  <th className="text-right px-3 py-3 font-medium text-slate-600">Spec</th>
-                  <th className="text-right px-3 py-3 font-medium text-slate-600">F1</th>
-                  <th className="text-right px-3 py-3 font-medium text-slate-600">DA Sens</th>
-                  <th className="text-right px-3 py-3 font-medium text-slate-600">DA Spec</th>
-                  <th className="text-right px-3 py-3 font-medium text-slate-600">DA F1</th>
+                  <th className="text-right px-3 py-3 font-medium text-slate-500 bg-slate-50" colSpan={3}>Forced Binary / Three-Class</th>
+                  <th className="text-right px-3 py-3 font-medium text-blue-600 bg-blue-50/50" colSpan={3}>Deference-Aware</th>
                   <th className="text-right px-3 py-3 font-medium text-slate-600">Errors</th>
                   <th className="text-right px-3 py-3 font-medium text-slate-600">Deferred</th>
                   <th className="text-left px-3 py-3 font-medium text-slate-600">Tier 2</th>
+                </tr>
+                <tr className="bg-slate-50 border-b border-slate-200">
+                  <th className="px-3 py-1" colSpan={2}></th>
+                  <th className="text-right px-3 py-1 text-xs text-slate-400">Sens</th>
+                  <th className="text-right px-3 py-1 text-xs text-slate-400">Spec</th>
+                  <th className="text-right px-3 py-1 text-xs text-slate-400">F1</th>
+                  <th className="text-right px-3 py-1 text-xs text-blue-400">Sens</th>
+                  <th className="text-right px-3 py-1 text-xs text-blue-400">Spec</th>
+                  <th className="text-right px-3 py-1 text-xs text-blue-400">F1</th>
+                  <th className="px-3 py-1" colSpan={3}></th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
@@ -395,9 +401,11 @@ export default function EvaluationPage() {
 
           <div className="text-xs text-slate-400 space-y-1 mb-6">
             <p>
-              All models accessed via OpenRouter. Sorted by DA F1 (deference-aware F1).
-              Models with F1 {'>'}= 67% or unique deference behavior selected for Tier 2.
-              DA F1 is the harmonic mean of DA sensitivity and decided precision.
+              All models accessed via OpenRouter. Sorted by DA F1.
+              For single-run benchmarks, forced binary and three-class metrics are
+              equivalent (UNCLEAR maps to EXCLUDE in both). The deference-aware column
+              shows the impact of treating UNCLEAR as correct — the gap only appears
+              for models that actually deferred (Claude, Kimi, Mistral).
             </p>
           </div>
 
