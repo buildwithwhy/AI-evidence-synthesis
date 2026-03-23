@@ -157,6 +157,47 @@ MODEL_CONFIGS = {
         "cost_per_1k_input": 0.003,
         "cost_per_1k_output": 0.015,
     },
+    # --- OpenRouter variants (same models, different infra) ---
+    "or-deepseek-v3": {
+        "provider": "openrouter",
+        "model": "deepseek/deepseek-v3.2",
+        "developer": "DeepSeek",
+        "open_source": True,
+        "env_key": "OPENROUTER_API_KEY",
+        "base_url": "https://openrouter.ai/api/v1",
+        "cost_per_1k_input": 0.00014,
+        "cost_per_1k_output": 0.00028,
+    },
+    "or-qwen3-235b": {
+        "provider": "openrouter",
+        "model": "qwen/qwen3-235b-a22b",
+        "developer": "Alibaba Cloud",
+        "open_source": True,
+        "env_key": "OPENROUTER_API_KEY",
+        "base_url": "https://openrouter.ai/api/v1",
+        "cost_per_1k_input": 0.0005,
+        "cost_per_1k_output": 0.002,
+    },
+    "or-kimi-k2": {
+        "provider": "openrouter",
+        "model": "moonshotai/kimi-k2",
+        "developer": "Moonshot AI",
+        "open_source": True,
+        "env_key": "OPENROUTER_API_KEY",
+        "base_url": "https://openrouter.ai/api/v1",
+        "cost_per_1k_input": 0.0006,
+        "cost_per_1k_output": 0.0024,
+    },
+    "or-claude-sonnet": {
+        "provider": "openrouter",
+        "model": "anthropic/claude-sonnet-4.6",
+        "developer": "Anthropic",
+        "open_source": False,
+        "env_key": "OPENROUTER_API_KEY",
+        "base_url": "https://openrouter.ai/api/v1",
+        "cost_per_1k_input": 0.003,
+        "cost_per_1k_output": 0.015,
+    },
 }
 
 
