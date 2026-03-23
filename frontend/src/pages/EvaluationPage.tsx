@@ -434,11 +434,12 @@ export default function EvaluationPage() {
             pharmacokinetics in hemophilia A. 258 studies (15 include, 243 exclude).
             PICO criteria verified from the{' '}
             <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC8585815/" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">published paper</a>.
-            Single-run per model, no dual consensus.
+            Single-run per model (no dual consensus) to isolate raw model capability.
+            Dual-run consensus results forthcoming.
           </p>
 
           {/* Standard metrics table */}
-          <h3 className="text-sm font-semibold text-slate-700 mb-2">Standard Metrics</h3>
+          <h3 className="text-sm font-semibold text-slate-700 mb-2">Standard Metrics (single-run)</h3>
           <div className="border border-slate-200 rounded-lg overflow-hidden mb-4">
             <table className="w-full text-sm">
               <thead className="bg-slate-50 border-b border-slate-200">
@@ -472,7 +473,7 @@ export default function EvaluationPage() {
           </div>
 
           {/* Deference-aware metrics table */}
-          <h3 className="text-sm font-semibold text-slate-700 mb-2">Deference-Aware Metrics</h3>
+          <h3 className="text-sm font-semibold text-slate-700 mb-2">Deference-Aware Metrics (single-run)</h3>
           <div className="border border-blue-200 rounded-lg overflow-hidden mb-4">
             <table className="w-full text-sm">
               <thead className="bg-blue-50 border-b border-blue-200">
