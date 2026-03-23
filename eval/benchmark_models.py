@@ -51,78 +51,101 @@ from run_eval import compute_standard_metrics, compute_deference_metrics, load_p
 # Model Configurations
 # ============================================================
 
+VENICE_BASE_URL = "https://api.venice.ai/api/v1"
+
+# Venice model IDs verified against /v1/models endpoint on 2026-03-23
 MODEL_CONFIGS = {
-    # OpenAI models
-    "gpt-4o": {
-        "provider": "openai",
-        "model": "gpt-4o-2024-08-06",
-        "env_key": "OPENAI_API_KEY",
-        "cost_per_1k_input": 0.0025,
-        "cost_per_1k_output": 0.01,
+    # --- Open source models (via Venice AI) ---
+    "llama-3.3-70b": {
+        "provider": "venice",
+        "model": "llama-3.3-70b",
+        "developer": "Meta",
+        "open_source": True,
+        "env_key": "AI_API_KEY",
+        "base_url": VENICE_BASE_URL,
+        "cost_per_1k_input": 0.0007,
+        "cost_per_1k_output": 0.0028,
     },
-    "gpt-4o-mini": {
-        "provider": "openai",
-        "model": "gpt-4o-mini",
-        "env_key": "OPENAI_API_KEY",
-        "cost_per_1k_input": 0.00015,
-        "cost_per_1k_output": 0.0006,
-    },
-    # Anthropic models
-    "claude-sonnet": {
-        "provider": "anthropic",
-        "model": "claude-sonnet-4-20250514",
-        "env_key": "ANTHROPIC_API_KEY",
-        "cost_per_1k_input": 0.003,
-        "cost_per_1k_output": 0.015,
-    },
-    "claude-haiku": {
-        "provider": "anthropic",
-        "model": "claude-haiku-4-5-20251001",
-        "env_key": "ANTHROPIC_API_KEY",
-        "cost_per_1k_input": 0.0008,
-        "cost_per_1k_output": 0.004,
-    },
-    # Open source via OpenRouter (or any OpenAI-compatible endpoint)
-    "llama-3.1-70b": {
-        "provider": "openrouter",
-        "model": "meta-llama/llama-3.1-70b-instruct",
-        "env_key": "OPENROUTER_API_KEY",
-        "base_url": "https://openrouter.ai/api/v1",
-        "cost_per_1k_input": 0.00059,
-        "cost_per_1k_output": 0.00079,
-    },
-    "llama-3.1-8b": {
-        "provider": "openrouter",
-        "model": "meta-llama/llama-3.1-8b-instruct",
-        "env_key": "OPENROUTER_API_KEY",
-        "base_url": "https://openrouter.ai/api/v1",
-        "cost_per_1k_input": 0.00006,
-        "cost_per_1k_output": 0.00006,
-    },
-    "mistral-large": {
-        "provider": "openrouter",
-        "model": "mistralai/mistral-large-latest",
-        "env_key": "OPENROUTER_API_KEY",
-        "base_url": "https://openrouter.ai/api/v1",
-        "cost_per_1k_input": 0.002,
-        "cost_per_1k_output": 0.006,
+    "mistral-31-24b": {
+        "provider": "venice",
+        "model": "mistral-31-24b",
+        "developer": "Mistral AI",
+        "open_source": True,
+        "env_key": "AI_API_KEY",
+        "base_url": VENICE_BASE_URL,
+        "cost_per_1k_input": 0.0003,
+        "cost_per_1k_output": 0.0012,
     },
     "deepseek-v3": {
-        "provider": "openrouter",
-        "model": "deepseek/deepseek-chat",
-        "env_key": "OPENROUTER_API_KEY",
-        "base_url": "https://openrouter.ai/api/v1",
+        "provider": "venice",
+        "model": "deepseek-v3.2",
+        "developer": "DeepSeek",
+        "open_source": True,
+        "env_key": "AI_API_KEY",
+        "base_url": VENICE_BASE_URL,
         "cost_per_1k_input": 0.00014,
         "cost_per_1k_output": 0.00028,
     },
-    # Local models via Ollama
-    "ollama-llama3": {
-        "provider": "ollama",
-        "model": "llama3",
-        "env_key": None,
-        "base_url": "http://localhost:11434/v1",
-        "cost_per_1k_input": 0,
-        "cost_per_1k_output": 0,
+    "qwen-3-235b": {
+        "provider": "venice",
+        "model": "qwen3-235b-a22b-instruct-2507",
+        "developer": "Alibaba Cloud",
+        "open_source": True,
+        "env_key": "AI_API_KEY",
+        "base_url": VENICE_BASE_URL,
+        "cost_per_1k_input": 0.0005,
+        "cost_per_1k_output": 0.002,
+    },
+    "gemma-3-27b": {
+        "provider": "venice",
+        "model": "google-gemma-3-27b-it",
+        "developer": "Google",
+        "open_source": True,
+        "env_key": "AI_API_KEY",
+        "base_url": VENICE_BASE_URL,
+        "cost_per_1k_input": 0.0003,
+        "cost_per_1k_output": 0.0012,
+    },
+    # --- Proprietary models (via Venice AI) ---
+    "gpt-4o": {
+        "provider": "venice",
+        "model": "openai-gpt-4o-2024-11-20",
+        "developer": "OpenAI",
+        "open_source": False,
+        "env_key": "AI_API_KEY",
+        "base_url": VENICE_BASE_URL,
+        "cost_per_1k_input": 0.00313,
+        "cost_per_1k_output": 0.0125,
+    },
+    "claude-sonnet-4.6": {
+        "provider": "venice",
+        "model": "claude-sonnet-4-6",
+        "developer": "Anthropic",
+        "open_source": False,
+        "env_key": "AI_API_KEY",
+        "base_url": VENICE_BASE_URL,
+        "cost_per_1k_input": 0.0036,
+        "cost_per_1k_output": 0.018,
+    },
+    "gemini-3-pro": {
+        "provider": "venice",
+        "model": "gemini-3-pro-preview",
+        "developer": "Google",
+        "open_source": False,
+        "env_key": "AI_API_KEY",
+        "base_url": VENICE_BASE_URL,
+        "cost_per_1k_input": 0.00125,
+        "cost_per_1k_output": 0.005,
+    },
+    "grok-4.1": {
+        "provider": "venice",
+        "model": "grok-41-fast",
+        "developer": "xAI",
+        "open_source": False,
+        "env_key": "AI_API_KEY",
+        "base_url": VENICE_BASE_URL,
+        "cost_per_1k_input": 0.003,
+        "cost_per_1k_output": 0.015,
     },
 }
 
@@ -166,7 +189,7 @@ def screen_with_model(text: str, pico: dict, config: dict) -> dict:
     system_prompt = SYSTEM_PROMPT_TEMPLATE.format(**pico)
     user_content = f"STUDY:\n{text[:15000]}"
 
-    if provider in ("openai", "openrouter", "ollama"):
+    if provider in ("openai", "openrouter", "ollama", "venice"):
         from openai import OpenAI
 
         api_key = os.getenv(config.get("env_key", "")) or "dummy"
@@ -377,22 +400,20 @@ def print_comparison(all_results: dict):
 
     print("-" * 110)
 
-    # Best model analysis
-    models = list(all_results.keys())
-    if models:
-        # Safest model (fewest confident errors)
-        safest = min(models, key=lambda n: all_results[n]["deference"].get("total_confident_errors", 999))
+    # Best model analysis — only consider models with actual results
+    models_with_data = [n for n in all_results if all_results[n]["deference"].get("total", 0) > 0]
+    if models_with_data:
+        safest = min(models_with_data, key=lambda n: all_results[n]["deference"].get("total_confident_errors", 999))
         sd = all_results[safest]["deference"]
-        print(f"\n  Safest: {safest} (DA sensitivity={sd['da_sensitivity']:.1%}, "
-              f"{sd['total_confident_errors']} confident errors)")
+        print(f"\n  Safest: {safest} (DA sensitivity={sd.get('da_sensitivity', 0):.1%}, "
+              f"{sd.get('total_confident_errors', '?')} confident errors)")
 
-        # Best when it decides (highest decided F1 with >50% coverage)
-        deciders = [n for n in models if all_results[n]["deference"].get("effective_coverage_pct", 0) > 50]
+        deciders = [n for n in models_with_data if all_results[n]["deference"].get("effective_coverage_pct", 0) > 50]
         if deciders:
             best_decider = max(deciders, key=lambda n: all_results[n]["deference"].get("decided_f1", 0))
             bd = all_results[best_decider]["deference"]
-            print(f"  Best decider: {best_decider} (decided F1={bd['decided_f1']:.1%}, "
-                  f"covers {bd['effective_coverage_pct']:.0f}% autonomously)")
+            print(f"  Best decider: {best_decider} (decided F1={bd.get('decided_f1', 0):.1%}, "
+                  f"covers {bd.get('effective_coverage_pct', 0):.0f}% autonomously)")
 
     print()
 
@@ -465,10 +486,14 @@ def main():
 
     if args.list:
         print("\nAvailable models:")
+        print(f"  {'Name':<20} {'Developer':<15} {'Model ID':<35} {'Type':<12} {'Status'}")
+        print(f"  {'-'*20} {'-'*15} {'-'*35} {'-'*12} {'-'*10}")
         for name, config in MODEL_CONFIGS.items():
             env = config.get("env_key", "None")
-            available = "available" if not env or os.getenv(env) else f"needs {env}"
-            print(f"  {name:<20} {config['provider']:<12} {config['model']:<40} [{available}]")
+            available = "ready" if not env or os.getenv(env) else f"needs {env}"
+            oss = "open source" if config.get("open_source") else "proprietary"
+            dev = config.get("developer", "?")
+            print(f"  {name:<20} {dev:<15} {config['model']:<35} {oss:<12} [{available}]")
         return
 
     protocols = load_protocols()
