@@ -94,11 +94,28 @@ export default function AboutPage() {
             <p>
               We evaluate our screening engine against published benchmark datasets
               including the SYNERGY dataset (26 systematic reviews, 169,000+ studies)
-              and test across multiple LLM models. Our evaluation methodology and
-              results are published on our{' '}
+              and test across 9 LLM models from 7 different developers. Our evaluation
+              methodology, including a novel deference-aware framework for human-in-the-loop
+              systems, and full results are published on our{' '}
               <Link to="/evaluation" className="text-blue-600 hover:text-blue-800 underline">
                 Evaluation page
               </Link>.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-xl font-semibold text-slate-800 mb-3">Getting Started</h2>
+            <p>
+              The free plan includes 20 AI screenings per month — enough to test the
+              tool on a sample of your review and evaluate whether it fits your workflow.
+              Creating projects, setting up PICO criteria, reviewing results, and
+              exporting data are all unlimited.
+            </p>
+            <p className="mt-3">
+              For institutional access with higher screening volumes, contact us at{' '}
+              <a href="mailto:hello@kallidao.com" className="text-blue-600 hover:text-blue-800 underline">
+                hello@kallidao.com
+              </a>.
             </p>
           </section>
         </div>

@@ -120,12 +120,34 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Evaluation highlight */}
+      <section className="border-t border-slate-200">
+        <div className="max-w-5xl mx-auto px-6 py-16">
+          <h2 className="text-2xl font-bold text-slate-800 mb-4">Openly Evaluated</h2>
+          <p className="text-sm text-slate-600 leading-relaxed max-w-2xl mb-6">
+            We benchmark our screening engine across 9 LLM models using published systematic
+            review datasets with verified PICO criteria. We report both standard metrics and
+            our novel deference-aware evaluation framework — which recognises that an AI
+            correctly flagging uncertainty for human review is not an error, but the right behavior.
+          </p>
+          <Link
+            to="/evaluation"
+            className="text-sm font-medium text-blue-600 hover:text-blue-800 underline"
+          >
+            View full evaluation results and methodology
+          </Link>
+        </div>
+      </section>
+
       {/* CTA */}
       <section className="bg-slate-900 text-white">
         <div className="max-w-5xl mx-auto px-6 py-16 text-center">
           <h2 className="text-2xl font-bold mb-4">Ready to accelerate your systematic review?</h2>
-          <p className="text-slate-400 mb-8 max-w-xl mx-auto">
-            Start screening studies in minutes. Free to try, no credit card required.
+          <p className="text-slate-400 mb-4 max-w-xl mx-auto">
+            Start screening studies in minutes. No credit card required.
+          </p>
+          <p className="text-slate-500 text-sm mb-8">
+            Free plan: 20 AI screenings per month. Contact us for institutional access.
           </p>
           <Link
             to="/login"
