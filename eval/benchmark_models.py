@@ -491,19 +491,19 @@ def print_comparison(all_results: dict):
               f"{s.get('seconds_per_study',0):>6.1f}s "
               f"${s.get('cost_estimate',0):>6.4f}")
 
-    # Three-class table
+    # Partial evaluation table (Framework 2)
     print(f"\n{'='*110}")
-    print(f"  THREE-CLASS (UNCLEAR exists but penalised)")
+    print(f"  PARTIAL EVALUATION (UNCLEAR excluded from denominator — scored on decided only)")
     print(f"{'='*110}")
-    header = f"{'Model':<20} {'Sensitivity':>11} {'Specificity':>11} {'Precision':>9} {'F1':>6} {'Accuracy':>8} {'UNCLEAR%':>9}"
+    header = f"{'Model':<20} {'Sensitivity':>11} {'Specificity':>11} {'Precision':>9} {'F1':>6} {'Coverage':>9}"
     print(header)
     print("-" * 110)
 
     for name, data in all_results.items():
         s = data["standard"]
         print(f"{name:<20} {s.get('sensitivity',0):>10.1%} {s.get('specificity',0):>10.1%} "
-              f"{s.get('precision',0):>8.1%} {s.get('f1_score',0):>5.1%} {s.get('accuracy',0):>7.1%} "
-              f"{s.get('unclear_pct',0):>7.1f}%")
+              f"{s.get('precision',0):>8.1%} {s.get('f1_score',0):>5.1%} "
+              f"{s.get('coverage_pct',0):>7.1f}%")
 
     # Deference-aware metrics table
     print(f"\n{'='*110}")
@@ -558,13 +558,12 @@ def save_comparison(all_results: dict, tier_label: str):
             "fb_sensitivity": fb.get("sensitivity", 0),
             "fb_specificity": fb.get("specificity", 0),
             "fb_f1": fb.get("f1_score", 0),
-            # Standard metrics
-            "std_sensitivity": s.get("sensitivity", 0),
-            "std_specificity": s.get("specificity", 0),
-            "std_precision": s.get("precision", 0),
-            "std_f1": s.get("f1_score", 0),
-            "std_accuracy": s.get("accuracy", 0),
-            "work_saved_pct": s.get("work_saved_pct", 0),
+            # Partial eval metrics (Framework 2 — decided only)
+            "partial_sensitivity": s.get("sensitivity", 0),
+            "partial_specificity": s.get("specificity", 0),
+            "partial_precision": s.get("precision", 0),
+            "partial_f1": s.get("f1_score", 0),
+            "partial_coverage_pct": s.get("coverage_pct", 0),
             # Deference-aware metrics
             "da_sensitivity": d.get("da_sensitivity", 0),
             "da_specificity": d.get("da_specificity", 0),

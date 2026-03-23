@@ -151,18 +151,36 @@ def compute_forced_binary_metrics(df: pd.DataFrame) -> dict:
 
 
 def compute_standard_metrics(df: pd.DataFrame) -> dict:
-    """Framework 2: Three-class with UNCLEAR penalised.
+    """Framework 2: Three-class with partial evaluation (coverage/risk).
 
-    UNCLEAR exists as a third class but is treated as non-INCLUDE
-    for metric computation. This is what a tool would report if it
-    added uncertainty as an output but evaluated traditionally.
+    The mainstream approach in selective prediction: UNCLEAR studies are
+    excluded from the denominator. Metrics are computed only on the
+    subset where the AI made a confident decision. Coverage is reported
+    separately.
+
+    This is what most existing tools report. The problem: a system
+    deferring 80% and getting 99% on the rest looks great, but 80%
+    still needs a human.
     """
-    m = _compute_binary_metrics(df["ai_decision"], df["ground_truth"])
-    m["framework"] = "standard"
-    m["work_saved_pct"] = round((m["tn"] + m["fn"]) / m["total"] * 100, 1) if m["total"] > 0 else 0
+    total = len(df)
     n_unclear = len(df[df["ai_decision"] == "UNCLEAR"])
+    decided = df[df["ai_decision"].isin(["INCLUDE", "EXCLUDE"])]
+    n_decided = len(decided)
+
+    # Metrics on decided subset only (UNCLEAR excluded from denominator)
+    if n_decided > 0:
+        m = _compute_binary_metrics(decided["ai_decision"], decided["ground_truth"])
+    else:
+        m = {"total": 0, "tp": 0, "fn": 0, "fp": 0, "tn": 0,
+             "accuracy": 0, "sensitivity": 0, "specificity": 0,
+             "precision": 0, "f1_score": 0}
+
+    m["framework"] = "partial_eval"
+    m["total_studies"] = total
+    m["n_decided"] = n_decided
     m["n_unclear"] = n_unclear
-    m["unclear_pct"] = round(n_unclear / m["total"] * 100, 1) if m["total"] > 0 else 0
+    m["coverage_pct"] = round(n_decided / total * 100, 1) if total > 0 else 0
+    m["unclear_pct"] = round(n_unclear / total * 100, 1) if total > 0 else 0
     return m
 
 
@@ -288,19 +306,22 @@ def compute_deference_metrics(df: pd.DataFrame) -> dict:
 
 def print_triple_metrics(forced: dict, standard: dict, deference: dict, label: str = "Overall"):
     """Print all three frameworks side by side."""
-    print(f"\n{'=' * 90}")
+    total = deference.get('total', forced.get('total', 0))
+    print(f"\n{'=' * 95}")
     print(f"  EVALUATION: {label}")
-    print(f"  {standard['total']} studies | {deference['n_decided']} decided | {deference['n_deferred']} deferred")
-    print(f"{'=' * 90}")
+    print(f"  {total} studies | {deference['n_decided']} decided | {deference['n_deferred']} deferred")
+    print(f"{'=' * 95}")
 
-    print(f"\n  {'METRIC':<28} {'FORCED BINARY':>14} {'THREE-CLASS':>12} {'DEFERENCE':>12}")
-    print(f"  {'-'*28} {'-'*14} {'-'*12} {'-'*12}")
+    print(f"\n  {'METRIC':<28} {'F1: FORCED':>14} {'F2: PARTIAL':>14} {'F3: DEFERENCE':>14}")
+    print(f"  {'':28} {'(all studies)':>14} {'(decided only)':>14} {'(UNSURE=correct)':>14}")
+    print(f"  {'-'*28} {'-'*14} {'-'*14} {'-'*14}")
 
-    print(f"  {'Sensitivity':<28} {forced['sensitivity']:>13.1%} {standard['sensitivity']:>11.1%} {deference['da_sensitivity']:>11.1%}")
-    print(f"  {'Specificity':<28} {forced['specificity']:>13.1%} {standard['specificity']:>11.1%} {deference['da_specificity']:>11.1%}")
-    print(f"  {'Precision':<28} {forced['precision']:>13.1%} {standard['precision']:>11.1%} {deference['decided_precision']:>11.1%}")
-    print(f"  {'F1':<28} {forced['f1_score']:>13.1%} {standard['f1_score']:>11.1%} {deference['da_f1']:>11.1%}")
-    print(f"  {'Accuracy':<28} {forced['accuracy']:>13.1%} {standard['accuracy']:>11.1%} {deference['da_accuracy']:>11.1%}")
+    print(f"  {'Sensitivity':<28} {forced['sensitivity']:>13.1%} {standard['sensitivity']:>13.1%} {deference['da_sensitivity']:>13.1%}")
+    print(f"  {'Specificity':<28} {forced['specificity']:>13.1%} {standard['specificity']:>13.1%} {deference['da_specificity']:>13.1%}")
+    print(f"  {'Precision':<28} {forced['precision']:>13.1%} {standard['precision']:>13.1%} {deference['decided_precision']:>13.1%}")
+    print(f"  {'F1':<28} {forced['f1_score']:>13.1%} {standard['f1_score']:>13.1%} {deference['da_f1']:>13.1%}")
+    print(f"  {'Denominator':<28} {'all ' + str(total):>13} {'decided ' + str(standard.get('n_decided', '?')):>13} {'all ' + str(total):>13}")
+    print(f"  {'Coverage':<28} {'100%':>13} {standard.get('coverage_pct', '?'):>12}% {'100%':>13}")
 
     print(f"\n  {'DEFERENCE ANALYSIS':<35}")
     print(f"  {'-'*55}")
