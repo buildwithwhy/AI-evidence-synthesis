@@ -512,149 +512,213 @@ export default function EvaluationPage() {
         {/* Tier 2 Results */}
         <section className="mb-12">
           <h2 className="text-xl font-semibold text-slate-800 mb-4">Tier 2 Results: Donners et al. 2021</h2>
-          <p className="text-sm text-slate-500 mb-2">
-            Complete screening set from Donners et al. 2021 — a systematic review of emicizumab
-            pharmacokinetics in hemophilia A. 258 studies (15 include, 243 exclude).
-            PICO criteria verified from the{' '}
+          <p className="text-sm text-slate-500 mb-4">
+            Complete screening set: 258 studies (15 include, 243 exclude). Single-run per model
+            via OpenRouter. PICO criteria verified from the{' '}
             <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC8585815/" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">published paper</a>.
-            Single-run per model (no dual consensus) to isolate raw model capability.
+            Raw model decisions stored for accurate forced binary metrics.
           </p>
-          <div className="border border-amber-200 bg-amber-50 rounded-lg p-3 mb-4">
-            <p className="text-xs text-amber-700">
-              Tier 2 is being rerun via OpenRouter with 6 models and raw decision tracking
-              for accurate forced binary metrics. Updated results forthcoming.
-            </p>
-          </div>
 
-          {/* Standard metrics table */}
-          <h3 className="text-sm font-semibold text-slate-700 mb-2">Standard Metrics (single-run)</h3>
-          <div className="border border-slate-200 rounded-lg overflow-hidden mb-4">
-            <table className="w-full text-sm">
+          <div className="border border-slate-200 rounded-lg overflow-hidden mb-4 overflow-x-auto">
+            <table className="w-full text-sm min-w-[900px]">
               <thead className="bg-slate-50 border-b border-slate-200">
                 <tr>
-                  <th className="text-left px-4 py-3 font-medium text-slate-600">Model</th>
-                  <th className="text-right px-4 py-3 font-medium text-slate-600">Sensitivity</th>
-                  <th className="text-right px-4 py-3 font-medium text-slate-600">Specificity</th>
-                  <th className="text-right px-4 py-3 font-medium text-slate-600">Precision</th>
-                  <th className="text-right px-4 py-3 font-medium text-slate-600">F1</th>
-                  <th className="text-right px-4 py-3 font-medium text-slate-600">Accuracy</th>
+                  <th className="text-left px-3 py-3 font-medium text-slate-600" rowSpan={2}>Model</th>
+                  <th className="text-center px-3 py-2 font-medium text-slate-500 bg-slate-100 border-b border-slate-200" colSpan={3}>Forced Binary (F1)</th>
+                  <th className="text-center px-3 py-2 font-medium text-blue-600 bg-blue-50 border-b border-blue-100" colSpan={3}>Deference-Aware (F3)</th>
+                  <th className="text-right px-3 py-3 font-medium text-slate-600" rowSpan={2}>Errors</th>
+                  <th className="text-right px-3 py-3 font-medium text-slate-600" rowSpan={2}>Deferred</th>
+                </tr>
+                <tr>
+                  <th className="text-right px-3 py-1 text-xs text-slate-400 bg-slate-100">Sens</th>
+                  <th className="text-right px-3 py-1 text-xs text-slate-400 bg-slate-100">Spec</th>
+                  <th className="text-right px-3 py-1 text-xs text-slate-400 bg-slate-100">F1</th>
+                  <th className="text-right px-3 py-1 text-xs text-blue-400 bg-blue-50">Sens</th>
+                  <th className="text-right px-3 py-1 text-xs text-blue-400 bg-blue-50">Spec</th>
+                  <th className="text-right px-3 py-1 text-xs text-blue-400 bg-blue-50">F1</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {[
-                  { model: 'Claude Sonnet 4.6', sens: '83.3%', spec: '99.0%', prec: '83.3%', f1: '83.3%', acc: '98.0%' },
-                  { model: 'Mistral 3.1 24B', sens: '93.3%', spec: '74.5%', prec: '18.4%', f1: '30.8%', acc: '75.6%' },
-                  { model: 'GPT-4o', sens: '73.3%', spec: '89.3%', prec: '29.7%', f1: '42.3%', acc: '88.4%' },
-                  { model: 'Gemma 3 27B', sens: '100%', spec: '49.8%', prec: '10.9%', f1: '19.7%', acc: '52.7%' },
-                ].map(({ model, sens, spec, prec, f1, acc }) => (
+                  { model: 'Claude Sonnet 4.6', dev: 'Anthropic', oss: false, fb_s: '73.3%', fb_sp: '95.9%', fb_f1: '61.1%', da_s: '100%', da_sp: '98.8%', da_f1: '85.7%', err: 3, def: '23.3%' },
+                  { model: 'Llama 3.3 70B', dev: 'Meta', oss: true, fb_s: '93.3%', fb_sp: '74.7%', fb_f1: '31.8%', da_s: '93.3%', da_sp: '75.1%', da_f1: '32.2%', err: 59, def: '6.5%' },
+                  { model: 'Mistral 3.1 24B', dev: 'Mistral AI', oss: true, fb_s: '86.7%', fb_sp: '83.5%', fb_f1: '38.2%', da_s: '93.3%', da_sp: '83.5%', da_f1: '38.9%', err: 41, def: '2.7%' },
+                  { model: 'DeepSeek v3', dev: 'DeepSeek', oss: true, fb_s: '73.3%', fb_sp: '89.7%', fb_f1: '43.1%', da_s: '73.3%', da_sp: '89.7%', da_f1: '43.1%', err: 29, def: '0.4%' },
+                  { model: 'Kimi k2', dev: 'Moonshot AI', oss: true, fb_s: '73.3%', fb_sp: '86.8%', fb_f1: '37.9%', da_s: '80.0%', da_sp: '86.8%', da_f1: '38.8%', err: 35, def: '1.9%' },
+                  { model: 'Gemma 3 27B', dev: 'Google', oss: true, fb_s: '93.3%', fb_sp: '71.2%', fb_f1: '28.3%', da_s: '93.3%', da_sp: '71.2%', da_f1: '28.3%', err: 71, def: '0.8%' },
+                ].map(({ model, dev, oss, fb_s, fb_sp, fb_f1, da_s, da_sp, da_f1, err, def: deferred }) => (
                   <tr key={model} className="hover:bg-slate-50">
-                    <td className="px-4 py-3 font-medium text-slate-800">{model}</td>
-                    <td className="px-4 py-3 text-right text-slate-700">{sens}</td>
-                    <td className="px-4 py-3 text-right text-slate-700">{spec}</td>
-                    <td className="px-4 py-3 text-right text-slate-700">{prec}</td>
-                    <td className="px-4 py-3 text-right text-slate-700">{f1}</td>
-                    <td className="px-4 py-3 text-right text-slate-700">{acc}</td>
+                    <td className="px-3 py-3 font-medium text-slate-800">
+                      {model}
+                      <span className="ml-2 text-xs text-slate-400">{dev}</span>
+                      {oss && <span className="ml-1 text-xs bg-green-50 text-green-600 px-1 py-0.5 rounded">OS</span>}
+                    </td>
+                    <td className="px-3 py-3 text-right text-slate-700 bg-slate-50/50">{fb_s}</td>
+                    <td className="px-3 py-3 text-right text-slate-700 bg-slate-50/50">{fb_sp}</td>
+                    <td className="px-3 py-3 text-right text-slate-700 bg-slate-50/50">{fb_f1}</td>
+                    <td className="px-3 py-3 text-right text-blue-700 bg-blue-50/30">{da_s}</td>
+                    <td className="px-3 py-3 text-right text-blue-700 bg-blue-50/30">{da_sp}</td>
+                    <td className="px-3 py-3 text-right text-blue-700 bg-blue-50/30">{da_f1}</td>
+                    <td className="px-3 py-3 text-right text-slate-700">{err}</td>
+                    <td className="px-3 py-3 text-right text-slate-700">{deferred}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
 
-          {/* Deference-aware metrics table */}
-          <h3 className="text-sm font-semibold text-slate-700 mb-2">Deference-Aware Metrics (single-run)</h3>
-          <div className="border border-blue-200 rounded-lg overflow-hidden mb-4">
-            <table className="w-full text-sm">
-              <thead className="bg-blue-50 border-b border-blue-200">
-                <tr>
-                  <th className="text-left px-4 py-3 font-medium text-blue-700">Model</th>
-                  <th className="text-right px-4 py-3 font-medium text-blue-700">DA Sensitivity</th>
-                  <th className="text-right px-4 py-3 font-medium text-blue-700">DA Specificity</th>
-                  <th className="text-right px-4 py-3 font-medium text-blue-700">Decided F1</th>
-                  <th className="text-right px-4 py-3 font-medium text-blue-700">Confident Errors</th>
-                  <th className="text-right px-4 py-3 font-medium text-blue-700">Deferred</th>
-                  <th className="text-right px-4 py-3 font-medium text-blue-700">Coverage</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-blue-100">
-                {[
-                  { model: 'Claude Sonnet 4.6', da_s: '100%', da_sp: '99.0%', df1: '90.9%', err: 2, def: '7.4%', cov: '92.6%' },
-                  { model: 'Mistral 3.1 24B', da_s: '100%', da_sp: '74.5%', df1: '31.1%', err: 62, def: '1.2%', cov: '98.8%' },
-                  { model: 'GPT-4o', da_s: '73.3%', da_sp: '89.3%', df1: '42.3%', err: 30, def: '0.4%', cov: '99.6%' },
-                  { model: 'Gemma 3 27B', da_s: '100%', da_sp: '49.8%', df1: '19.7%', err: 122, def: '0.0%', cov: '100%' },
-                ].map(({ model, da_s, da_sp, df1, err, def: deferred, cov }) => (
-                  <tr key={model} className="hover:bg-blue-50/50">
-                    <td className="px-4 py-3 font-medium text-slate-800">{model}</td>
-                    <td className="px-4 py-3 text-right text-slate-700">{da_s}</td>
-                    <td className="px-4 py-3 text-right text-slate-700">{da_sp}</td>
-                    <td className="px-4 py-3 text-right text-slate-700">{df1}</td>
-                    <td className="px-4 py-3 text-right text-slate-700">{err}</td>
-                    <td className="px-4 py-3 text-right text-slate-700">{deferred}</td>
-                    <td className="px-4 py-3 text-right text-slate-700">{cov}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
-          {/* Collapsible Tier 2 findings */}
           <details className="border border-slate-200 rounded-lg">
             <summary className="px-5 py-3 cursor-pointer text-sm font-semibold text-slate-700 hover:bg-slate-50">
               Key Findings from Tier 2
             </summary>
             <div className="px-5 py-4 border-t border-slate-100 space-y-4 text-sm text-slate-600">
               <div>
-                <h4 className="font-semibold text-slate-700 mb-1">Claude achieved 100% DA sensitivity with only 2 confident errors</h4>
+                <h4 className="font-semibold text-slate-700 mb-1">Claude: 100% DA sensitivity, 3 confident errors</h4>
                 <p>
-                  Across 258 studies, Claude Sonnet 4.6 did not hard-miss a single included study.
-                  Every relevant study was either correctly included or flagged for human review.
-                  It made only 2 confident errors total out of 258 decisions — an error rate of 0.8%.
-                  Standard metrics report its sensitivity as 83.3%, but the 16.7% gap represents
-                  studies it correctly deferred rather than guessing wrong.
+                  Across 258 studies, Claude did not hard-miss a single included study.
+                  It deferred 23.3% of studies to human review and made only 3 confident errors.
+                  Under forced binary, its sensitivity drops to 73.3% — the 26.7% gap is studies
+                  it would have guessed on without deference. The DA F1 (85.7%) vs forced binary
+                  F1 (61.1%) captures this: deference made Claude dramatically safer.
                 </p>
               </div>
               <div>
-                <h4 className="font-semibold text-slate-700 mb-1">The deference-aware framework reveals the true picture</h4>
+                <h4 className="font-semibold text-slate-700 mb-1">Open source models: high sensitivity, low specificity</h4>
                 <p>
-                  Under standard metrics, Mistral (93.3% sensitivity) appears to outperform
-                  Claude (83.3%). But Mistral made 62 confident errors while Claude made 2.
-                  Deference-aware metrics correctly identify Claude as the safer model: it
-                  achieves 100% DA sensitivity by deferring on uncertain cases rather than
-                  guessing. This is precisely the behavior you want in a human-in-the-loop system.
+                  Llama and Gemma both achieved 93.3% forced-binary sensitivity — they
+                  catch most included studies. But their specificity (71-75%) and F1 (28-32%)
+                  are low because they over-include. This makes them strong candidates for
+                  mixed-model consensus pairing with high-specificity models.
                 </p>
               </div>
               <div>
-                <h4 className="font-semibold text-slate-700 mb-1">High sensitivity without specificity is unusable</h4>
+                <h4 className="font-semibold text-slate-700 mb-1">DeepSeek: best balance without deference</h4>
                 <p>
-                  Gemma 3 27B achieved 100% sensitivity — it caught every included study.
-                  But with 49.8% specificity and 10.9% precision, it marked half the
-                  irrelevant studies as INCLUDE. A reviewer using Gemma would need to
-                  manually re-screen over half the database, defeating the purpose of
-                  AI-assisted screening. This validates our argument that sensitivity
-                  alone is insufficient — all three core metrics must be high.
-                </p>
-              </div>
-              <div>
-                <h4 className="font-semibold text-slate-700 mb-1">GPT-4o hard-missed studies without deferring</h4>
-                <p>
-                  GPT-4o was the only model with DA sensitivity below 100% (73.3%).
-                  Unlike Claude, which defers when uncertain, GPT-4o confidently
-                  excluded 4 studies that should have been included. It made 30
-                  confident errors total. This pattern — confidence without calibration —
-                  is exactly what deference-aware evaluation is designed to detect.
-                </p>
-              </div>
-              <div>
-                <h4 className="font-semibold text-slate-700 mb-1">Claude had the highest JSON error rate (21%)</h4>
-                <p>
-                  Claude returned unparseable responses for 55 of 258 studies via Venice AI.
-                  Despite this, on the 203 studies it successfully processed, its performance
-                  was dramatically better than all other models. This suggests that with
-                  improved structured output handling (or a different API provider), Claude's
-                  effective results could be even stronger.
+                  DeepSeek v3 barely deferred (0.4%) but achieved the best forced-binary F1
+                  among open source models (43.1%) with balanced sensitivity (73.3%) and
+                  specificity (89.7%). This makes it the strongest option for deployments
+                  where deference is not available.
                 </p>
               </div>
             </div>
           </details>
+        </section>
+
+        {/* Tier 3b Results */}
+        <section className="mb-12">
+          <h2 className="text-xl font-semibold text-slate-800 mb-4">Tier 3b Results: Mixed-Model Consensus</h2>
+          <p className="text-sm text-slate-500 mb-4">
+            Pairing a high-sensitivity model with a high-specificity model. Agreement = decide.
+            Disagreement = defer to human. Computed from Tier 2 per-study decisions — no
+            additional API calls. All pairs are open source models.
+          </p>
+
+          <div className="border border-slate-200 rounded-lg overflow-hidden mb-4 overflow-x-auto">
+            <table className="w-full text-sm min-w-[800px]">
+              <thead className="bg-slate-50 border-b border-slate-200">
+                <tr>
+                  <th className="text-left px-3 py-3 font-medium text-slate-600" rowSpan={2}>Model Pair</th>
+                  <th className="text-center px-3 py-2 font-medium text-slate-500 bg-slate-100 border-b border-slate-200" colSpan={3}>Forced Binary (F1)</th>
+                  <th className="text-center px-3 py-2 font-medium text-blue-600 bg-blue-50 border-b border-blue-100" colSpan={3}>Deference-Aware (F3)</th>
+                  <th className="text-right px-3 py-3 font-medium text-slate-600" rowSpan={2}>Errors</th>
+                  <th className="text-right px-3 py-3 font-medium text-slate-600" rowSpan={2}>Deferred</th>
+                </tr>
+                <tr>
+                  <th className="text-right px-3 py-1 text-xs text-slate-400 bg-slate-100">Sens</th>
+                  <th className="text-right px-3 py-1 text-xs text-slate-400 bg-slate-100">Spec</th>
+                  <th className="text-right px-3 py-1 text-xs text-slate-400 bg-slate-100">F1</th>
+                  <th className="text-right px-3 py-1 text-xs text-blue-400 bg-blue-50">Sens</th>
+                  <th className="text-right px-3 py-1 text-xs text-blue-400 bg-blue-50">Spec</th>
+                  <th className="text-right px-3 py-1 text-xs text-blue-400 bg-blue-50">F1</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {[
+                  { pair: 'Llama 70B + DeepSeek v3', fb_s: '66.7%', fb_sp: '92.7%', fb_f1: '47.6%', da_s: '100%', da_sp: '92.7%', da_f1: '54.0%', err: 17, def: '28.2%' },
+                  { pair: 'Llama 70B + Kimi k2', fb_s: '66.7%', fb_sp: '90.1%', fb_f1: '41.7%', da_s: '100%', da_sp: '90.1%', da_f1: '46.5%', err: 23, def: '25.9%' },
+                  { pair: 'Gemma 27B + DeepSeek v3', fb_s: '73.3%', fb_sp: '90.5%', fb_f1: '44.9%', da_s: '93.3%', da_sp: '90.5%', da_f1: '48.0%', err: 24, def: '21.3%' },
+                  { pair: 'Gemma 27B + Kimi k2', fb_s: '73.3%', fb_sp: '89.3%', fb_f1: '42.3%', da_s: '93.3%', da_sp: '89.3%', da_f1: '45.1%', err: 27, def: '22.2%' },
+                ].map(({ pair, fb_s, fb_sp, fb_f1, da_s, da_sp, da_f1, err, def: deferred }) => (
+                  <tr key={pair} className="hover:bg-slate-50">
+                    <td className="px-3 py-3 font-medium text-slate-800">{pair}</td>
+                    <td className="px-3 py-3 text-right text-slate-700 bg-slate-50/50">{fb_s}</td>
+                    <td className="px-3 py-3 text-right text-slate-700 bg-slate-50/50">{fb_sp}</td>
+                    <td className="px-3 py-3 text-right text-slate-700 bg-slate-50/50">{fb_f1}</td>
+                    <td className="px-3 py-3 text-right text-blue-700 bg-blue-50/30">{da_s}</td>
+                    <td className="px-3 py-3 text-right text-blue-700 bg-blue-50/30">{da_sp}</td>
+                    <td className="px-3 py-3 text-right text-blue-700 bg-blue-50/30">{da_f1}</td>
+                    <td className="px-3 py-3 text-right text-slate-700">{err}</td>
+                    <td className="px-3 py-3 text-right text-slate-700">{deferred}</td>
+                  </tr>
+                ))}
+                <tr className="bg-slate-50 border-t-2 border-slate-300">
+                  <td className="px-3 py-3 font-medium text-slate-500 italic">Claude single (reference)</td>
+                  <td className="px-3 py-3 text-right text-slate-500">73.3%</td>
+                  <td className="px-3 py-3 text-right text-slate-500">95.9%</td>
+                  <td className="px-3 py-3 text-right text-slate-500">61.1%</td>
+                  <td className="px-3 py-3 text-right text-slate-500">100%</td>
+                  <td className="px-3 py-3 text-right text-slate-500">98.8%</td>
+                  <td className="px-3 py-3 text-right text-slate-500">85.7%</td>
+                  <td className="px-3 py-3 text-right text-slate-500">3</td>
+                  <td className="px-3 py-3 text-right text-slate-500">23.3%</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <details className="border border-slate-200 rounded-lg">
+            <summary className="px-5 py-3 cursor-pointer text-sm font-semibold text-slate-700 hover:bg-slate-50">
+              Key Findings from Tier 3b
+            </summary>
+            <div className="px-5 py-4 border-t border-slate-100 space-y-4 text-sm text-slate-600">
+              <div>
+                <h4 className="font-semibold text-slate-700 mb-1">Open source pairs match Claude's DA sensitivity at 1/15th the cost</h4>
+                <p>
+                  Llama + DeepSeek achieved 100% DA sensitivity — identical to Claude.
+                  No included study was missed or confidently excluded. The pair cost
+                  approximately $1 to run on 258 studies vs Claude's $15. For budget-constrained
+                  institutions, this demonstrates that safety is achievable with open source models
+                  through complementary consensus.
+                </p>
+              </div>
+              <div>
+                <h4 className="font-semibold text-slate-700 mb-1">Specificity improved dramatically through pairing</h4>
+                <p>
+                  Llama alone had 74.7% specificity. Paired with DeepSeek (89.7% specificity),
+                  the consensus achieves 92.7% — because the high-specificity model catches
+                  false inclusions that the high-sensitivity model lets through. Disagreements
+                  are deferred rather than resolved by a single model's guess.
+                </p>
+              </div>
+              <div>
+                <h4 className="font-semibold text-slate-700 mb-1">Claude still leads on precision and total errors</h4>
+                <p>
+                  While open source pairs match Claude on DA sensitivity, Claude's DA F1 (85.7%)
+                  remains substantially higher than the best pair (54.0%). This is because when
+                  Claude decides, it's right far more often (3 errors vs 17). For workflows
+                  where minimising total errors matters more than cost, Claude remains the
+                  strongest single model.
+                </p>
+              </div>
+            </div>
+          </details>
+        </section>
+
+        {/* Tier 3a status */}
+        <section className="mb-12">
+          <h2 className="text-xl font-semibold text-slate-800 mb-4">Tier 3a: Same-Model Dual-Run Consensus</h2>
+          <div className="border border-amber-200 bg-amber-50 rounded-lg p-6">
+            <div className="flex items-start gap-3">
+              <AlertTriangle className="w-5 h-5 text-amber-600 mt-0.5 flex-shrink-0" />
+              <div>
+                <h3 className="font-semibold text-amber-800 text-sm mb-1">In Progress</h3>
+                <p className="text-sm text-amber-700">
+                  Running same-model dual-run consensus (two passes per study, same model)
+                  for Claude, DeepSeek, Mistral, and Kimi on Donners_2021. Results forthcoming.
+                </p>
+              </div>
+            </div>
+          </div>
         </section>
 
         {/* Dual-run explanation */}
