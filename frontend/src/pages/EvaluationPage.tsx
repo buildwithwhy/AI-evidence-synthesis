@@ -15,13 +15,13 @@ export default function EvaluationPage() {
           How we test our screening engine, what datasets we use, and what the results mean.
         </p>
 
-        {/* Placeholder banner */}
+        {/* Status note */}
         <div className="border border-blue-200 bg-blue-50 rounded-lg p-4 mb-10">
           <div className="flex items-start gap-3">
             <Info className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
             <p className="text-sm text-blue-700">
-              This page describes our evaluation methodology and framework.
-              Benchmark results will be published here once evaluations are complete.
+              Results below are from evaluations on the Donners et al. 2021 dataset
+              (258 studies). Additional reviews and model combinations are being evaluated.
             </p>
           </div>
         </div>
@@ -217,13 +217,13 @@ export default function EvaluationPage() {
             </div>
 
             <p className="mt-4 text-slate-500 italic">
-              We report Framework 1 and Framework 3 side by side in our results.
-              The gap between them shows exactly how much safety is gained by allowing
-              deference — and the deference rate and coverage metrics make the workload
-              trade-off explicit rather than hiding it. This applies to any domain where
-              AI operates under human oversight — not just systematic reviews. A forthcoming
-              white paper will formalise this as a general evaluation framework for
-              human-in-the-loop AI systems.
+              We report all three frameworks in our results: Framework 1 as the traditional
+              baseline, Framework 2 to show how partial evaluation inflates metrics, and
+              Framework 3 as the unified quality signal. The gap between F1 and F3 shows
+              how much safety is gained by allowing deference. This applies to any domain
+              where AI operates under human oversight — not just systematic reviews.
+              A forthcoming white paper will formalise this as a general evaluation
+              framework for human-in-the-loop AI systems.
             </p>
           </div>
         </section>
@@ -284,9 +284,9 @@ export default function EvaluationPage() {
                 desc: 'Complete screening sets from 3 verified reviews with PICO criteria extracted from published papers. Covers human pharmacology, preclinical research, and clinical biosimilars.',
               },
               {
-                tier: 'Tier 3a: Full Benchmark',
-                studies: '169K studies',
-                desc: 'Complete SYNERGY dataset across all 26 reviews. Single-model evaluation for aggregate statistics and cross-domain robustness testing.',
+                tier: 'Tier 3a: Same-Model Dual-Run',
+                studies: 'Tier 2 dataset',
+                desc: 'Run the same model twice per study (temp=0 and temp=0.3) and apply consensus. Tests whether dual-run amplifies deference and reduces confident errors compared to single-run.',
               },
               {
                 tier: 'Tier 3b: Mixed-Model Consensus',
@@ -384,11 +384,9 @@ export default function EvaluationPage() {
 
           <h3 className="text-sm font-semibold text-blue-600 mb-2">Framework 3 — Deference-Aware</h3>
           <DeferenceAwareTable data={tier1Results} errorThreshold={4} showTier2 />
-
-          <p className="text-xs text-slate-400 mb-4">
-            Read Table A then Table B: Claude drops from 60% recall in forced binary to 100%
-            DA sensitivity when deference is valued. The inversion shows standard metrics penalise
-            the safest model.
+          <p className="text-xs text-slate-400 mt-2 mb-4">
+            Compare the two tables above: Claude drops from 60% recall (Framework 1) to 100%
+            DA sensitivity (Framework 3). The inversion shows standard metrics penalise the safest model.
           </p>
 
           <details className="border border-slate-200 rounded-lg">
@@ -442,6 +440,37 @@ export default function EvaluationPage() {
           </details>
         </section>
 
+        {/* Dual-run explanation — before 3a results */}
+        <section className="mb-12">
+          <h2 className="text-xl font-semibold text-slate-800 mb-4">Dual-Run Consensus</h2>
+          <div className="bg-slate-50 border border-slate-200 rounded-lg p-6 text-sm text-slate-600 space-y-3">
+            <p>
+              Our production screening engine runs each study through the AI twice — once
+              deterministically (temp=0) and once with slight variation (temp=0.3) to probe
+              decision stability. The consensus logic:
+            </p>
+            <div className="space-y-2">
+              <div className="flex items-start gap-2">
+                <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                <span><strong>Both agree + high confidence:</strong> Decision accepted (INCLUDE or EXCLUDE)</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <AlertTriangle className="w-4 h-4 text-amber-500 mt-0.5 flex-shrink-0" />
+                <span><strong>Both agree + low confidence:</strong> Flagged as UNCLEAR for human review</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <AlertTriangle className="w-4 h-4 text-amber-500 mt-0.5 flex-shrink-0" />
+                <span><strong>Disagreement:</strong> Always flagged as UNCLEAR for human review</span>
+              </div>
+            </div>
+            <p>
+              This mirrors the dual-reviewer requirement in Cochrane methodology. The
+              reasoning from both runs is preserved in the audit trail so human
+              reviewers can see exactly where the AI was uncertain.
+            </p>
+          </div>
+        </section>
+
         {/* Tier 3a: Same-Model Dual-Run */}
         <section className="mb-12">
           <h2 className="text-xl font-semibold text-slate-800 mb-4">Tier 3a: Same-Model Dual-Run Consensus</h2>
@@ -453,6 +482,7 @@ export default function EvaluationPage() {
 
           <h3 className="text-sm font-semibold text-blue-600 mb-2">Single-Run vs Dual-Run (Deference-Aware)</h3>
           <DualRunTable data={tier3aResults} />
+          <div className="mb-4" />
 
           <details className="border border-slate-200 rounded-lg">
             <summary className="px-5 py-3 cursor-pointer text-sm font-semibold text-slate-700 hover:bg-slate-50">
@@ -478,6 +508,7 @@ export default function EvaluationPage() {
           </p>
 
           <MixedConsensusTable data={tier3bResults} reference={claudeReference} />
+          <div className="mb-4" />
 
           <details className="border border-slate-200 rounded-lg">
             <summary className="px-5 py-3 cursor-pointer text-sm font-semibold text-slate-700 hover:bg-slate-50">
@@ -492,36 +523,6 @@ export default function EvaluationPage() {
           </details>
         </section>
 
-        {/* Dual-run explanation */}
-        <section className="mb-12">
-          <h2 className="text-xl font-semibold text-slate-800 mb-4">Dual-Run Consensus</h2>
-          <div className="bg-slate-50 border border-slate-200 rounded-lg p-6 text-sm text-slate-600 space-y-3">
-            <p>
-              Our screening engine runs each study through the AI twice — once
-              deterministically and once with slight variation to probe decision
-              stability. The consensus logic:
-            </p>
-            <div className="space-y-2">
-              <div className="flex items-start gap-2">
-                <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
-                <span><strong>Both agree + high confidence:</strong> Decision accepted (INCLUDE or EXCLUDE)</span>
-              </div>
-              <div className="flex items-start gap-2">
-                <AlertTriangle className="w-4 h-4 text-amber-500 mt-0.5 flex-shrink-0" />
-                <span><strong>Both agree + low confidence:</strong> Flagged as UNCLEAR for human review</span>
-              </div>
-              <div className="flex items-start gap-2">
-                <AlertTriangle className="w-4 h-4 text-amber-500 mt-0.5 flex-shrink-0" />
-                <span><strong>Disagreement:</strong> Always flagged as UNCLEAR for human review</span>
-              </div>
-            </div>
-            <p>
-              This mirrors the dual-reviewer requirement in Cochrane methodology. The
-              reasoning from both runs is preserved in the audit trail so human
-              reviewers can see exactly where the AI was uncertain.
-            </p>
-          </div>
-        </section>
       </div>
 
       <Footer />
