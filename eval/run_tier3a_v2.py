@@ -26,8 +26,8 @@ load_dotenv(Path(__file__).parent.parent / "backend" / ".env")
 DATA_DIR = Path(__file__).parent / "data"
 RESULTS_DIR = Path(__file__).parent / "results"
 
-from eval.benchmark_models import screen_with_model, MODEL_CONFIGS, SYSTEM_PROMPT_TEMPLATE
-from eval.run_eval import (
+from benchmark_models import screen_with_model, MODEL_CONFIGS, SYSTEM_PROMPT_TEMPLATE
+from run_eval import (
     compute_forced_binary_metrics,
     compute_standard_metrics,
     compute_deference_metrics,
