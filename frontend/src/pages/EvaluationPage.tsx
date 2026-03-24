@@ -613,54 +613,50 @@ export default function EvaluationPage() {
             additional API calls. All pairs are open source models.
           </p>
 
-          <div className="border border-slate-200 rounded-lg overflow-hidden mb-4 overflow-x-auto">
-            <table className="w-full text-sm min-w-[800px]">
-              <thead className="bg-slate-50 border-b border-slate-200">
+          <p className="text-xs text-slate-400 mb-4">
+            Forced binary (F1) is not reported for consensus pairs — when two models disagree,
+            there is no single "raw decision" to fall back on. Only deference-aware metrics
+            apply, since disagreement naturally produces deference.
+          </p>
+
+          <div className="border border-blue-200 rounded-lg overflow-hidden mb-4 overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead className="bg-blue-50 border-b border-blue-200">
                 <tr>
-                  <th className="text-left px-3 py-3 font-medium text-slate-600" rowSpan={2}>Model Pair</th>
-                  <th className="text-center px-3 py-2 font-medium text-slate-500 bg-slate-100 border-b border-slate-200" colSpan={3}>Forced Binary (F1)</th>
-                  <th className="text-center px-3 py-2 font-medium text-blue-600 bg-blue-50 border-b border-blue-100" colSpan={3}>Deference-Aware (F3)</th>
-                  <th className="text-right px-3 py-3 font-medium text-slate-600" rowSpan={2}>Errors</th>
-                  <th className="text-right px-3 py-3 font-medium text-slate-600" rowSpan={2}>Deferred</th>
-                </tr>
-                <tr>
-                  <th className="text-right px-3 py-1 text-xs text-slate-400 bg-slate-100">Sens</th>
-                  <th className="text-right px-3 py-1 text-xs text-slate-400 bg-slate-100">Spec</th>
-                  <th className="text-right px-3 py-1 text-xs text-slate-400 bg-slate-100">F1</th>
-                  <th className="text-right px-3 py-1 text-xs text-blue-400 bg-blue-50">Sens</th>
-                  <th className="text-right px-3 py-1 text-xs text-blue-400 bg-blue-50">Spec</th>
-                  <th className="text-right px-3 py-1 text-xs text-blue-400 bg-blue-50">F1</th>
+                  <th className="text-left px-3 py-3 font-medium text-blue-700">Model Pair</th>
+                  <th className="text-right px-3 py-3 font-medium text-blue-700">DA Sens</th>
+                  <th className="text-right px-3 py-3 font-medium text-blue-700">DA Spec</th>
+                  <th className="text-right px-3 py-3 font-medium text-blue-700">DA F1</th>
+                  <th className="text-right px-3 py-3 font-medium text-blue-700">Errors</th>
+                  <th className="text-right px-3 py-3 font-medium text-blue-700">Deferred</th>
+                  <th className="text-right px-3 py-3 font-medium text-blue-700">Coverage</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-blue-100">
                 {[
-                  { pair: 'Llama 70B + DeepSeek v3', fb_s: '66.7%', fb_sp: '92.7%', fb_f1: '47.6%', da_s: '100%', da_sp: '92.7%', da_f1: '54.0%', err: 17, def: '28.2%' },
-                  { pair: 'Llama 70B + Kimi k2', fb_s: '66.7%', fb_sp: '90.1%', fb_f1: '41.7%', da_s: '100%', da_sp: '90.1%', da_f1: '46.5%', err: 23, def: '25.9%' },
-                  { pair: 'Gemma 27B + DeepSeek v3', fb_s: '73.3%', fb_sp: '90.5%', fb_f1: '44.9%', da_s: '93.3%', da_sp: '90.5%', da_f1: '48.0%', err: 24, def: '21.3%' },
-                  { pair: 'Gemma 27B + Kimi k2', fb_s: '73.3%', fb_sp: '89.3%', fb_f1: '42.3%', da_s: '93.3%', da_sp: '89.3%', da_f1: '45.1%', err: 27, def: '22.2%' },
-                ].map(({ pair, fb_s, fb_sp, fb_f1, da_s, da_sp, da_f1, err, def: deferred }) => (
-                  <tr key={pair} className="hover:bg-slate-50">
+                  { pair: 'Llama 70B + DeepSeek v3', da_s: '100%', da_sp: '92.7%', da_f1: '54.0%', err: 17, def: '28.2%', cov: '71.8%' },
+                  { pair: 'Llama 70B + Kimi k2', da_s: '100%', da_sp: '90.1%', da_f1: '46.5%', err: 23, def: '25.9%', cov: '74.1%' },
+                  { pair: 'Gemma 27B + DeepSeek v3', da_s: '93.3%', da_sp: '90.5%', da_f1: '48.0%', err: 24, def: '21.3%', cov: '78.7%' },
+                  { pair: 'Gemma 27B + Kimi k2', da_s: '93.3%', da_sp: '89.3%', da_f1: '45.1%', err: 27, def: '22.2%', cov: '77.8%' },
+                ].map(({ pair, da_s, da_sp, da_f1, err, def: deferred, cov }) => (
+                  <tr key={pair} className="hover:bg-blue-50/50">
                     <td className="px-3 py-3 font-medium text-slate-800">{pair}</td>
-                    <td className="px-3 py-3 text-right text-slate-700 bg-slate-50/50">{fb_s}</td>
-                    <td className="px-3 py-3 text-right text-slate-700 bg-slate-50/50">{fb_sp}</td>
-                    <td className="px-3 py-3 text-right text-slate-700 bg-slate-50/50">{fb_f1}</td>
-                    <td className="px-3 py-3 text-right text-blue-700 bg-blue-50/30">{da_s}</td>
-                    <td className="px-3 py-3 text-right text-blue-700 bg-blue-50/30">{da_sp}</td>
-                    <td className="px-3 py-3 text-right text-blue-700 bg-blue-50/30">{da_f1}</td>
+                    <td className="px-3 py-3 text-right text-blue-700">{da_s}</td>
+                    <td className="px-3 py-3 text-right text-blue-700">{da_sp}</td>
+                    <td className="px-3 py-3 text-right text-blue-700">{da_f1}</td>
                     <td className="px-3 py-3 text-right text-slate-700">{err}</td>
                     <td className="px-3 py-3 text-right text-slate-700">{deferred}</td>
+                    <td className="px-3 py-3 text-right text-slate-700">{cov}</td>
                   </tr>
                 ))}
                 <tr className="bg-slate-50 border-t-2 border-slate-300">
                   <td className="px-3 py-3 font-medium text-slate-500 italic">Claude single (reference)</td>
-                  <td className="px-3 py-3 text-right text-slate-500">73.3%</td>
-                  <td className="px-3 py-3 text-right text-slate-500">95.9%</td>
-                  <td className="px-3 py-3 text-right text-slate-500">61.1%</td>
                   <td className="px-3 py-3 text-right text-slate-500">100%</td>
                   <td className="px-3 py-3 text-right text-slate-500">98.8%</td>
                   <td className="px-3 py-3 text-right text-slate-500">85.7%</td>
                   <td className="px-3 py-3 text-right text-slate-500">3</td>
                   <td className="px-3 py-3 text-right text-slate-500">23.3%</td>
+                  <td className="px-3 py-3 text-right text-slate-500">76.7%</td>
                 </tr>
               </tbody>
             </table>
