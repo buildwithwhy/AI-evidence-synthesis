@@ -66,6 +66,15 @@ export default function EvaluationPage() {
               ones as INCLUDE has not meaningfully helped the reviewer. All three metrics
               must be high for the system to deliver real value.
             </p>
+            <p>
+              The systematic review literature prioritises sensitivity at Level 1 screening
+              because missing a relevant study is irrecoverable. This has led to tools that
+              chronically sacrifice specificity to maximise sensitivity — the high-sensitivity,
+              low-specificity failure mode is treated as an acceptable trade-off. We argue
+              this trade-off is a symptom of forced-binary evaluation, not a fundamental
+              property of the screening task. When the AI can express uncertainty, it exits
+              the trade-off on uncertain cases entirely.
+            </p>
           </div>
         </section>
 
