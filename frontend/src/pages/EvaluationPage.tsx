@@ -38,42 +38,45 @@ export default function EvaluationPage() {
               by the original review team.
             </p>
             <p>
-              In traditional automated screening evaluation, sensitivity is treated as
-              the dominant metric — missing a relevant study is the worst error.
-              We argue that in a human-in-the-loop system, <strong>all three core metrics
-              matter equally</strong>:
+              At Level 1 (title/abstract) screening, the field correctly prioritises
+              <strong> sensitivity/recall</strong> — missing a relevant study at this stage
+              is irrecoverable. We agree. But current tools achieve high sensitivity by
+              chronically sacrificing specificity: they over-include to avoid missing anything,
+              flooding human reviewers with irrelevant studies. This is treated as an
+              acceptable trade-off.
+            </p>
+            <p>
+              We argue it is not acceptable — it is a <strong>symptom of forced-binary
+              evaluation</strong>, not a fundamental property of the screening task. When
+              the AI must commit to INCLUDE or EXCLUDE on every study, the only way to
+              avoid missing relevant ones is to include too many irrelevant ones. But when
+              the AI can say UNSURE, it exits this trade-off on uncertain cases entirely —
+              deferring to a human rather than guessing. Under deference-aware evaluation,
+              <strong>all three core metrics can be high simultaneously</strong>:
             </p>
             <ul className="space-y-3 ml-1">
               <li>
-                <strong>Sensitivity (recall)</strong> matters because missing a relevant study
-                undermines the review.
+                <strong>Sensitivity/recall</strong> remains paramount — missing a relevant study
+                still undermines the review. DA evaluation counts deferred studies as caught,
+                so the AI achieves high sensitivity without over-including.
               </li>
               <li>
-                <strong>Specificity</strong> matters because if the AI fails to filter
-                out irrelevant studies, it floods the human reviewer with noise. Reviewer
-                fatigue from wading through false positives leads to less careful review
-                of each study — defeating the purpose of human oversight.
+                <strong>Specificity</strong> matters because if the AI floods reviewers with
+                noise, reviewer fatigue leads to less careful assessment of each study —
+                defeating the purpose of human oversight.
               </li>
               <li>
-                <strong>Precision</strong> matters for the same reason: if most of what
-                the AI marks as INCLUDE is actually irrelevant, reviewers learn to distrust
-                the AI's INCLUDE decisions and either rubber-stamp them (introducing errors)
-                or re-screen everything manually (negating the efficiency gain).
+                <strong>Precision</strong> matters because if most of what the AI marks as
+                INCLUDE is irrelevant, reviewers learn to distrust the AI's decisions and
+                either rubber-stamp them (introducing errors) or re-screen everything
+                manually (negating the efficiency gain).
               </li>
             </ul>
             <p>
               A tool that catches every relevant study but also marks half the irrelevant
-              ones as INCLUDE has not meaningfully helped the reviewer. All three metrics
-              must be high for the system to deliver real value.
-            </p>
-            <p>
-              The systematic review literature prioritises sensitivity at Level 1 screening
-              because missing a relevant study is irrecoverable. This has led to tools that
-              chronically sacrifice specificity to maximise sensitivity — the high-sensitivity,
-              low-specificity failure mode is treated as an acceptable trade-off. We argue
-              this trade-off is a symptom of forced-binary evaluation, not a fundamental
-              property of the screening task. When the AI can express uncertainty, it exits
-              the trade-off on uncertain cases entirely.
+              ones as INCLUDE has not meaningfully helped the reviewer. The forced-binary
+              framework treats this as an unavoidable cost of high sensitivity. The
+              deference-aware framework shows it is avoidable.
             </p>
           </div>
         </section>
