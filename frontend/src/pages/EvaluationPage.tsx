@@ -237,7 +237,8 @@ export default function EvaluationPage() {
         {/* Datasets */}
         <section className="mb-12">
           <h2 className="text-xl font-semibold text-slate-800 mb-4">Benchmark Datasets</h2>
-          <div className="space-y-4">
+
+          <div className="space-y-4 mb-6">
             <div className="border border-slate-200 rounded-lg p-5">
               <div className="flex items-start justify-between mb-2">
                 <h3 className="font-semibold text-slate-800">SYNERGY Dataset</h3>
@@ -271,6 +272,30 @@ export default function EvaluationPage() {
                 <span>3-level labels with protocols</span>
               </div>
             </div>
+          </div>
+
+          <div className="bg-slate-50 border border-slate-200 rounded-lg p-5">
+            <h3 className="font-semibold text-slate-800 text-sm mb-2">What we actually evaluated on</h3>
+            <p className="text-sm text-slate-600 mb-3">
+              The results on this page use a single review from the SYNERGY dataset:
+              <strong> Donners et al. 2021</strong> — a systematic review of emicizumab
+              pharmacokinetics in hemophilia A (258 studies, 15 included, 243 excluded).
+              We chose this review because it has a complete screening set with
+              PICO criteria{' '}
+              <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC8585815/" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">verified from the published paper</a>.
+            </p>
+            <p className="text-sm text-slate-600 mb-3">
+              This is a deliberate limitation: we prioritised having one review with
+              verified ground truth over testing on more reviews with approximated criteria.
+              Evaluating with incorrect PICO would measure the wrong thing.
+            </p>
+            <p className="text-sm text-slate-600">
+              <strong>Planned expansions:</strong> We have verified PICO criteria prepared
+              for two additional SYNERGY reviews — Sep et al. 2021 (rodent object-in-context
+              memory, 271 studies) and Meijboom et al. 2021 (TNF-alpha biosimilar
+              retransitioning, 882 studies). Evaluations on these reviews, as well as
+              the larger Chan et al. dataset, are forthcoming.
+            </p>
           </div>
         </section>
 
