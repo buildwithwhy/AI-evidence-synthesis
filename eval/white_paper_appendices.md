@@ -79,12 +79,14 @@ Table B1 provides summary statistics for the evaluation datasets used in this pa
 | Dataset | Review | Domain | Total Studies | Included | Excluded | Inclusion Rate | Avg Abstract Length | PICO Source | Complete Set |
 |---------|--------|--------|:---:|:---:|:---:|:---:|:---:|--------|:---:|
 | **Tier 1** | Donners et al. 2021 | Human pharmacology | 10 | 5 | 5 | 50.0%† | — | Published paper | Sampled |
-| **Tier 2** | Donners et al. 2021 | Human pharmacology | 250 | 14 | 236 | 5.6% | 2,243 chars | Published paper | Yes |
-| Tier 2 (prepared) | Sep et al. 2021 | Preclinical / rodent behaviour | 270 | 40 | 230 | 14.8% | 1,569 chars | Published paper | Yes |
-| Tier 2 (prepared) | Meijboom et al. 2021 | Clinical biosimilars | 825 | 36 | 789 | 4.4% | 1,642 chars | Published paper | Yes |
-| **Tier 2 total** | 3 reviews | Mixed | **1,345** | **90** | **1,255** | **6.7%** | 1,758 chars | All verified | Yes |
+| **Tier 2 (evaluated)** | Donners et al. 2021 | Human pharmacology | 258 | 15 | 243 | 5.8% | 2,243 chars‡ | Published paper | Yes |
+| Tier 2 (prepared) | Sep et al. 2021 | Preclinical / rodent behaviour | 271 | 40 | 231 | 14.8% | 1,569 chars | Published paper | Yes |
+| Tier 2 (prepared) | Meijboom et al. 2021 | Clinical biosimilars | 882 | 37 | 845 | 4.2% | 1,642 chars | Published paper | Yes |
+| **Tier 2 total** | 3 reviews | Mixed | **1,411** | **92** | **1,319** | **6.5%** | 1,758 chars | All verified | Yes |
 
 † Tier 1 is deliberately balanced (5 include, 5 exclude) for smoke testing. It is not representative of real screening ratios.
+
+‡ 8 of 258 studies in Donners et al. 2021 had no abstract in the SYNERGY dataset. These were still evaluated using title only.
 
 ### Table B2: Dataset Provenance
 
@@ -96,8 +98,8 @@ Table B1 provides summary statistics for the evaluation datasets used in this pa
 
 ### Notes on Dataset Selection
 
-**Why one review for current results.** The results presented in this paper use only the Donners et al. 2021 dataset (258 studies). We prioritised having one review with PICO criteria verified directly from the published paper over evaluating on more reviews with approximated or generic criteria. Our initial evaluation attempt using AI-approximated PICO criteria produced significantly incorrect criteria for two of three reviews (e.g., a rodent behavioural study was mislabeled as a PTSD treatment trial), which would have invalidated the evaluation entirely. We therefore adopted a policy of only evaluating on reviews where the PICO criteria have been manually verified against the source publication.
+**Why one review for current results.** The results presented in this paper use only the Donners et al. 2021 dataset (258 studies, 15 included, 243 excluded). We prioritised having one review with PICO criteria verified directly from the published paper over evaluating on more reviews with approximated or generic criteria. Our initial evaluation attempt using AI-approximated PICO criteria produced significantly incorrect criteria for two of three reviews (e.g., a rodent behavioural study was mislabeled as a PTSD treatment trial), which would have invalidated the evaluation entirely. We therefore adopted a policy of only evaluating on reviews where the PICO criteria have been manually verified against the source publication.
 
 **Why SYNERGY and not Cohen et al. or Chan et al.** The SYNERGY dataset provides complete screening sets (all studies that were screened, not just included ones) with OpenAlex identifiers linking to abstracts. The Cohen et al. drug review dataset provides 9-category exclusion reasons but lacks abstracts. The Chan et al. Cochrane dataset (544K studies, 8,608 reviews) provides three-level labels and review protocols but requires additional processing to extract structured PICO criteria. Both are planned for future evaluation.
 
-**Inclusion rate context.** The 5.6% inclusion rate for Donners et al. 2021 is typical of systematic review screening. At these prevalence levels, a model that excludes every study would achieve ~94% accuracy. This is why we report sensitivity/recall, specificity, and precision rather than accuracy — accuracy is uninformative when classes are severely imbalanced.
+**Inclusion rate context.** The 5.8% inclusion rate for Donners et al. 2021 is typical of systematic review screening. At these prevalence levels, a model that excludes every study would achieve ~94% accuracy. This is why we report sensitivity/recall, specificity, and precision rather than accuracy — accuracy is uninformative when classes are severely imbalanced.
