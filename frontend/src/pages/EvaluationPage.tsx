@@ -522,6 +522,45 @@ export default function EvaluationPage() {
             </table>
           </div>
 
+          <h3 className="text-sm font-semibold text-amber-600 mb-2">Framework 2 — Partial Evaluation <span className="text-xs font-normal text-amber-400">(decided subset only)</span></h3>
+          <div className="border border-amber-200 rounded-lg overflow-hidden mb-6 overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead className="bg-amber-50 border-b border-amber-200">
+                <tr>
+                  <th className="text-left px-3 py-2.5 font-medium text-amber-700">Model</th>
+                  <th className="text-right px-3 py-2.5 font-medium text-amber-700">Recall</th>
+                  <th className="text-right px-3 py-2.5 font-medium text-amber-700">Specificity</th>
+                  <th className="text-right px-3 py-2.5 font-medium text-amber-700">Precision</th>
+                  <th className="text-right px-3 py-2.5 font-medium text-amber-700">F1</th>
+                  <th className="text-right px-3 py-2.5 font-medium text-amber-700">Coverage</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-amber-100">
+                {[
+                  { m: 'Claude Sonnet 4.6', r: '100%', sp: '98.4%', p: '75.0%', f1: '85.7%', cov: '76.7%', green: true },
+                  { m: 'Llama 3.3 70B', r: '93.3%', sp: '73.3%', p: '19.4%', f1: '32.2%', cov: '93.5%', green: false },
+                  { m: 'Mistral 3.1 24B', r: '92.9%', sp: '83.1%', p: '24.5%', f1: '38.8%', cov: '97.3%', green: false },
+                  { m: 'DeepSeek v3', r: '73.3%', sp: '89.5%', p: '30.6%', f1: '43.1%', cov: '99.6%', green: false },
+                  { m: 'Kimi k2', r: '78.6%', sp: '86.6%', p: '25.6%', f1: '38.6%', cov: '98.1%', green: false },
+                  { m: 'Gemma 3 27B', r: '93.3%', sp: '71.0%', p: '16.7%', f1: '28.3%', cov: '99.2%', green: false },
+                ].map(({ m, r, sp, p, f1, cov, green }) => (
+                  <tr key={m} className={`${green ? 'bg-green-50/50' : ''} hover:bg-amber-50/30`}>
+                    <td className="px-3 py-2.5 font-medium text-slate-800">{m}</td>
+                    <td className="px-3 py-2.5 text-right">{r}</td>
+                    <td className="px-3 py-2.5 text-right">{sp}</td>
+                    <td className="px-3 py-2.5 text-right">{p}</td>
+                    <td className="px-3 py-2.5 text-right font-medium">{f1}</td>
+                    <td className="px-3 py-2.5 text-right">{cov}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <p className="text-xs text-slate-400 mb-6">
+            Claude scores 100% recall and 85.7% F1 — but only on 76.7% of studies.
+            The remaining 23.3% are excluded from the denominator, hiding the deferred workload.
+          </p>
+
           <h3 className="text-sm font-semibold text-blue-600 mb-2">Framework 3 — Deference-Aware</h3>
           <div className="border border-blue-200 rounded-lg overflow-hidden mb-6 overflow-x-auto">
             <table className="w-full text-sm">
@@ -530,6 +569,7 @@ export default function EvaluationPage() {
                   <th className="text-left px-3 py-2.5 font-medium text-blue-700">Model</th>
                   <th className="text-right px-3 py-2.5 font-medium text-blue-700">DA Sens</th>
                   <th className="text-right px-3 py-2.5 font-medium text-blue-700">DA Spec</th>
+                  <th className="text-right px-3 py-2.5 font-medium text-blue-700">DA Prec</th>
                   <th className="text-right px-3 py-2.5 font-medium text-blue-700">DA F1</th>
                   <th className="text-right px-3 py-2.5 font-medium text-blue-700">Errors</th>
                   <th className="text-right px-3 py-2.5 font-medium text-blue-700">Deferred</th>
@@ -538,17 +578,18 @@ export default function EvaluationPage() {
               </thead>
               <tbody className="divide-y divide-blue-100">
                 {[
-                  { m: 'Claude Sonnet 4.6', da_s: '100%', da_sp: '98.8%', da_f1: '85.7%', err: 3, def: '23.3%', cov: '76.7%', green: true },
-                  { m: 'Llama 3.3 70B', da_s: '93.3%', da_sp: '75.1%', da_f1: '32.2%', err: 59, def: '6.5%', cov: '93.5%', green: false },
-                  { m: 'Mistral 3.1 24B', da_s: '93.3%', da_sp: '83.5%', da_f1: '38.9%', err: 41, def: '2.7%', cov: '97.3%', green: false },
-                  { m: 'DeepSeek v3', da_s: '73.3%', da_sp: '89.7%', da_f1: '43.1%', err: 29, def: '0.4%', cov: '99.6%', green: false },
-                  { m: 'Kimi k2', da_s: '80.0%', da_sp: '86.8%', da_f1: '38.8%', err: 35, def: '1.9%', cov: '98.1%', green: false },
-                  { m: 'Gemma 3 27B', da_s: '93.3%', da_sp: '71.2%', da_f1: '28.3%', err: 71, def: '0.8%', cov: '99.2%', green: false },
-                ].map(({ m, da_s, da_sp, da_f1, err, def: deferred, cov, green }) => (
+                  { m: 'Claude Sonnet 4.6', da_s: '100%', da_sp: '98.8%', da_p: '75.0%', da_f1: '85.7%', err: 3, def: '23.3%', cov: '76.7%', green: true },
+                  { m: 'Llama 3.3 70B', da_s: '93.3%', da_sp: '75.1%', da_p: '19.4%', da_f1: '32.2%', err: 59, def: '6.5%', cov: '93.5%', green: false },
+                  { m: 'Mistral 3.1 24B', da_s: '93.3%', da_sp: '83.5%', da_p: '24.5%', da_f1: '38.9%', err: 41, def: '2.7%', cov: '97.3%', green: false },
+                  { m: 'DeepSeek v3', da_s: '73.3%', da_sp: '89.7%', da_p: '30.6%', da_f1: '43.1%', err: 29, def: '0.4%', cov: '99.6%', green: false },
+                  { m: 'Kimi k2', da_s: '80.0%', da_sp: '86.8%', da_p: '25.6%', da_f1: '38.8%', err: 35, def: '1.9%', cov: '98.1%', green: false },
+                  { m: 'Gemma 3 27B', da_s: '93.3%', da_sp: '71.2%', da_p: '16.7%', da_f1: '28.3%', err: 71, def: '0.8%', cov: '99.2%', green: false },
+                ].map(({ m, da_s, da_sp, da_p, da_f1, err, def: deferred, cov, green }) => (
                   <tr key={m} className={`${green ? 'bg-green-50/50' : ''} hover:bg-blue-50/30`}>
                     <td className="px-3 py-2.5 font-medium text-slate-800">{m}</td>
                     <td className="px-3 py-2.5 text-right">{da_s}</td>
                     <td className="px-3 py-2.5 text-right">{da_sp}</td>
+                    <td className="px-3 py-2.5 text-right">{da_p}</td>
                     <td className="px-3 py-2.5 text-right font-medium">{da_f1}</td>
                     <td className={`px-3 py-2.5 text-right ${err >= 40 ? 'text-red-600 font-medium' : ''}`}>{err}</td>
                     <td className="px-3 py-2.5 text-right">{deferred}</td>
@@ -560,8 +601,10 @@ export default function EvaluationPage() {
           </div>
 
           <p className="text-xs text-slate-400 mb-4">
-            Claude inverts: 73.3% recall in forced binary becomes 100% DA sensitivity. The gap (26.7%)
-            represents studies deferred rather than guessed wrong. DA F1 jumps from 61.1% to 85.7%.
+            F2 and F3 share the same precision (75.0% for Claude) because UNCLEAR is not an INCLUDE call
+            in either framework. The difference: F2 hides 23.3% of studies in the denominator,
+            F3 reports them as deferred. F3 sensitivity (100%) is computed on all studies,
+            F2 sensitivity (100%) only on the 76.7% it decided on.
           </p>
 
           <details className="border border-slate-200 rounded-lg">
