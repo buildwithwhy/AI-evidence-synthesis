@@ -20,8 +20,9 @@ export default function EvaluationPage() {
           <div className="flex items-start gap-3">
             <Info className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
             <p className="text-sm text-blue-700">
-              Results below are from evaluations on the Donners et al. 2021 dataset
-              (258 studies). Additional reviews and model combinations are being evaluated.
+              All results below are from <strong>Level 1 (title and abstract) screening</strong> on
+              the Donners et al. 2021 dataset (258 studies). Full-text (Level 2) screening
+              and additional review datasets are planned.
             </p>
           </div>
         </div>

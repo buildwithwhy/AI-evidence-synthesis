@@ -96,6 +96,14 @@ Table B1 provides summary statistics for the evaluation datasets used in this pa
 | Sep et al. 2021 | [10.1371/journal.pone.0249102](https://doi.org/10.1371/journal.pone.0249102) | Extracted from Methods section ([PMC8284613](https://pmc.ncbi.nlm.nih.gov/articles/PMC8284613/)) | SYNERGY dataset | CC0 |
 | Meijboom et al. 2021 | [10.1007/s40259-021-00508-4](https://doi.org/10.1007/s40259-021-00508-4) | Extracted from Methods section ([PMC8847209](https://pmc.ncbi.nlm.nih.gov/articles/PMC8847209/)) | SYNERGY dataset | CC0 |
 
+### Screening Level and Scope
+
+All evaluations in this paper are **Level 1 (title and abstract) screening** — the standard first-pass screening stage in systematic review methodology. This is what the SYNERGY dataset supports: it provides titles and abstracts but not full texts.
+
+**Level 2 (full-text) screening was not evaluated.** In Cochrane methodology, studies that pass Level 1 screening proceed to Level 2 where the full paper is read to confirm PICO eligibility. Our tool supports both levels, but the benchmark dataset does not include full texts. Full-text evaluation is feasible (DOIs are available for 99% of studies in the dataset) and is planned for future work.
+
+**Studies without abstracts.** 8 of 258 studies (3.1%) in the Donners et al. 2021 dataset had no abstract indexed in the SYNERGY source data. These were screened on title only — less information than the standard Level 1 case. Of these 8, one was an included study, which Claude correctly deferred rather than guessing. Excluding these 8 studies does not materially change any reported metric (DA sensitivity remains 100%, confident errors remain 3).
+
 ### Notes on Dataset Selection
 
 **Why one review for current results.** The results presented in this paper use only the Donners et al. 2021 dataset (258 studies, 15 included, 243 excluded). We prioritised having one review with PICO criteria verified directly from the published paper over evaluating on more reviews with approximated or generic criteria. Our initial evaluation attempt using AI-approximated PICO criteria produced significantly incorrect criteria for two of three reviews (e.g., a rodent behavioural study was mislabeled as a PTSD treatment trial), which would have invalidated the evaluation entirely. We therefore adopted a policy of only evaluating on reviews where the PICO criteria have been manually verified against the source publication.
