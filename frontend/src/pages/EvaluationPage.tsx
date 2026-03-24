@@ -1,5 +1,7 @@
 import PublicNav from '../components/PublicNav'
 import Footer from '../components/Footer'
+import { ForcedBinaryTable, PartialEvalTable, DeferenceAwareTable, DualRunTable, MixedConsensusTable } from '../components/EvalTables'
+import { tier1Results, tier2Results, tier3aResults, tier3bResults, claudeReference } from '../data/benchmarkResults'
 import { CheckCircle, AlertTriangle, Info } from 'lucide-react'
 
 export default function EvaluationPage() {
@@ -376,89 +378,12 @@ export default function EvaluationPage() {
             10 studies from Donners et al. 2021 (5 include, 5 exclude). Single-run, all models via OpenRouter.
           </p>
 
-          {/* Table A: Forced Binary */}
           <h3 className="text-sm font-semibold text-slate-600 mb-2">Framework 1 — Forced Binary</h3>
-          <div className="border border-slate-200 rounded-lg overflow-hidden mb-6 overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead className="bg-slate-50 border-b border-slate-200">
-                <tr>
-                  <th className="text-left px-3 py-2.5 font-medium text-slate-600">Model</th>
-                  <th className="text-right px-3 py-2.5 font-medium text-slate-600">Recall</th>
-                  <th className="text-right px-3 py-2.5 font-medium text-slate-600">Specificity</th>
-                  <th className="text-right px-3 py-2.5 font-medium text-slate-600">Precision</th>
-                  <th className="text-right px-3 py-2.5 font-medium text-slate-600">F1</th>
-                  <th className="text-right px-3 py-2.5 font-medium text-slate-600">Errors</th>
-                  <th className="text-left px-3 py-2.5 font-medium text-slate-600">Tier 2</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100">
-                {[
-                  { m: 'Claude Sonnet 4.6', d: 'Anthropic', oss: false, r: '60%', sp: '100%', p: '100%', f1: '75%', err: 0, t2: true, green: true },
-                  { m: 'DeepSeek v3', d: 'DeepSeek', oss: true, r: '80%', sp: '80%', p: '80%', f1: '80%', err: 2, t2: true, green: false },
-                  { m: 'Kimi k2', d: 'Moonshot AI', oss: true, r: '60%', sp: '80%', p: '75%', f1: '67%', err: 2, t2: true, green: false },
-                  { m: 'Llama 3.3 70B', d: 'Meta', oss: true, r: '80%', sp: '60%', p: '67%', f1: '73%', err: 3, t2: true, green: false },
-                  { m: 'Mistral 3.1 24B', d: 'Mistral AI', oss: true, r: '60%', sp: '60%', p: '60%', f1: '60%', err: 3, t2: true, green: false },
-                  { m: 'Gemma 3 27B', d: 'Google', oss: true, r: '80%', sp: '40%', p: '57%', f1: '67%', err: 4, t2: true, green: false },
-                  { m: 'GPT-4o', d: 'OpenAI', oss: false, r: '60%', sp: '60%', p: '60%', f1: '60%', err: 4, t2: false, green: false },
-                  { m: 'Qwen 3 235B', d: 'Alibaba', oss: true, r: '60%', sp: '60%', p: '60%', f1: '60%', err: 4, t2: false, green: false },
-                  { m: 'DeepSeek R1 32B', d: 'DeepSeek', oss: true, r: '80%', sp: '20%', p: '50%', f1: '62%', err: 5, t2: false, green: false },
-                ].map(({ m, d, oss, r, sp, p, f1, err, t2, green }) => (
-                  <tr key={m} className={`${green ? 'bg-green-50/50' : ''} ${!t2 ? 'opacity-50' : ''} hover:bg-slate-50`}>
-                    <td className="px-3 py-2.5 font-medium text-slate-800">{m} <span className="text-xs text-slate-400">{d}</span>{oss && <span className="ml-1 text-xs bg-green-50 text-green-600 px-1 rounded">OS</span>}</td>
-                    <td className="px-3 py-2.5 text-right">{r}</td>
-                    <td className="px-3 py-2.5 text-right">{sp}</td>
-                    <td className="px-3 py-2.5 text-right">{p}</td>
-                    <td className="px-3 py-2.5 text-right font-medium">{f1}</td>
-                    <td className={`px-3 py-2.5 text-right ${err >= 4 ? 'text-red-600 font-medium' : ''}`}>{err}</td>
-                    <td className="px-3 py-2.5">{t2 ? <span className="text-xs bg-blue-50 text-blue-600 px-1.5 py-0.5 rounded-full">Yes</span> : <span className="text-xs text-slate-300">No</span>}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <ForcedBinaryTable data={tier1Results} errorThreshold={4} showTier2 />
+          <div className="mb-6" />
 
-          {/* Table B: Deference-Aware */}
           <h3 className="text-sm font-semibold text-blue-600 mb-2">Framework 3 — Deference-Aware</h3>
-          <div className="border border-blue-200 rounded-lg overflow-hidden mb-6 overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead className="bg-blue-50 border-b border-blue-200">
-                <tr>
-                  <th className="text-left px-3 py-2.5 font-medium text-blue-700">Model</th>
-                  <th className="text-right px-3 py-2.5 font-medium text-blue-700">DA Sens</th>
-                  <th className="text-right px-3 py-2.5 font-medium text-blue-700">DA Spec</th>
-                  <th className="text-right px-3 py-2.5 font-medium text-blue-700">DA F1</th>
-                  <th className="text-right px-3 py-2.5 font-medium text-blue-700">Errors</th>
-                  <th className="text-right px-3 py-2.5 font-medium text-blue-700">Deferred</th>
-                  <th className="text-right px-3 py-2.5 font-medium text-blue-700">Coverage</th>
-                  <th className="text-left px-3 py-2.5 font-medium text-blue-700">Tier 2</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-blue-100">
-                {[
-                  { m: 'Claude Sonnet 4.6', da_s: '100%', da_sp: '100%', da_f1: '100%', err: 0, def: '40%', cov: '60%', t2: true, green: true },
-                  { m: 'DeepSeek v3', da_s: '80%', da_sp: '80%', da_f1: '80%', err: 2, def: '0%', cov: '100%', t2: true, green: false },
-                  { m: 'Kimi k2', da_s: '80%', da_sp: '80%', da_f1: '77%', err: 2, def: '10%', cov: '90%', t2: true, green: false },
-                  { m: 'Llama 3.3 70B', da_s: '80%', da_sp: '60%', da_f1: '73%', err: 3, def: '10%', cov: '90%', t2: true, green: false },
-                  { m: 'Mistral 3.1 24B', da_s: '80%', da_sp: '60%', da_f1: '69%', err: 3, def: '10%', cov: '90%', t2: true, green: false },
-                  { m: 'Gemma 3 27B', da_s: '80%', da_sp: '40%', da_f1: '67%', err: 4, def: '0%', cov: '100%', t2: true, green: false },
-                  { m: 'GPT-4o', da_s: '60%', da_sp: '60%', da_f1: '60%', err: 4, def: '0%', cov: '100%', t2: false, green: false },
-                  { m: 'Qwen 3 235B', da_s: '60%', da_sp: '60%', da_f1: '60%', err: 4, def: '0%', cov: '100%', t2: false, green: false },
-                  { m: 'DeepSeek R1 32B', da_s: '80%', da_sp: '20%', da_f1: '62%', err: 5, def: '0%', cov: '100%', t2: false, green: false },
-                ].map(({ m, da_s, da_sp, da_f1, err, def: deferred, cov, t2, green }) => (
-                  <tr key={m} className={`${green ? 'bg-green-50/50' : ''} ${!t2 ? 'opacity-50' : ''} hover:bg-blue-50/30`}>
-                    <td className="px-3 py-2.5 font-medium text-slate-800">{m}</td>
-                    <td className="px-3 py-2.5 text-right">{da_s}</td>
-                    <td className="px-3 py-2.5 text-right">{da_sp}</td>
-                    <td className="px-3 py-2.5 text-right font-medium">{da_f1}</td>
-                    <td className={`px-3 py-2.5 text-right ${err >= 4 ? 'text-red-600 font-medium' : ''}`}>{err}</td>
-                    <td className="px-3 py-2.5 text-right">{deferred}</td>
-                    <td className="px-3 py-2.5 text-right">{cov}</td>
-                    <td className="px-3 py-2.5">{t2 ? <span className="text-xs bg-blue-50 text-blue-600 px-1.5 py-0.5 rounded-full">Yes</span> : <span className="text-xs text-slate-300">No</span>}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <DeferenceAwareTable data={tier1Results} errorThreshold={4} showTier2 />
 
           <p className="text-xs text-slate-400 mb-4">
             Read Table A then Table B: Claude drops from 60% recall in forced binary to 100%
@@ -488,123 +413,21 @@ export default function EvaluationPage() {
           </p>
 
           <h3 className="text-sm font-semibold text-slate-600 mb-2">Framework 1 — Forced Binary</h3>
-          <div className="border border-slate-200 rounded-lg overflow-hidden mb-6 overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead className="bg-slate-50 border-b border-slate-200">
-                <tr>
-                  <th className="text-left px-3 py-2.5 font-medium text-slate-600">Model</th>
-                  <th className="text-right px-3 py-2.5 font-medium text-slate-600">Recall</th>
-                  <th className="text-right px-3 py-2.5 font-medium text-slate-600">Specificity</th>
-                  <th className="text-right px-3 py-2.5 font-medium text-slate-600">Precision</th>
-                  <th className="text-right px-3 py-2.5 font-medium text-slate-600">F1</th>
-                  <th className="text-right px-3 py-2.5 font-medium text-slate-600">Errors</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100">
-                {[
-                  { m: 'Claude Sonnet 4.6', r: '73.3%', sp: '95.9%', p: '52.4%', f1: '61.1%', err: 13, green: true },
-                  { m: 'Llama 3.3 70B', r: '93.3%', sp: '74.7%', p: '19.2%', f1: '31.8%', err: 62, green: false },
-                  { m: 'Mistral 3.1 24B', r: '86.7%', sp: '83.5%', p: '24.5%', f1: '38.2%', err: 42, green: false },
-                  { m: 'DeepSeek v3', r: '73.3%', sp: '89.7%', p: '30.6%', f1: '43.1%', err: 29, green: false },
-                  { m: 'Kimi k2', r: '73.3%', sp: '86.8%', p: '25.6%', f1: '37.9%', err: 36, green: false },
-                  { m: 'Gemma 3 27B', r: '93.3%', sp: '71.2%', p: '16.7%', f1: '28.3%', err: 71, green: false },
-                ].map(({ m, r, sp, p, f1, err, green }) => (
-                  <tr key={m} className={`${green ? 'bg-green-50/50' : ''} hover:bg-slate-50`}>
-                    <td className="px-3 py-2.5 font-medium text-slate-800">{m}</td>
-                    <td className="px-3 py-2.5 text-right">{r}</td>
-                    <td className="px-3 py-2.5 text-right">{sp}</td>
-                    <td className="px-3 py-2.5 text-right">{p}</td>
-                    <td className="px-3 py-2.5 text-right font-medium">{f1}</td>
-                    <td className={`px-3 py-2.5 text-right ${err >= 40 ? 'text-red-600 font-medium' : ''}`}>{err}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <ForcedBinaryTable data={tier2Results} />
+          <div className="mb-6" />
 
           <h3 className="text-sm font-semibold text-amber-600 mb-2">Framework 2 — Partial Evaluation <span className="text-xs font-normal text-amber-400">(decided subset only)</span></h3>
-          <div className="border border-amber-200 rounded-lg overflow-hidden mb-6 overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead className="bg-amber-50 border-b border-amber-200">
-                <tr>
-                  <th className="text-left px-3 py-2.5 font-medium text-amber-700">Model</th>
-                  <th className="text-right px-3 py-2.5 font-medium text-amber-700">Recall</th>
-                  <th className="text-right px-3 py-2.5 font-medium text-amber-700">Specificity</th>
-                  <th className="text-right px-3 py-2.5 font-medium text-amber-700">Precision</th>
-                  <th className="text-right px-3 py-2.5 font-medium text-amber-700">F1</th>
-                  <th className="text-right px-3 py-2.5 font-medium text-amber-700">Coverage</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-amber-100">
-                {[
-                  { m: 'Claude Sonnet 4.6', r: '100%', sp: '98.4%', p: '75.0%', f1: '85.7%', cov: '76.7%', green: true },
-                  { m: 'Llama 3.3 70B', r: '93.3%', sp: '73.3%', p: '19.4%', f1: '32.2%', cov: '93.5%', green: false },
-                  { m: 'Mistral 3.1 24B', r: '92.9%', sp: '83.1%', p: '24.5%', f1: '38.8%', cov: '97.3%', green: false },
-                  { m: 'DeepSeek v3', r: '73.3%', sp: '89.5%', p: '30.6%', f1: '43.1%', cov: '99.6%', green: false },
-                  { m: 'Kimi k2', r: '78.6%', sp: '86.6%', p: '25.6%', f1: '38.6%', cov: '98.1%', green: false },
-                  { m: 'Gemma 3 27B', r: '93.3%', sp: '71.0%', p: '16.7%', f1: '28.3%', cov: '99.2%', green: false },
-                ].map(({ m, r, sp, p, f1, cov, green }) => (
-                  <tr key={m} className={`${green ? 'bg-green-50/50' : ''} hover:bg-amber-50/30`}>
-                    <td className="px-3 py-2.5 font-medium text-slate-800">{m}</td>
-                    <td className="px-3 py-2.5 text-right">{r}</td>
-                    <td className="px-3 py-2.5 text-right">{sp}</td>
-                    <td className="px-3 py-2.5 text-right">{p}</td>
-                    <td className="px-3 py-2.5 text-right font-medium">{f1}</td>
-                    <td className="px-3 py-2.5 text-right">{cov}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          <p className="text-xs text-slate-400 mb-6">
+          <PartialEvalTable data={tier2Results} />
+          <p className="text-xs text-slate-400 mt-2 mb-6">
             Claude scores 100% recall and 85.7% F1 — but only on 76.7% of studies.
             The remaining 23.3% are excluded from the denominator, hiding the deferred workload.
           </p>
 
           <h3 className="text-sm font-semibold text-blue-600 mb-2">Framework 3 — Deference-Aware</h3>
-          <div className="border border-blue-200 rounded-lg overflow-hidden mb-6 overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead className="bg-blue-50 border-b border-blue-200">
-                <tr>
-                  <th className="text-left px-3 py-2.5 font-medium text-blue-700">Model</th>
-                  <th className="text-right px-3 py-2.5 font-medium text-blue-700">DA Sens</th>
-                  <th className="text-right px-3 py-2.5 font-medium text-blue-700">DA Spec</th>
-                  <th className="text-right px-3 py-2.5 font-medium text-blue-700">DA Prec</th>
-                  <th className="text-right px-3 py-2.5 font-medium text-blue-700">DA F1</th>
-                  <th className="text-right px-3 py-2.5 font-medium text-blue-700">Errors</th>
-                  <th className="text-right px-3 py-2.5 font-medium text-blue-700">Deferred</th>
-                  <th className="text-right px-3 py-2.5 font-medium text-blue-700">Coverage</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-blue-100">
-                {[
-                  { m: 'Claude Sonnet 4.6', da_s: '100%', da_sp: '98.8%', da_p: '75.0%', da_f1: '85.7%', err: 3, def: '23.3%', cov: '76.7%', green: true },
-                  { m: 'Llama 3.3 70B', da_s: '93.3%', da_sp: '75.1%', da_p: '19.4%', da_f1: '32.2%', err: 59, def: '6.5%', cov: '93.5%', green: false },
-                  { m: 'Mistral 3.1 24B', da_s: '93.3%', da_sp: '83.5%', da_p: '24.5%', da_f1: '38.9%', err: 41, def: '2.7%', cov: '97.3%', green: false },
-                  { m: 'DeepSeek v3', da_s: '73.3%', da_sp: '89.7%', da_p: '30.6%', da_f1: '43.1%', err: 29, def: '0.4%', cov: '99.6%', green: false },
-                  { m: 'Kimi k2', da_s: '80.0%', da_sp: '86.8%', da_p: '25.6%', da_f1: '38.8%', err: 35, def: '1.9%', cov: '98.1%', green: false },
-                  { m: 'Gemma 3 27B', da_s: '93.3%', da_sp: '71.2%', da_p: '16.7%', da_f1: '28.3%', err: 71, def: '0.8%', cov: '99.2%', green: false },
-                ].map(({ m, da_s, da_sp, da_p, da_f1, err, def: deferred, cov, green }) => (
-                  <tr key={m} className={`${green ? 'bg-green-50/50' : ''} hover:bg-blue-50/30`}>
-                    <td className="px-3 py-2.5 font-medium text-slate-800">{m}</td>
-                    <td className="px-3 py-2.5 text-right">{da_s}</td>
-                    <td className="px-3 py-2.5 text-right">{da_sp}</td>
-                    <td className="px-3 py-2.5 text-right">{da_p}</td>
-                    <td className="px-3 py-2.5 text-right font-medium">{da_f1}</td>
-                    <td className={`px-3 py-2.5 text-right ${err >= 40 ? 'text-red-600 font-medium' : ''}`}>{err}</td>
-                    <td className="px-3 py-2.5 text-right">{deferred}</td>
-                    <td className="px-3 py-2.5 text-right">{cov}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
-          <p className="text-xs text-slate-400 mb-4">
-            F2 and F3 share the same precision (75.0% for Claude) because UNCLEAR is not an INCLUDE call
-            in either framework. The difference: F2 hides 23.3% of studies in the denominator,
-            F3 reports them as deferred. F3 sensitivity (100%) is computed on all studies,
-            F2 sensitivity (100%) only on the 76.7% it decided on.
+          <DeferenceAwareTable data={tier2Results} />
+          <p className="text-xs text-slate-400 mt-2 mb-4">
+            F2 and F3 share the same precision (75.0% for Claude) — UNCLEAR is not an INCLUDE call
+            in either. The difference: F2 hides 23.3% in the denominator, F3 reports it as deferred.
           </p>
 
           <details className="border border-slate-200 rounded-lg">
@@ -629,48 +452,7 @@ export default function EvaluationPage() {
           </p>
 
           <h3 className="text-sm font-semibold text-blue-600 mb-2">Single-Run vs Dual-Run (Deference-Aware)</h3>
-          <div className="border border-blue-200 rounded-lg overflow-hidden mb-6 overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead className="bg-blue-50 border-b border-blue-200">
-                <tr>
-                  <th className="text-left px-3 py-2.5 font-medium text-blue-700" rowSpan={2}>Model</th>
-                  <th className="text-center px-3 py-2 font-medium text-slate-500 border-b border-slate-200" colSpan={3}>Single-Run DA (Tier 2)</th>
-                  <th className="text-center px-3 py-2 font-medium text-blue-700 border-b border-blue-200" colSpan={3}>Dual-Run DA (Tier 3a)</th>
-                  <th className="text-center px-3 py-2 font-medium text-slate-600 border-b border-slate-200" colSpan={2}>Dual-Run Detail</th>
-                </tr>
-                <tr>
-                  <th className="text-right px-3 py-1 text-xs text-slate-400">Sens</th>
-                  <th className="text-right px-3 py-1 text-xs text-slate-400">Errors</th>
-                  <th className="text-right px-3 py-1 text-xs text-slate-400">Def%</th>
-                  <th className="text-right px-3 py-1 text-xs text-blue-500">Sens</th>
-                  <th className="text-right px-3 py-1 text-xs text-blue-500">Errors</th>
-                  <th className="text-right px-3 py-1 text-xs text-blue-500">Def%</th>
-                  <th className="text-right px-3 py-1 text-xs text-slate-400">Hard Miss</th>
-                  <th className="text-right px-3 py-1 text-xs text-slate-400">Coverage</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-blue-100">
-                {[
-                  { m: 'Claude Sonnet 4.6', s1_s: '100%', s1_e: 3, s1_d: '23.3%', s2_s: '100%', s2_e: 3, s2_d: '25.2%', hm: 0, cov: '74.8%', green: true },
-                  { m: 'Mistral 3.1 24B', s1_s: '93.3%', s1_e: 41, s1_d: '2.7%', s2_s: '93.3%', s2_e: 39, s2_d: '6.6%', hm: 1, cov: '93.4%', green: false },
-                  { m: 'Kimi k2', s1_s: '80.0%', s1_e: 35, s1_d: '1.9%', s2_s: '80.0%', s2_e: 28, s2_d: '6.6%', hm: 3, cov: '93.4%', green: false },
-                  { m: 'DeepSeek v3', s1_s: '73.3%', s1_e: 29, s1_d: '0.4%', s2_s: '73.3%', s2_e: 29, s2_d: '0.4%', hm: 4, cov: '99.6%', green: false },
-                ].map(({ m, s1_s, s1_e, s1_d, s2_s, s2_e, s2_d, hm, cov, green }) => (
-                  <tr key={m} className={`${green ? 'bg-green-50/50' : ''} hover:bg-blue-50/30`}>
-                    <td className="px-3 py-2.5 font-medium text-slate-800">{m}</td>
-                    <td className="px-3 py-2.5 text-right text-slate-500">{s1_s}</td>
-                    <td className="px-3 py-2.5 text-right text-slate-500">{s1_e}</td>
-                    <td className="px-3 py-2.5 text-right text-slate-500">{s1_d}</td>
-                    <td className="px-3 py-2.5 text-right text-blue-700 font-medium">{s2_s}</td>
-                    <td className="px-3 py-2.5 text-right text-blue-700 font-medium">{s2_e}</td>
-                    <td className="px-3 py-2.5 text-right text-blue-700">{s2_d}</td>
-                    <td className={`px-3 py-2.5 text-right ${hm > 0 ? 'text-red-600' : 'text-green-600 font-medium'}`}>{hm}</td>
-                    <td className="px-3 py-2.5 text-right">{cov}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <DualRunTable data={tier3aResults} />
 
           <details className="border border-slate-200 rounded-lg">
             <summary className="px-5 py-3 cursor-pointer text-sm font-semibold text-slate-700 hover:bg-slate-50">
@@ -695,48 +477,7 @@ export default function EvaluationPage() {
             Forced binary is not applicable to consensus pairs (disagreement has no single raw decision).
           </p>
 
-          <div className="border border-blue-200 rounded-lg overflow-hidden mb-6 overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead className="bg-blue-50 border-b border-blue-200">
-                <tr>
-                  <th className="text-left px-3 py-2.5 font-medium text-blue-700">Model Pair</th>
-                  <th className="text-right px-3 py-2.5 font-medium text-blue-700">DA Sens</th>
-                  <th className="text-right px-3 py-2.5 font-medium text-blue-700">DA Spec</th>
-                  <th className="text-right px-3 py-2.5 font-medium text-blue-700">DA F1</th>
-                  <th className="text-right px-3 py-2.5 font-medium text-blue-700">Errors</th>
-                  <th className="text-right px-3 py-2.5 font-medium text-blue-700">Deferred</th>
-                  <th className="text-right px-3 py-2.5 font-medium text-blue-700">Coverage</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-blue-100">
-                {[
-                  { pair: 'Llama 70B + DeepSeek v3', da_s: '100%', da_sp: '92.7%', da_f1: '54.0%', err: 17, def: '28.2%', cov: '71.8%' },
-                  { pair: 'Llama 70B + Kimi k2', da_s: '100%', da_sp: '90.1%', da_f1: '46.5%', err: 23, def: '25.9%', cov: '74.1%' },
-                  { pair: 'Gemma 27B + DeepSeek v3', da_s: '93.3%', da_sp: '90.5%', da_f1: '48.0%', err: 24, def: '21.3%', cov: '78.7%' },
-                  { pair: 'Gemma 27B + Kimi k2', da_s: '93.3%', da_sp: '89.3%', da_f1: '45.1%', err: 27, def: '22.2%', cov: '77.8%' },
-                ].map(({ pair, da_s, da_sp, da_f1, err, def: deferred, cov }) => (
-                  <tr key={pair} className="hover:bg-blue-50/30">
-                    <td className="px-3 py-2.5 font-medium text-slate-800">{pair}</td>
-                    <td className="px-3 py-2.5 text-right">{da_s}</td>
-                    <td className="px-3 py-2.5 text-right">{da_sp}</td>
-                    <td className="px-3 py-2.5 text-right font-medium">{da_f1}</td>
-                    <td className="px-3 py-2.5 text-right">{err}</td>
-                    <td className="px-3 py-2.5 text-right">{deferred}</td>
-                    <td className="px-3 py-2.5 text-right">{cov}</td>
-                  </tr>
-                ))}
-                <tr className="bg-slate-50 border-t-2 border-slate-300">
-                  <td className="px-3 py-2.5 font-medium text-slate-400 italic">Claude single (ref)</td>
-                  <td className="px-3 py-2.5 text-right text-slate-400">100%</td>
-                  <td className="px-3 py-2.5 text-right text-slate-400">98.8%</td>
-                  <td className="px-3 py-2.5 text-right text-slate-400">85.7%</td>
-                  <td className="px-3 py-2.5 text-right text-slate-400">3</td>
-                  <td className="px-3 py-2.5 text-right text-slate-400">23.3%</td>
-                  <td className="px-3 py-2.5 text-right text-slate-400">76.7%</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+          <MixedConsensusTable data={tier3bResults} reference={claudeReference} />
 
           <details className="border border-slate-200 rounded-lg">
             <summary className="px-5 py-3 cursor-pointer text-sm font-semibold text-slate-700 hover:bg-slate-50">
