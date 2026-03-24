@@ -44,7 +44,7 @@ export default function EvaluationPage() {
             </p>
             <ul className="space-y-3 ml-1">
               <li>
-                <strong>Sensitivity</strong> matters because missing a relevant study
+                <strong>Sensitivity (recall)</strong> matters because missing a relevant study
                 undermines the review.
               </li>
               <li>
@@ -74,9 +74,9 @@ export default function EvaluationPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {[
               {
-                name: 'Sensitivity (Recall)',
+                name: 'Sensitivity / Recall',
                 target: '> 95%',
-                desc: 'Of all studies that SHOULD be included, what percentage did the AI catch? Missing relevant studies undermines the entire review.',
+                desc: 'Of all studies that SHOULD be included, what percentage did the AI catch? Missing relevant studies undermines the entire review. These terms are interchangeable — we use both throughout.',
                 critical: true,
               },
               {
@@ -94,13 +94,19 @@ export default function EvaluationPage() {
               {
                 name: 'F1 Score',
                 target: 'Varies',
-                desc: 'The harmonic mean of precision and sensitivity. Balances the trade-off between catching all relevant studies and not overwhelming reviewers with false positives. Ranges from 0 to 1, where 1 is perfect.',
+                desc: 'The harmonic mean of precision and sensitivity/recall. Balances catching all relevant studies against not overwhelming reviewers with false positives. Ranges from 0 to 1, where 1 is perfect.',
                 critical: false,
               },
               {
-                name: 'Work Saved',
-                target: '> 40%',
-                desc: 'The percentage of studies reviewers can skip because the AI excluded them. Only meaningful when all three core metrics are above threshold.',
+                name: 'Confident Errors',
+                target: '0',
+                desc: 'The number of studies where the AI made a confident wrong decision — either including an irrelevant study or excluding a relevant one. In the deference-aware framework, these are the only true failures.',
+                critical: true,
+              },
+              {
+                name: 'Deference Rate / Coverage',
+                target: 'Varies',
+                desc: 'Deference rate: what percentage of studies the AI flagged for human review. Coverage: the complement — what percentage the AI handled autonomously. Higher deference = safer but more human workload.',
                 critical: false,
               },
             ].map(({ name, target, desc, critical }) => (
@@ -135,8 +141,8 @@ export default function EvaluationPage() {
               <div className="bg-white border border-slate-200 rounded-md p-4">
                 <h4 className="font-semibold text-slate-700 mb-2">Framework 1: Forced Binary Classification</h4>
                 <p className="text-xs text-slate-500">
-                  The AI produces only INCLUDE or EXCLUDE, evaluated on standard sensitivity,
-                  specificity, and F1. This is the appropriate baseline for fully automated
+                  The AI produces only INCLUDE or EXCLUDE, evaluated on standard sensitivity/recall,
+                  specificity, precision, and F1. This is the appropriate baseline for fully automated
                   systems. It does not fragment the evaluation — it simply excludes the
                   possibility of uncertainty entirely. The limitation is the assumption that
                   every case must receive a confident decision regardless of how certain the
@@ -193,9 +199,9 @@ export default function EvaluationPage() {
                   rate and effective coverage, rather than hidden in the denominator.
                 </p>
                 <ul className="text-xs text-slate-500 space-y-1">
-                  <li><strong>DA Sensitivity:</strong> Of all studies that should be included, how many did the AI either correctly include OR defer? Only confident exclusions of included studies count as failures.</li>
+                  <li><strong>DA Sensitivity/Recall:</strong> Of all studies that should be included, how many did the AI either correctly include OR defer? Only confident exclusions of included studies count as failures.</li>
                   <li><strong>DA Specificity:</strong> Of all studies that should be excluded, how many did the AI either correctly exclude OR defer? Only confident inclusions of excluded studies count as failures.</li>
-                  <li><strong>DA F1:</strong> Harmonic mean of DA sensitivity and decided precision. Balances safety (catching included studies or deferring) with quality (when you say INCLUDE, being right).</li>
+                  <li><strong>DA F1:</strong> Harmonic mean of DA sensitivity/recall and decided precision. Balances safety (catching included studies or deferring) with quality (when you say INCLUDE, being right).</li>
                   <li><strong>Confident errors:</strong> The total count of confident wrong answers — the only true failures in a HITL system.</li>
                   <li><strong>Deference rate:</strong> What percentage of studies the AI flagged for human review — making workload visible.</li>
                   <li><strong>Effective coverage:</strong> What percentage of screening the AI handles autonomously.</li>
@@ -385,8 +391,8 @@ export default function EvaluationPage() {
           <h3 className="text-sm font-semibold text-blue-600 mb-2">Framework 3 — Deference-Aware</h3>
           <DeferenceAwareTable data={tier1Results} errorThreshold={4} showTier2 />
           <p className="text-xs text-slate-400 mt-2 mb-4">
-            Compare the two tables above: Claude drops from 60% recall (Framework 1) to 100%
-            DA sensitivity (Framework 3). The inversion shows standard metrics penalise the safest model.
+            Compare the two tables above: Claude drops from 60% sens/recall (Framework 1) to 100%
+            DA sens/recall (Framework 3). The inversion shows standard metrics penalise the safest model.
           </p>
 
           <details className="border border-slate-200 rounded-lg">
@@ -394,9 +400,9 @@ export default function EvaluationPage() {
               Key Findings from Tier 1
             </summary>
             <div className="px-5 py-4 border-t border-slate-100 space-y-3 text-sm text-slate-600">
-              <p><strong>Claude: zero confident errors.</strong> 40% deference rate, 100% DA across all metrics. Forced binary penalises this to 60% recall.</p>
+              <p><strong>Claude: zero confident errors.</strong> 40% deference rate, 100% DA across all metrics. Forced binary penalises this to 60% sens/recall.</p>
               <p><strong>Three models deferred:</strong> Claude (40%), Kimi (10%), Mistral (10%). Most models never defer.</p>
-              <p><strong>DeepSeek v3:</strong> Best balanced non-deferring model (80/80/80 across recall/spec/F1).</p>
+              <p><strong>DeepSeek v3:</strong> Best balanced non-deferring model (80/80/80 across sens/recall, specificity, F1).</p>
               <p><strong>Infrastructure matters:</strong> DeepSeek and Kimi failed on Venice AI but worked perfectly on OpenRouter.</p>
             </div>
           </details>
@@ -417,7 +423,7 @@ export default function EvaluationPage() {
           <h3 className="text-sm font-semibold text-amber-600 mb-2">Framework 2 — Partial Evaluation <span className="text-xs font-normal text-amber-400">(decided subset only)</span></h3>
           <PartialEvalTable data={tier2Results} />
           <p className="text-xs text-slate-400 mt-2 mb-6">
-            Claude scores 100% recall and 85.7% F1 — but only on 76.7% of studies.
+            Claude scores 100% sens/recall and 85.7% F1 — but only on 76.7% of studies.
             The remaining 23.3% are excluded from the denominator, hiding the deferred workload.
           </p>
 
@@ -433,8 +439,8 @@ export default function EvaluationPage() {
               Key Findings from Tier 2
             </summary>
             <div className="px-5 py-4 border-t border-slate-100 space-y-3 text-sm text-slate-600">
-              <p><strong>Claude: 100% DA sensitivity, 3 errors.</strong> Zero hard misses — every included study was either correctly included or deferred. Forced binary F1 (61.1%) vs DA F1 (85.7%) is the clearest demonstration of the framework inversion.</p>
-              <p><strong>Llama + Gemma: high recall, low precision.</strong> 93.3% forced-binary recall but F1 under 32% due to massive over-inclusion. Good candidates for mixed-model pairing with high-specificity models.</p>
+              <p><strong>Claude: 100% DA sens/recall, 3 errors.</strong> Zero hard misses — every included study was either correctly included or deferred. Forced binary F1 (61.1%) vs DA F1 (85.7%) is the clearest demonstration of the framework inversion.</p>
+              <p><strong>Llama + Gemma: high sens/recall, low precision.</strong> 93.3% forced-binary sens/recall but F1 under 32% due to massive over-inclusion. Good candidates for mixed-model pairing with high-specificity models.</p>
               <p><strong>DeepSeek: best balance without deference.</strong> 43.1% forced-binary F1 with 89.7% specificity. Barely defers (0.4%). Strongest option for fully automated deployments.</p>
             </div>
           </details>
@@ -515,7 +521,7 @@ export default function EvaluationPage() {
               Key Findings from Tier 3b
             </summary>
             <div className="px-5 py-4 border-t border-slate-100 space-y-3 text-sm text-slate-600">
-              <p><strong>Llama + DeepSeek: 100% DA sensitivity at 1/15th the cost of Claude.</strong> No included study was missed or confidently excluded. ~$1 vs Claude's ~$15.</p>
+              <p><strong>Llama + DeepSeek: 100% DA sens/recall at 1/15th the cost of Claude.</strong> No included study was missed or confidently excluded. ~$1 vs Claude's ~$15.</p>
               <p><strong>Pairing boosts specificity.</strong> Llama alone: 74.7% specificity. Llama + DeepSeek: 92.7%. The high-specificity model catches over-inclusions.</p>
               <p><strong>Claude still leads on precision.</strong> DA F1: Claude 85.7% vs best pair 54.0%. When Claude decides, it's right far more often (3 errors vs 17).</p>
               <p><strong>3a vs 3b:</strong> Same-model dual-run (3a) amplifies existing deference. Mixed-model consensus (3b) creates deference from disagreement between complementary models. Both achieve deference, through different mechanisms.</p>

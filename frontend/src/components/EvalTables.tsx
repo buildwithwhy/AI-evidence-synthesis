@@ -17,7 +17,7 @@ export function ForcedBinaryTable({ data, errorThreshold = ERROR_THRESHOLD, show
         <thead className="bg-slate-50 border-b border-slate-200">
           <tr>
             <th className="text-left px-3 py-2.5 font-medium text-slate-600">Model</th>
-            <th className="text-right px-3 py-2.5 font-medium text-slate-600">Recall</th>
+            <th className="text-right px-3 py-2.5 font-medium text-slate-600">Sens/Recall</th>
             <th className="text-right px-3 py-2.5 font-medium text-slate-600">Specificity</th>
             <th className="text-right px-3 py-2.5 font-medium text-slate-600">Precision</th>
             <th className="text-right px-3 py-2.5 font-medium text-slate-600">F1</th>
@@ -62,7 +62,7 @@ export function PartialEvalTable({ data }: { data: ModelResult[] }) {
         <thead className="bg-amber-50 border-b border-amber-200">
           <tr>
             <th className="text-left px-3 py-2.5 font-medium text-amber-700">Model</th>
-            <th className="text-right px-3 py-2.5 font-medium text-amber-700">Recall</th>
+            <th className="text-right px-3 py-2.5 font-medium text-amber-700">Sens/Recall</th>
             <th className="text-right px-3 py-2.5 font-medium text-amber-700">Specificity</th>
             <th className="text-right px-3 py-2.5 font-medium text-amber-700">Precision</th>
             <th className="text-right px-3 py-2.5 font-medium text-amber-700">F1</th>
