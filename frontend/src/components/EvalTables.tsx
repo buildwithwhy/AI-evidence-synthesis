@@ -22,6 +22,7 @@ export function ForcedBinaryTable({ data, errorThreshold = ERROR_THRESHOLD, show
             <th className="text-right px-3 py-2.5 font-medium text-slate-600">Precision</th>
             <th className="text-right px-3 py-2.5 font-medium text-slate-600">F1</th>
             <th className="text-right px-3 py-2.5 font-medium text-slate-600">Errors</th>
+            <th className="text-right px-3 py-2.5 font-medium text-slate-600">H.Miss</th>
             {showTier2 && <th className="text-left px-3 py-2.5 font-medium text-slate-600">Tier 2</th>}
           </tr>
         </thead>
@@ -38,6 +39,7 @@ export function ForcedBinaryTable({ data, errorThreshold = ERROR_THRESHOLD, show
               <td className="px-3 py-2.5 text-right">{d.fb_prec}</td>
               <td className="px-3 py-2.5 text-right font-medium">{d.fb_f1}</td>
               <td className={`px-3 py-2.5 text-right ${d.fb_errors >= errorThreshold ? 'text-red-600 font-medium' : ''}`}>{d.fb_errors}</td>
+              <td className={`px-3 py-2.5 text-right ${d.fb_hmiss > 0 ? 'text-red-600' : 'text-green-600 font-medium'}`}>{d.fb_hmiss}</td>
               {showTier2 && (
                 <td className="px-3 py-2.5">
                   {d.tier2 ? <span className="text-xs bg-blue-50 text-blue-600 px-1.5 py-0.5 rounded-full">Yes</span> : <span className="text-xs text-slate-300">No</span>}
@@ -106,6 +108,7 @@ export function DeferenceAwareTable({ data, errorThreshold = ERROR_THRESHOLD, sh
             {data.some(d => d.da_prec) && <th className="text-right px-3 py-2.5 font-medium text-blue-700">DA Prec</th>}
             <th className="text-right px-3 py-2.5 font-medium text-blue-700">DA F1</th>
             <th className="text-right px-3 py-2.5 font-medium text-blue-700">Errors</th>
+            <th className="text-right px-3 py-2.5 font-medium text-blue-700">H.Miss</th>
             <th className="text-right px-3 py-2.5 font-medium text-blue-700">Deferred</th>
             <th className="text-right px-3 py-2.5 font-medium text-blue-700">Coverage</th>
             {showTier2 && <th className="text-left px-3 py-2.5 font-medium text-blue-700">Tier 2</th>}
@@ -120,6 +123,7 @@ export function DeferenceAwareTable({ data, errorThreshold = ERROR_THRESHOLD, sh
               {data.some(dd => dd.da_prec) && <td className="px-3 py-2.5 text-right">{d.da_prec}</td>}
               <td className="px-3 py-2.5 text-right font-medium">{d.da_f1}</td>
               <td className={`px-3 py-2.5 text-right ${d.da_errors >= errorThreshold ? 'text-red-600 font-medium' : ''}`}>{d.da_errors}</td>
+              <td className={`px-3 py-2.5 text-right ${d.da_hmiss > 0 ? 'text-red-600' : 'text-green-600 font-medium'}`}>{d.da_hmiss}</td>
               <td className="px-3 py-2.5 text-right">{d.da_deferred}</td>
               <td className="px-3 py-2.5 text-right">{d.da_coverage}</td>
               {showTier2 && (
@@ -196,6 +200,7 @@ export function MixedConsensusTable({ data, reference }: { data: ConsensusResult
             <th className="text-right px-3 py-2.5 font-medium text-blue-700">DA Spec</th>
             <th className="text-right px-3 py-2.5 font-medium text-blue-700">DA F1</th>
             <th className="text-right px-3 py-2.5 font-medium text-blue-700">Errors</th>
+            <th className="text-right px-3 py-2.5 font-medium text-blue-700">H.Miss</th>
             <th className="text-right px-3 py-2.5 font-medium text-blue-700">Deferred</th>
             <th className="text-right px-3 py-2.5 font-medium text-blue-700">Coverage</th>
           </tr>
@@ -208,6 +213,7 @@ export function MixedConsensusTable({ data, reference }: { data: ConsensusResult
               <td className="px-3 py-2.5 text-right">{d.da_spec}</td>
               <td className="px-3 py-2.5 text-right font-medium">{d.da_f1}</td>
               <td className="px-3 py-2.5 text-right">{d.errors}</td>
+              <td className={`px-3 py-2.5 text-right ${d.hmiss > 0 ? 'text-red-600' : 'text-green-600 font-medium'}`}>{d.hmiss}</td>
               <td className="px-3 py-2.5 text-right">{d.deferred}</td>
               <td className="px-3 py-2.5 text-right">{d.coverage}</td>
             </tr>
@@ -219,6 +225,7 @@ export function MixedConsensusTable({ data, reference }: { data: ConsensusResult
               <td className="px-3 py-2.5 text-right text-slate-400">{reference.da_spec}</td>
               <td className="px-3 py-2.5 text-right text-slate-400">{reference.da_f1}</td>
               <td className="px-3 py-2.5 text-right text-slate-400">{reference.errors}</td>
+              <td className="px-3 py-2.5 text-right text-slate-400">{reference.hmiss}</td>
               <td className="px-3 py-2.5 text-right text-slate-400">{reference.deferred}</td>
               <td className="px-3 py-2.5 text-right text-slate-400">{reference.coverage}</td>
             </tr>

@@ -27,6 +27,11 @@ export default function EvaluationPage() {
           </div>
         </div>
 
+        <p className="text-xs text-slate-400 mb-10">
+          By Yuyu Shen, KalliDao Research. Methodology and results formalised in{' '}
+          <em>Deference-Aware Evaluation for Human-in-the-Loop AI Systems</em> (March 2026).
+        </p>
+
         {/* Methodology */}
         <section className="mb-12">
           <h2 className="text-xl font-semibold text-slate-800 mb-4">Methodology</h2>
@@ -241,8 +246,8 @@ export default function EvaluationPage() {
               Framework 3 as the unified quality signal. The gap between F1 and F3 shows
               how much safety is gained by allowing deference. This applies to any domain
               where AI operates under human oversight — not just systematic reviews.
-              A forthcoming white paper will formalise this as a general evaluation
-              framework for human-in-the-loop AI systems.
+              This is formalised in: <em>Deference-Aware Evaluation for Human-in-the-Loop
+              AI Systems</em> (Yuyu Shen, KalliDao Research, March 2026).
             </p>
           </div>
         </section>
@@ -291,7 +296,7 @@ export default function EvaluationPage() {
             <h3 className="font-semibold text-slate-800 text-sm mb-2">What we actually evaluated on</h3>
             <p className="text-sm text-slate-600 mb-3">
               The results on this page use a single review from the SYNERGY dataset:
-              <strong> Donners et al. 2021</strong> — a systematic review of emicizumab
+              <strong>Donners et al. 2021</strong> — a systematic review of emicizumab
               pharmacokinetics in hemophilia A (258 studies, 15 included, 243 excluded).
               We chose this review because it has a complete screening set with
               PICO criteria{' '}
@@ -304,9 +309,8 @@ export default function EvaluationPage() {
             </p>
             <p className="text-sm text-slate-600">
               <strong>Planned expansions:</strong> We have verified PICO criteria prepared
-              for two additional SYNERGY reviews — Sep et al. 2021 (rodent object-in-context
-              memory, 271 studies) and Meijboom et al. 2021 (TNF-alpha biosimilar
-              retransitioning, 882 studies). Evaluations on these reviews, as well as
+              for two additional SYNERGY reviews — Sep et al. 2021 (271 studies) and
+              Meijboom et al. 2021 (882 studies). Evaluations on these reviews, as well as
               the larger Chan et al. dataset, are forthcoming.
             </p>
           </div>
@@ -324,8 +328,8 @@ export default function EvaluationPage() {
               },
               {
                 tier: 'Tier 2: Core Evaluation',
-                studies: '1,345 studies',
-                desc: 'Complete screening sets from 3 verified reviews with PICO criteria extracted from published papers. Covers human pharmacology, preclinical research, and clinical biosimilars.',
+                studies: '1,411 studies',
+                desc: 'Complete screening sets from 3 verified reviews (Donners 258, Sep 271, Meijboom 882) with PICO criteria extracted from published papers. Covers human pharmacology, preclinical research, and clinical biosimilars.',
               },
               {
                 tier: 'Tier 3a: Same-Model Dual-Run',
@@ -377,8 +381,8 @@ export default function EvaluationPage() {
                 <span className="text-blue-600 font-bold mt-0.5">2.</span>
                 <div>
                   <strong>Tier 2 deep evaluation (top models only):</strong> The best
-                  performers from Tier 1 — typically 3-5 models — are run on the full
-                  Donners_2021 review (250 studies, complete screening set). This produces
+                  performers from Tier 1 — typically 3-6 models — are run on the full
+                  Donners_2021 review (258 studies, complete screening set). This produces
                   statistically meaningful metrics and reveals patterns invisible in 10
                   studies: consistency across study types, calibration of confidence
                   scores, and deference behavior.
@@ -559,9 +563,9 @@ export default function EvaluationPage() {
               Key Findings from Tier 3b
             </summary>
             <div className="px-5 py-4 border-t border-slate-100 space-y-3 text-sm text-slate-600">
-              <p><strong>Llama + DeepSeek: 100% DA sens/recall at 1/15th the cost of Claude.</strong> No included study was missed or confidently excluded. ~$1 vs Claude's ~$15.</p>
+              <p><strong>Llama + DeepSeek: 100% DA sens/recall, zero H.Miss, at 1/15th the cost of Claude.</strong> No included study was missed or confidently excluded. All 17 errors are false positives (over-includes), not false negatives — extra work for reviewers but no missed studies. ~$1 vs Claude's ~$15.</p>
               <p><strong>Pairing boosts specificity.</strong> Llama alone: 74.7% specificity. Llama + DeepSeek: 92.7%. The high-specificity model catches over-inclusions.</p>
-              <p><strong>Claude still leads on precision.</strong> DA F1: Claude 85.7% vs best pair 54.0%. When Claude decides, it's right far more often (3 errors vs 17).</p>
+              <p><strong>Claude still leads on precision.</strong> DA F1: Claude 85.7% vs best pair 54.0%. When Claude decides, it's right far more often (3 errors vs 17). But critically, both achieve zero H.Miss — the difference is entirely in false positives.</p>
               <p><strong>3a vs 3b:</strong> Same-model dual-run (3a) amplifies existing deference. Mixed-model consensus (3b) creates deference from disagreement between complementary models. Both achieve deference, through different mechanisms.</p>
             </div>
           </details>
