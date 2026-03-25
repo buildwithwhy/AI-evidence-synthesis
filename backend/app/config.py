@@ -11,13 +11,13 @@ class Settings(BaseSettings):
     AI_API_KEY: str = ""          # Default API key (used if model-specific key not set)
     OPENROUTER_API_KEY: str = ""  # OpenRouter API key (primary for production)
 
-    # Legacy: still accepted for backwards compat
+    # Legacy: used by ai_provider.py for PICO extraction and mining only
     OPENAI_API_KEY: str = ""
     AI_PROVIDER: str = "openrouter"
     AI_BASE_URL: str = ""
-    AI_MODEL_LEVEL1: str = "llama-3.3-70b"
-    AI_MODEL_LEVEL2: str = "llama-3.3-70b"
-    AI_MODEL_EXTRACTION: str = "llama-3.3-70b"
+    AI_MODEL_LEVEL1: str = "llama-3.3-70b"    # Legacy: PICO/mining model
+    AI_MODEL_LEVEL2: str = "llama-3.3-70b"    # Legacy: PICO/mining model
+    AI_MODEL_EXTRACTION: str = "llama-3.3-70b" # Legacy: PICO extraction model
 
     # Screening strategy defaults
     SCREENING_STRATEGY: str = "mixed_model"  # single, same_model_dual, mixed_model

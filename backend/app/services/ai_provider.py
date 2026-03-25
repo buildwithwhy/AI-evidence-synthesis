@@ -47,8 +47,10 @@ class OpenAICompatibleProvider(AIProvider):
 
     def __init__(self):
         settings = get_settings()
+        # Use OPENROUTER_API_KEY first, fall back to AI_API_KEY
+        api_key = settings.OPENROUTER_API_KEY or settings.AI_API_KEY
         client_kwargs = {
-            "api_key": settings.AI_API_KEY,
+            "api_key": api_key,
             "timeout": 120.0,
         }
         if settings.AI_BASE_URL:

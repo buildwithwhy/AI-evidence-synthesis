@@ -1,5 +1,4 @@
 import time
-import requests
 from fastapi import Header, HTTPException
 from jwt import PyJWKClient, decode as jwt_decode, InvalidTokenError
 from app.config import get_settings
