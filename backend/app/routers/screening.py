@@ -2,8 +2,9 @@ import io
 from typing import Optional, List
 from fastapi import APIRouter, Depends, UploadFile, File, Form, HTTPException
 from app.dependencies import get_current_user
-from app.services.ai_provider import get_ai_provider
+from app.services.screening_engine import screen_study, ConsensusStrategy
 from app.services.pdf_service import extract_text_from_pdf
+from app.config import get_settings
 from app.schemas import ScreeningResultOut
 
 router = APIRouter(prefix="/api/screening", tags=["screening"])
@@ -39,8 +40,15 @@ async def analyze_study(
     stage = "level_1" if level == 1 else "level_2"
 
     try:
-        provider = get_ai_provider()
-        result = provider.analyze_study(content, pico, stage)
+        settings = get_settings()
+        result = screen_study(
+            text=content,
+            pico=pico,
+            stage=stage,
+            strategy=ConsensusStrategy(settings.SCREENING_STRATEGY),
+            model_a_name=settings.SCREENING_MODEL_A,
+            model_b_name=settings.SCREENING_MODEL_B,
+        )
     except Exception as e:
         raise HTTPException(status_code=502, detail=f"AI analysis failed: {str(e)}")
 
@@ -101,7 +109,7 @@ async def analyze_batch(
     """Batch analyze multiple PDF files."""
     pico = {"P": pico_p, "I": pico_i, "C": pico_c, "O": pico_o, "S": pico_s, "E": pico_e}
     stage = "level_1" if level == 1 else "level_2"
-    provider = get_ai_provider()
+    settings = get_settings()
 
     results = []
     errors = []
@@ -113,7 +121,12 @@ async def analyze_batch(
             text = extract_text_from_pdf(file_bytes, strict_crop=strict_crop)
             title = f.filename or "Unknown"
             content = f"Title: {title}\nText: {text}"
-            result = provider.analyze_study(content, pico, stage)
+            result = screen_study(
+                text=content, pico=pico, stage=stage,
+                strategy=ConsensusStrategy(settings.SCREENING_STRATEGY),
+                model_a_name=settings.SCREENING_MODEL_A,
+                model_b_name=settings.SCREENING_MODEL_B,
+            )
             results.append(_build_result_dict(title, result))
         except Exception as e:
             errors.append({"title": f.filename or "Unknown", "error": str(e)})
@@ -138,7 +151,7 @@ async def analyze_batch_csv(
 
     pico = {"P": pico_p, "I": pico_i, "C": pico_c, "O": pico_o, "S": pico_s, "E": pico_e}
     stage = "level_1" if level == 1 else "level_2"
-    provider = get_ai_provider()
+    settings = get_settings()
 
     content_bytes = await file.read()
     try:
@@ -166,7 +179,12 @@ async def analyze_batch_csv(
             abstract = str(row[abstract_key])
             text = f"{title}\n{abstract}"
 
-            result = provider.analyze_study(text, pico, stage)
+            result = screen_study(
+                text=text, pico=pico, stage=stage,
+                strategy=ConsensusStrategy(settings.SCREENING_STRATEGY),
+                model_a_name=settings.SCREENING_MODEL_A,
+                model_b_name=settings.SCREENING_MODEL_B,
+            )
             results.append(_build_result_dict(title, result, abstract))
         except Exception as e:
             errors.append({"title": str(row.iloc[0]) if len(row) > 0 else "Unknown", "error": str(e)})

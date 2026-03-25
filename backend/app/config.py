@@ -7,16 +7,22 @@ class Settings(BaseSettings):
     SUPABASE_URL: str = ""
     SUPABASE_SECRET_KEY: str = ""
 
-    # AI Provider: "openai", "venice", "openrouter", or any OpenAI-compatible endpoint
-    AI_PROVIDER: str = "openai"
-    AI_API_KEY: str = ""          # Works for any provider
-    AI_BASE_URL: str = ""         # Leave empty for OpenAI default, or set custom endpoint
-    AI_MODEL_LEVEL1: str = "gpt-4o-mini"
-    AI_MODEL_LEVEL2: str = "gpt-4o-2024-08-06"
-    AI_MODEL_EXTRACTION: str = "gpt-4o-2024-08-06"
+    # AI Configuration
+    AI_API_KEY: str = ""          # Default API key (used if model-specific key not set)
+    OPENROUTER_API_KEY: str = ""  # OpenRouter API key (primary for production)
 
-    # Legacy: still accepted so existing .env files don't break
+    # Legacy: still accepted for backwards compat
     OPENAI_API_KEY: str = ""
+    AI_PROVIDER: str = "openrouter"
+    AI_BASE_URL: str = ""
+    AI_MODEL_LEVEL1: str = "llama-3.3-70b"
+    AI_MODEL_LEVEL2: str = "llama-3.3-70b"
+    AI_MODEL_EXTRACTION: str = "llama-3.3-70b"
+
+    # Screening strategy defaults
+    SCREENING_STRATEGY: str = "mixed_model"  # single, same_model_dual, mixed_model
+    SCREENING_MODEL_A: str = "llama-3.3-70b"  # High sensitivity model
+    SCREENING_MODEL_B: str = "deepseek-v3"    # High specificity model
 
     CORS_ORIGINS: str = "http://localhost:5173,http://localhost:3000"
 
@@ -24,15 +30,17 @@ class Settings(BaseSettings):
 
     @model_validator(mode="after")
     def validate_required(self):
-        # AI_API_KEY takes priority, fall back to OPENAI_API_KEY for backwards compat
+        # Cascade API keys: OPENROUTER > AI_API_KEY > OPENAI_API_KEY
+        if not self.OPENROUTER_API_KEY and self.AI_API_KEY:
+            self.OPENROUTER_API_KEY = self.AI_API_KEY
         if not self.AI_API_KEY and self.OPENAI_API_KEY:
             self.AI_API_KEY = self.OPENAI_API_KEY
 
         missing = []
         if not self.SUPABASE_URL:
             missing.append("SUPABASE_URL")
-        if not self.AI_API_KEY:
-            missing.append("AI_API_KEY (or OPENAI_API_KEY)")
+        if not self.OPENROUTER_API_KEY and not self.AI_API_KEY:
+            missing.append("OPENROUTER_API_KEY (or AI_API_KEY)")
         if missing:
             raise ValueError(f"Missing required environment variables: {', '.join(missing)}")
 
