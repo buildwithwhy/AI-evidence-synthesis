@@ -28,8 +28,10 @@ export default function EvaluationPage() {
         </div>
 
         <p className="text-xs text-slate-400 mb-10">
-          By Yuyu Shen, KalliDao Research. Methodology and results formalised in{' '}
-          <em>Deference-Aware Evaluation for Human-in-the-Loop AI Systems</em> (March 2026).
+          By Yuyu Shen, KalliDao Research. Methodology formalised in{' '}
+          <em>Deference-Aware Evaluation for Human-in-the-Loop AI Systems:
+          A Unified Quality Signal for AI Systems Operating Under Human Oversight</em>{' '}
+          (KalliDao Research, March 2026). CC BY 4.0.
         </p>
 
         {/* Methodology */}
@@ -247,7 +249,8 @@ export default function EvaluationPage() {
               how much safety is gained by allowing deference. This applies to any domain
               where AI operates under human oversight — not just systematic reviews.
               This is formalised in: <em>Deference-Aware Evaluation for Human-in-the-Loop
-              AI Systems</em> (Yuyu Shen, KalliDao Research, March 2026).
+              AI Systems: A Unified Quality Signal for AI Systems Operating Under Human
+              Oversight</em> (Yuyu Shen, KalliDao Research, March 2026). CC BY 4.0.
             </p>
           </div>
         </section>
@@ -472,8 +475,9 @@ export default function EvaluationPage() {
           <h3 className="text-sm font-semibold text-blue-600 mb-2">Framework 3 — Deference-Aware</h3>
           <DeferenceAwareTable data={tier2Results} />
           <p className="text-xs text-slate-400 mt-2 mb-4">
-            F2 and F3 share the same precision (75.0% for Claude) — UNCLEAR is not an INCLUDE call
-            in either. The difference: F2 hides 23.3% in the denominator, F3 reports it as deferred.
+            F2 and F3 share the same precision (75.0% for Claude) — UNSURE is never an INCLUDE call,
+            so precision is computed over the same set of confident INCLUDEs in both frameworks.
+            The difference: F2 hides 23.3% in the denominator, F3 reports it as deferred.
           </p>
 
           <details className="border border-slate-200 rounded-lg">
