@@ -29,8 +29,10 @@ export default function EvaluationPage() {
 
         <p className="text-xs text-slate-400 mb-10">
           By Yuyu Shen, KalliDao Research. Methodology formalised in{' '}
-          <em>Deference-Aware Evaluation for Human-in-the-Loop AI Systems:
-          A Unified Quality Signal for AI Systems Operating Under Human Oversight</em>{' '}
+          <a href="https://doi.org/10.17605/OSF.IO/A69YH" target="_blank" rel="noopener noreferrer" className="text-blue-500 underline">
+            <em>Deference-Aware Evaluation for Human-in-the-Loop AI Systems:
+            A Unified Quality Signal for AI Systems Operating Under Human Oversight</em>
+          </a>{' '}
           (KalliDao Research, March 2026). CC BY 4.0.
         </p>
 
@@ -248,9 +250,11 @@ export default function EvaluationPage() {
               Framework 3 as the unified quality signal. The gap between F1 and F3 shows
               how much safety is gained by allowing deference. This applies to any domain
               where AI operates under human oversight — not just systematic reviews.
-              This is formalised in: <em>Deference-Aware Evaluation for Human-in-the-Loop
-              AI Systems: A Unified Quality Signal for AI Systems Operating Under Human
-              Oversight</em> (Yuyu Shen, KalliDao Research, March 2026). CC BY 4.0.
+              This is formalised in:{' '}
+              <a href="https://doi.org/10.17605/OSF.IO/A69YH" target="_blank" rel="noopener noreferrer" className="text-blue-400 underline">
+                <em>Deference-Aware Evaluation for Human-in-the-Loop AI Systems</em>
+              </a>{' '}
+              (Yuyu Shen, KalliDao Research, March 2026). CC BY 4.0.
             </p>
           </div>
         </section>
