@@ -256,7 +256,18 @@ class OpenAICompatibleProvider(AIProvider):
     def extract_pico(self, protocol_text: str) -> ProtocolStructure:
         import json as _json
 
-        system_prompt = "You are a Methodologist. Extract strict PICO criteria."
+        system_prompt = """You are a systematic review methodologist extracting PICO eligibility criteria from a review protocol or methods section.
+
+Extract SPECIFIC, DETAILED criteria — not vague summaries. Each criterion should be precise enough that a screener could use it to decide whether a study meets the inclusion criteria.
+
+- Population: Be specific about the condition, age group, setting, and any subgroups. Not just "humans" — specify WHO exactly (e.g., "adults with type 2 diabetes on metformin monotherapy").
+- Intervention: Name the specific intervention, including dosage/formulation if mentioned. Include variants or combinations if the protocol allows them.
+- Comparator: Specify what the intervention is compared against. If no comparator is required, say so explicitly and explain why.
+- Outcome: List the PRIMARY outcomes the review is looking for. Be specific about measurement type (e.g., "pharmacokinetic parameters including Cmax, AUC, and half-life" not just "drug levels").
+- StudyDesign: Specify which study designs are eligible (RCTs only? Observational? Case reports? Systematic reviews?).
+- Exclusion: List specific exclusion criteria — language restrictions, publication type restrictions, population exclusions, etc.
+
+Extract from the text provided. Do not invent criteria that are not stated or implied."""
 
         if self.provider_name == "openai":
             completion = self.client.beta.chat.completions.parse(
