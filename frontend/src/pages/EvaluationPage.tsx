@@ -4,7 +4,7 @@ import { ForcedBinaryTable, PartialEvalTable, DeferenceAwareTable, DualRunTable,
 import { tier1Results, tier2Results, tier3aResults, tier3bResults, claudeReference } from '../data/benchmarkResults'
 import { CheckCircle, AlertTriangle } from 'lucide-react'
 
-const PAPER_URL = "https://doi.org/10.17605/OSF.IO/A69YH"
+const PAPER_URL = "https://osf.io/a69yh/files/vj95h"
 
 export default function EvaluationPage() {
   return (
