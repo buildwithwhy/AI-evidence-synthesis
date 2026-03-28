@@ -1,0 +1,47 @@
+# AI Evidence Synthesis
+# https://evidencesynthesisai.com
+# By KalliDao Research (https://kallidao.com)
+
+## About
+AI Evidence Synthesis is an AI-powered systematic review screening tool with full auditability. It uses dual-run consensus screening where each study is screened twice by AI, and uncertain cases are flagged for human review rather than receiving forced decisions. The tool supports Level 1 (title/abstract) and Level 2 (full-text) screening with PICO-structured reasoning and a complete override audit trail.
+
+## Key Innovation: Deference-Aware Evaluation
+We propose a novel evaluation framework for human-in-the-loop AI systems. Standard evaluation penalises AI uncertainty — if the AI says "I'm not sure", it counts as wrong. In our deference-aware (DA) framework, appropriate uncertainty is counted as correct. The only failures are confident wrong answers.
+
+This is formalised in: "Deference-Aware Evaluation for Human-in-the-Loop AI Systems: A Unified Quality Signal for AI Systems Operating Under Human Oversight" (Yuyu Shen, KalliDao Research, March 2026). Available at: https://osf.io/a69yh/files/vj95h
+
+## Three Evaluation Frameworks
+1. Forced Binary (Framework 1): AI must decide INCLUDE or EXCLUDE. Traditional baseline.
+2. Partial Evaluation (Framework 2): AI can say UNSURE but deferred cases are excluded from the denominator — hides workload.
+3. Deference-Aware (Framework 3): UNSURE counts as correct. Only confident wrong answers are failures. Workload reported explicitly.
+
+## Key Results (Donners et al. 2021, 258 studies, 9 LLM models)
+- Claude Sonnet 4.6: 100% DA sensitivity, 0 H.Miss (zero missed included studies), 3 confident errors, 23.3% deferred
+- Standard metrics rank Claude last (60% recall) because it defers — DA evaluation correctly ranks it first
+- Open source pair (Llama 70B + DeepSeek v3): matches Claude on DA sensitivity and H.Miss at 1/15th cost, but with 17 errors vs 3
+- Framework 2 produces 100% recall for Claude on the same data where Framework 1 shows 73.3% — the denominator hiding problem demonstrated empirically
+
+## Models Evaluated
+Claude Sonnet 4.6 (Anthropic), DeepSeek v3 (DeepSeek), Kimi k2 (Moonshot AI), Llama 3.3 70B (Meta), Mistral 3.1 24B (Mistral AI), Gemma 3 27B (Google), GPT-4o (OpenAI), Qwen 3 235B (Alibaba Cloud), DeepSeek R1 32B (DeepSeek)
+
+## Dataset
+SYNERGY dataset (CC0 licence): Donners et al. 2021 — Pharmacokinetics and Associated Efficacy of Emicizumab in Humans. 258 studies, 15 included, 243 excluded. PICO criteria verified from published paper (PMC8585815).
+
+## Product Features
+- Two-stage screening (Level 1 abstract, Level 2 full-text)
+- Dual-run consensus screening
+- Mixed-model consensus (pair complementary open source models)
+- PICO-structured reasoning with per-criterion checks
+- Immutable audit trail (original AI decision preserved, all overrides logged with who/when/from/to)
+- Analytics dashboard
+- Meta-miner for citation extraction from systematic reviews
+- Free tier: 20 screenings/month
+- Institutional access: contact hello@kallidao.com
+
+## Links
+- Product: https://evidencesynthesisai.com
+- Evaluation: https://evidencesynthesisai.com/evaluation
+- White Paper: https://osf.io/a69yh/files/vj95h
+- About: https://evidencesynthesisai.com/about
+- Contact: hello@kallidao.com
+- Company: https://kallidao.com
