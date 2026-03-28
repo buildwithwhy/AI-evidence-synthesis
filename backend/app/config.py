@@ -7,22 +7,28 @@ class Settings(BaseSettings):
     SUPABASE_URL: str = ""
     SUPABASE_SECRET_KEY: str = ""
 
-    # AI Configuration
-    AI_API_KEY: str = ""          # Default API key (used if model-specific key not set)
-    OPENROUTER_API_KEY: str = ""  # OpenRouter API key (primary for production)
+    # AI Configuration — OpenRouter is the primary provider
+    OPENROUTER_API_KEY: str = ""
+    AI_API_KEY: str = ""          # Fallback if OPENROUTER_API_KEY not set
+    OPENAI_API_KEY: str = ""      # Legacy fallback
 
-    # Legacy: used by ai_provider.py for PICO extraction and mining only
-    OPENAI_API_KEY: str = ""
+    # Provider config (auto-set for OpenRouter)
     AI_PROVIDER: str = "openrouter"
     AI_BASE_URL: str = ""
-    AI_MODEL_LEVEL1: str = "llama-3.3-70b"    # Legacy: PICO/mining model
-    AI_MODEL_LEVEL2: str = "llama-3.3-70b"    # Legacy: PICO/mining model
-    AI_MODEL_EXTRACTION: str = "llama-3.3-70b" # Legacy: PICO extraction model
 
-    # Screening strategy defaults
-    SCREENING_STRATEGY: str = "mixed_model"  # single, same_model_dual, mixed_model
-    SCREENING_MODEL_A: str = "llama-3.3-70b"  # High sensitivity model
-    SCREENING_MODEL_B: str = "deepseek-v3"    # High specificity model
+    # Models for PICO extraction and meta-miner (OpenRouter model IDs)
+    PICO_MODEL: str = "meta-llama/llama-3.3-70b-instruct"
+    MINING_MODEL: str = "meta-llama/llama-3.3-70b-instruct"
+
+    # Legacy aliases (mapped to new names in validator)
+    AI_MODEL_LEVEL1: str = ""
+    AI_MODEL_LEVEL2: str = ""
+    AI_MODEL_EXTRACTION: str = ""
+
+    # Screening strategy (uses model registry, not these model IDs)
+    SCREENING_STRATEGY: str = "mixed_model"
+    SCREENING_MODEL_A: str = "llama-3.3-70b"
+    SCREENING_MODEL_B: str = "deepseek-v3"
 
     CORS_ORIGINS: str = "http://localhost:5173,http://localhost:3000"
 
@@ -35,6 +41,14 @@ class Settings(BaseSettings):
             self.OPENROUTER_API_KEY = self.AI_API_KEY
         if not self.AI_API_KEY and self.OPENAI_API_KEY:
             self.AI_API_KEY = self.OPENAI_API_KEY
+        if not self.AI_API_KEY and self.OPENROUTER_API_KEY:
+            self.AI_API_KEY = self.OPENROUTER_API_KEY
+
+        # Legacy model name overrides
+        if self.AI_MODEL_EXTRACTION:
+            self.PICO_MODEL = self.AI_MODEL_EXTRACTION
+        if self.AI_MODEL_LEVEL1:
+            self.MINING_MODEL = self.AI_MODEL_LEVEL1
 
         missing = []
         if not self.SUPABASE_URL:
@@ -44,7 +58,7 @@ class Settings(BaseSettings):
         if missing:
             raise ValueError(f"Missing required environment variables: {', '.join(missing)}")
 
-        # Set default base URLs for known providers
+        # Set default base URL for OpenRouter
         if not self.AI_BASE_URL:
             provider_urls = {
                 "venice": "https://api.venice.ai/api/v1",

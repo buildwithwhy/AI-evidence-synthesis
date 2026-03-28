@@ -57,9 +57,9 @@ class OpenAICompatibleProvider(AIProvider):
             client_kwargs["base_url"] = settings.AI_BASE_URL
 
         self.client = OpenAI(**client_kwargs)
-        self.model_l1 = settings.AI_MODEL_LEVEL1
-        self.model_l2 = settings.AI_MODEL_LEVEL2
-        self.model_extraction = settings.AI_MODEL_EXTRACTION
+        self.model_l1 = settings.MINING_MODEL
+        self.model_l2 = settings.MINING_MODEL
+        self.model_extraction = settings.PICO_MODEL
         self.provider_name = settings.AI_PROVIDER
 
         logger.info(f"AI Provider initialized: {self.provider_name} "
