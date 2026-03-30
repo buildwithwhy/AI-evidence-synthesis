@@ -243,6 +243,20 @@ export default function EvaluationPage() {
           </details>
         </section>
 
+        {/* Diagnostic value */}
+        <section className="mb-12">
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-5">
+            <h3 className="font-semibold text-blue-800 text-sm mb-2">DA evaluation as a diagnostic tool</h3>
+            <p className="text-xs text-blue-700">
+              A model whose DA metrics jump dramatically relative to its standard metrics was being
+              penalised for appropriate conservatism — the fix is to adopt the DA framework, or
+              fine-tune the model on the deferred cases. A model whose DA metrics barely move has
+              genuine confident errors — retrain, re-prompt, or replace. The gap between frameworks
+              tells you what kind of problem you have.
+            </p>
+          </div>
+        </section>
+
         {/* Paper link */}
         <section className="mb-12">
           <div className="bg-slate-50 border border-slate-200 rounded-lg p-6 text-center">
