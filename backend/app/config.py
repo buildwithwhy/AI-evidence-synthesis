@@ -17,8 +17,8 @@ class Settings(BaseSettings):
     AI_BASE_URL: str = ""
 
     # Models for PICO extraction and meta-miner (OpenRouter model IDs)
-    PICO_MODEL: str = "meta-llama/llama-3.3-70b-instruct"
-    MINING_MODEL: str = "meta-llama/llama-3.3-70b-instruct"
+    PICO_MODEL: str = "moonshotai/kimi-k2"
+    MINING_MODEL: str = "moonshotai/kimi-k2"
 
     # Legacy aliases (mapped to new names in validator)
     AI_MODEL_LEVEL1: str = ""
