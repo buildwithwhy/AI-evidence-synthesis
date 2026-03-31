@@ -177,13 +177,64 @@ def _error_result(reason: str) -> ScreeningDecisionAI:
     )
 
 
+def _compare_pico_criteria(run1: ScreeningDecisionAI, run2: ScreeningDecisionAI) -> list:
+    """Compare PICO criteria between two runs. Returns list of disagreeing criteria."""
+    checks = [
+        ("Population", run1.ReasoningLog.Population_Check, run2.ReasoningLog.Population_Check),
+        ("Intervention", run1.ReasoningLog.Intervention_Check, run2.ReasoningLog.Intervention_Check),
+        ("Comparator", run1.ReasoningLog.Comparator_Check, run2.ReasoningLog.Comparator_Check),
+        ("Outcome", run1.ReasoningLog.Outcome_Check, run2.ReasoningLog.Outcome_Check),
+        ("StudyDesign", run1.ReasoningLog.StudyDesign_Check, run2.ReasoningLog.StudyDesign_Check),
+        ("Exclusion", run1.ReasoningLog.Exclusion_Check, run2.ReasoningLog.Exclusion_Check),
+    ]
+    return [name for name, v1, v2 in checks if v1 != v2]
+
+
+def _merge_pico_reasoning(run1: ScreeningDecisionAI, run2: ScreeningDecisionAI, disagreements: list) -> ReasoningLog:
+    """Merge PICO reasoning from two runs. For disagreeing criteria, combine both reasons."""
+    r1 = run1.ReasoningLog
+    r2 = run2.ReasoningLog
+
+    def merge_reason(criterion: str, r1_reason: str, r2_reason: str) -> str:
+        if criterion in disagreements:
+            return f"[DISAGREEMENT] Run 1: {r1_reason} | Run 2: {r2_reason}"
+        return r1_reason
+
+    # For boolean checks on disagreeing criteria, use the more conservative value
+    # (True for exclusion = violated, so conservative = True;
+    #  True for others = matches, so conservative = False for safety)
+    def merge_check(criterion: str, v1: bool, v2: bool) -> bool:
+        if criterion not in disagreements:
+            return v1
+        # For Exclusion_Check, True means violated (bad) — conservative = True
+        if criterion == "Exclusion":
+            return True
+        # For all others, True means matches (good) — conservative = False (don't assume match)
+        return False
+
+    return ReasoningLog(
+        Population_Check=merge_check("Population", r1.Population_Check, r2.Population_Check),
+        Population_Reason=merge_reason("Population", r1.Population_Reason, r2.Population_Reason),
+        Intervention_Check=merge_check("Intervention", r1.Intervention_Check, r2.Intervention_Check),
+        Intervention_Reason=merge_reason("Intervention", r1.Intervention_Reason, r2.Intervention_Reason),
+        Comparator_Check=merge_check("Comparator", r1.Comparator_Check, r2.Comparator_Check),
+        Comparator_Reason=merge_reason("Comparator", r1.Comparator_Reason, r2.Comparator_Reason),
+        Outcome_Check=merge_check("Outcome", r1.Outcome_Check, r2.Outcome_Check),
+        Outcome_Reason=merge_reason("Outcome", r1.Outcome_Reason, r2.Outcome_Reason),
+        StudyDesign_Check=merge_check("StudyDesign", r1.StudyDesign_Check, r2.StudyDesign_Check),
+        StudyDesign_Reason=merge_reason("StudyDesign", r1.StudyDesign_Reason, r2.StudyDesign_Reason),
+        Exclusion_Check=merge_check("Exclusion", r1.Exclusion_Check, r2.Exclusion_Check),
+        Exclusion_Reason=merge_reason("Exclusion", r1.Exclusion_Reason, r2.Exclusion_Reason),
+    )
+
+
 def _apply_consensus(
     run1: ScreeningDecisionAI,
     run2: ScreeningDecisionAI,
     label_a: str = "Run 1",
     label_b: str = "Run 2",
 ) -> ScreeningDecisionAI:
-    """Apply consensus logic between two screening results."""
+    """Apply consensus logic between two screening results, including PICO-level comparison."""
     r1d = run1.ScreeningDecision
     r2d = run2.ScreeningDecision
     r1c = run1.Confidence_Score
@@ -194,21 +245,43 @@ def _apply_consensus(
     min_conf = min(r1c, r2c)
     avg_conf = (r1c + r2c) // 2
 
-    if both_agree and both_high_conf and r1d in ("INCLUDE", "EXCLUDE"):
+    # Compare individual PICO criteria
+    pico_disagreements = _compare_pico_criteria(run1, run2)
+    merged_reasoning = _merge_pico_reasoning(run1, run2, pico_disagreements)
+
+    pico_note = ""
+    if pico_disagreements:
+        pico_note = f" PICO disagreements: {', '.join(pico_disagreements)}."
+
+    if both_agree and both_high_conf and r1d in ("INCLUDE", "EXCLUDE") and not pico_disagreements:
         result = run1
         result.Confidence_Score = avg_conf
+        result.ReasoningLog = merged_reasoning
         result.Reasoning_Summary = (
             f"[CONSENSUS] {label_a} and {label_b} agreed: {r1d} "
             f"(confidence: {r1c}%, {r2c}%). "
             f"{label_a}: {run1.Reasoning_Summary}"
         )
+    elif both_agree and r1d in ("INCLUDE", "EXCLUDE") and pico_disagreements:
+        # Same top-level decision but PICO criteria disagree — flag for review
+        result = run1
+        result.ScreeningDecision = "UNCLEAR"
+        result.Confidence_Score = min_conf
+        result.ReasoningLog = merged_reasoning
+        result.Reasoning_Summary = (
+            f"[FLAGGED - PICO DISAGREEMENT] Both said {r1d} but disagreed on "
+            f"{', '.join(pico_disagreements)}.{pico_note} "
+            f"{label_a}: {run1.Reasoning_Summary} | "
+            f"{label_b}: {run2.Reasoning_Summary}"
+        )
     elif both_agree and r1d in ("INCLUDE", "EXCLUDE"):
         result = run1
         result.ScreeningDecision = "UNCLEAR"
         result.Confidence_Score = min_conf
+        result.ReasoningLog = merged_reasoning
         result.Reasoning_Summary = (
             f"[FLAGGED - LOW CONFIDENCE] Both said {r1d} but confidence low "
-            f"({r1c}%, {r2c}%). "
+            f"({r1c}%, {r2c}%).{pico_note} "
             f"{label_a}: {run1.Reasoning_Summary} | "
             f"{label_b}: {run2.Reasoning_Summary}"
         )
@@ -216,9 +289,10 @@ def _apply_consensus(
         result = run1
         result.ScreeningDecision = "UNCLEAR"
         result.Confidence_Score = min_conf
+        result.ReasoningLog = merged_reasoning
         result.Reasoning_Summary = (
             f"[FLAGGED - DISAGREEMENT] {label_a}: {r1d} ({r1c}%), "
-            f"{label_b}: {r2d} ({r2c}%). "
+            f"{label_b}: {r2d} ({r2c}%).{pico_note} "
             f"{label_a}: {run1.Reasoning_Summary} | "
             f"{label_b}: {run2.Reasoning_Summary}"
         )
