@@ -55,7 +55,25 @@ export default function ScreeningPage() {
     if (data?.pico_data) setPico(data.pico_data as PicoData)
   }
 
+  const checkDuplicate = async (title: string): Promise<boolean> => {
+    if (!title || title === 'Untitled') return false
+    const { data } = await supabase
+      .from('screening_results')
+      .select('id')
+      .eq('project_id', projectId)
+      .eq('level', level)
+      .eq('title', title)
+      .limit(1)
+    return (data && data.length > 0) || false
+  }
+
   const saveResultToSupabase = async (r: ScreeningResponse & { title?: string; abstract?: string }, source: string) => {
+    // Check for duplicate
+    const isDup = await checkDuplicate(r.title || 'Untitled')
+    if (isDup) {
+      return { id: null, error: null, duplicate: true }
+    }
+
     const { data, error } = await supabase
       .from('screening_results')
       .insert({
@@ -76,7 +94,7 @@ export default function ScreeningPage() {
       })
       .select('id')
       .single()
-    return { id: data?.id ?? null, error }
+    return { id: data?.id ?? null, error, duplicate: false }
   }
 
   const limitMessage = (reason: string) =>
@@ -124,11 +142,13 @@ export default function ScreeningPage() {
       // Save to Supabase
       const resultTitle = inputMode === 'upload' && file ? file.name : title || 'Untitled'
       const resultAbstract = inputMode === 'upload' ? '' : text
-      const { id, error: saveErr } = await saveResultToSupabase(
+      const { id, error: saveErr, duplicate } = await saveResultToSupabase(
         { ...data, title: resultTitle, abstract: resultAbstract },
         'Single'
       )
-      if (saveErr) {
+      if (duplicate) {
+        setError('A study with this title already exists in this project. Result shown but not saved.')
+      } else if (saveErr) {
         setError('Result was analyzed but could not be saved. Try again.')
       } else {
         setLastSavedId(id)
@@ -230,26 +250,46 @@ export default function ScreeningPage() {
         return
       }
 
-      // Batch insert to Supabase (single round trip instead of N)
-      setBatchTotal(apiResults.length)
-      const source = level === 1 ? 'Batch CSV' : 'Batch PDF'
+      // Dedup: fetch existing titles in this project+level
+      const { data: existing } = await supabase
+        .from('screening_results')
+        .select('title')
+        .eq('project_id', projectId)
+        .eq('level', level)
+      const existingTitles = new Set((existing || []).map((r: any) => r.title))
 
-      const rows = apiResults.map((r: any) => ({
-        project_id: projectId,
-        level,
-        title: r.title || 'Untitled',
-        abstract: r.abstract || '',
-        decision: r.decision,
-        ai_decision: r.decision,
-        reason: r.reason,
-        confidence: r.confidence,
-        p_check: r.p_check, i_check: r.i_check, c_check: r.c_check,
-        o_check: r.o_check, s_check: r.s_check, e_check: r.e_check,
-        p_reas: r.p_reas, i_reas: r.i_reas, c_reas: r.c_reas,
-        o_reas: r.o_reas, s_reas: r.s_reas, e_reas: r.e_reas,
-        source,
-        override_history: [],
-      }))
+      // Filter out duplicates from batch and within batch itself
+      const seenInBatch = new Set<string>()
+      const source = level === 1 ? 'Batch CSV' : 'Batch PDF'
+      const rows: any[] = []
+      let duplicateCount = 0
+
+      for (const r of apiResults) {
+        const title = r.title || 'Untitled'
+        if (existingTitles.has(title) || seenInBatch.has(title)) {
+          duplicateCount++
+          continue
+        }
+        seenInBatch.add(title)
+        rows.push({
+          project_id: projectId,
+          level,
+          title,
+          abstract: r.abstract || '',
+          decision: r.decision,
+          ai_decision: r.decision,
+          reason: r.reason,
+          confidence: r.confidence,
+          p_check: r.p_check, i_check: r.i_check, c_check: r.c_check,
+          o_check: r.o_check, s_check: r.s_check, e_check: r.e_check,
+          p_reas: r.p_reas, i_reas: r.i_reas, c_reas: r.c_reas,
+          o_reas: r.o_reas, s_reas: r.s_reas, e_reas: r.e_reas,
+          source,
+          override_history: [],
+        })
+      }
+
+      setBatchTotal(rows.length)
 
       // Insert in chunks of 500 to avoid payload limits
       let saveErrors = 0
@@ -261,7 +301,7 @@ export default function ScreeningPage() {
         setBatchProgress(Math.min(i + chunkSize, rows.length))
       }
 
-      setBatchDone({ processed: apiResults.length, failed: apiFailed, saveErrors })
+      setBatchDone({ processed: rows.length, failed: apiFailed, saveErrors, duplicates: duplicateCount } as any)
     } catch (err: any) {
       const msg = err.response?.data?.detail || err.message || 'Batch processing failed'
       setBatchError(msg)
@@ -522,8 +562,9 @@ export default function ScreeningPage() {
               <p className={`text-sm font-medium ${
                 batchDone.saveErrors > 0 ? 'text-amber-700' : 'text-green-700'
               }`}>
-                Batch complete: {batchDone.processed} analyzed, {batchDone.failed} failed.
+                Batch complete: {batchDone.processed} saved, {batchDone.failed} failed.
                 {batchDone.saveErrors > 0 && ` ${batchDone.saveErrors} could not be saved.`}
+                {(batchDone as any).duplicates > 0 && ` ${(batchDone as any).duplicates} duplicates skipped.`}
               </p>
             </div>
           )}
