@@ -2,13 +2,24 @@ import { useEffect, useState } from 'react'
 import { useParams, useSearchParams } from 'react-router-dom'
 import { supabase } from '../api/supabase'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts'
-import type { ScreeningResult } from '../types'
+import type { OverrideEntry } from '../types'
+
+interface AnalyticsResult {
+  id: string
+  title: string
+  decision: string
+  ai_decision: string
+  confidence: number
+  source: string
+  override_history: OverrideEntry[]
+  created_at: string
+}
 
 export default function AnalyticsPage() {
   const { projectId } = useParams()
   const [searchParams] = useSearchParams()
   const [level, setLevel] = useState(parseInt(searchParams.get('level') || '1'))
-  const [results, setResults] = useState<ScreeningResult[]>([])
+  const [results, setResults] = useState<AnalyticsResult[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -19,21 +30,44 @@ export default function AnalyticsPage() {
     setLoading(true)
     const { data } = await supabase
       .from('screening_results')
-      .select('*')
+      .select('id,title,decision,ai_decision,confidence,source,override_history,created_at')
       .eq('project_id', projectId)
       .eq('level', level)
     setResults(data || [])
     setLoading(false)
   }
 
+  // Helper: check if a result has been overridden (JSONB array with entries)
+  const isOverridden = (r: AnalyticsResult) =>
+    Array.isArray(r.override_history) && r.override_history.length > 0
+
   const total = results.length
   const included = results.filter((r) => r.decision === 'INCLUDE').length
   const excluded = results.filter((r) => r.decision === 'EXCLUDE').length
   const unclear = results.filter((r) => r.decision === 'UNCLEAR').length
-  const overridden = results.filter((r) => r.override_history).length
+
+  // Override analysis
+  const overriddenResults = results.filter(isOverridden)
+  const overridden = overriddenResults.length
   const overrideRate = total > 0 ? ((overridden / total) * 100).toFixed(1) : '0'
-  const ovToInc = results.filter((r) => r.override_history && r.decision === 'INCLUDE').length
-  const ovToExc = results.filter((r) => r.override_history && r.decision === 'EXCLUDE').length
+
+  // AI vs Human agreement
+  const aiAgreed = results.filter((r) => !isOverridden(r) && r.ai_decision === r.decision).length
+  const aiOverruled = overridden
+
+  // Override direction breakdown (AI said X, human changed to Y)
+  const overrideFlows: Record<string, number> = {}
+  overriddenResults.forEach((r) => {
+    if (Array.isArray(r.override_history) && r.override_history.length > 0) {
+      const first = r.override_history[0]
+      const flow = `${first.from} → ${first.to}`
+      overrideFlows[flow] = (overrideFlows[flow] || 0) + 1
+    }
+  })
+  const overrideFlowData = Object.entries(overrideFlows).map(([flow, count]) => ({
+    flow,
+    count,
+  }))
 
   // Confidence distribution
   const confBuckets = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90].map((min) => ({
@@ -51,6 +85,17 @@ export default function AnalyticsPage() {
   const sourceData = Object.entries(sourceCounts).map(([source, counts]) => ({
     source,
     ...counts,
+  }))
+
+  // AI decision distribution for overridden studies
+  const aiDecisionOfOverridden: Record<string, number> = {}
+  overriddenResults.forEach((r) => {
+    const ai = r.ai_decision || 'Unknown'
+    aiDecisionOfOverridden[ai] = (aiDecisionOfOverridden[ai] || 0) + 1
+  })
+  const aiDecisionData = Object.entries(aiDecisionOfOverridden).map(([decision, count]) => ({
+    decision,
+    count,
   }))
 
   if (loading) {
@@ -91,7 +136,7 @@ export default function AnalyticsPage() {
               { label: 'Total Studies', value: total, color: 'text-slate-800' },
               { label: 'Included', value: included, color: 'text-green-600' },
               { label: 'Excluded', value: excluded, color: 'text-red-600' },
-              { label: 'Unclear', value: unclear, color: 'text-amber-600' },
+              { label: 'Unclear (Deferred)', value: unclear, color: 'text-amber-600' },
             ].map((m) => (
               <div key={m.label} className="bg-white border border-slate-200 rounded-lg p-4">
                 <div className="text-sm text-slate-500">{m.label}</div>
@@ -102,7 +147,7 @@ export default function AnalyticsPage() {
 
           {/* Override analysis */}
           <h2 className="text-lg font-semibold text-slate-800 mb-4">Override Analysis</h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
             <div className="bg-white border border-slate-200 rounded-lg p-4">
               <div className="text-sm text-slate-500">Total Overrides</div>
               <div className="text-2xl font-bold text-slate-800">{overridden}</div>
@@ -112,16 +157,65 @@ export default function AnalyticsPage() {
               <div className="text-2xl font-bold text-slate-800">{overrideRate}%</div>
             </div>
             <div className="bg-white border border-slate-200 rounded-lg p-4">
-              <div className="text-sm text-slate-500">Overridden to INCLUDE</div>
-              <div className="text-2xl font-bold text-green-600">{ovToInc}</div>
+              <div className="text-sm text-slate-500">AI Decisions Kept</div>
+              <div className="text-2xl font-bold text-green-600">{aiAgreed}</div>
             </div>
             <div className="bg-white border border-slate-200 rounded-lg p-4">
-              <div className="text-sm text-slate-500">Overridden to EXCLUDE</div>
-              <div className="text-2xl font-bold text-red-600">{ovToExc}</div>
+              <div className="text-sm text-slate-500">AI Decisions Overruled</div>
+              <div className="text-2xl font-bold text-amber-600">{aiOverruled}</div>
             </div>
           </div>
 
-          {/* Charts */}
+          {/* Override charts */}
+          {overridden > 0 && (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+              <div className="bg-white border border-slate-200 rounded-lg p-6">
+                <h3 className="text-sm font-semibold text-slate-700 mb-4">Override Direction (AI → Human)</h3>
+                {overrideFlowData.length > 0 ? (
+                  <ResponsiveContainer width="100%" height={200}>
+                    <BarChart data={overrideFlowData} layout="vertical">
+                      <XAxis type="number" tick={{ fontSize: 12 }} />
+                      <YAxis dataKey="flow" type="category" tick={{ fontSize: 11 }} width={120} />
+                      <Tooltip />
+                      <Bar dataKey="count" fill="#6366f1" />
+                    </BarChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <p className="text-sm text-slate-400">No override data yet</p>
+                )}
+              </div>
+
+              <div className="bg-white border border-slate-200 rounded-lg p-6">
+                <h3 className="text-sm font-semibold text-slate-700 mb-4">Original AI Decision (Overridden Studies)</h3>
+                {aiDecisionData.length > 0 ? (
+                  <ResponsiveContainer width="100%" height={200}>
+                    <BarChart data={aiDecisionData}>
+                      <XAxis dataKey="decision" tick={{ fontSize: 12 }} />
+                      <YAxis tick={{ fontSize: 12 }} />
+                      <Tooltip />
+                      <Bar dataKey="count">
+                        {aiDecisionData.map((entry, idx) => (
+                          <Cell
+                            key={idx}
+                            fill={
+                              entry.decision === 'INCLUDE' ? '#16a34a' :
+                              entry.decision === 'EXCLUDE' ? '#dc2626' :
+                              '#d97706'
+                            }
+                          />
+                        ))}
+                      </Bar>
+                    </BarChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <p className="text-sm text-slate-400">No override data yet</p>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Main charts */}
+          <h2 className="text-lg font-semibold text-slate-800 mb-4">Screening Overview</h2>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div className="bg-white border border-slate-200 rounded-lg p-6">
               <h3 className="text-sm font-semibold text-slate-700 mb-4">Decisions by Source</h3>
