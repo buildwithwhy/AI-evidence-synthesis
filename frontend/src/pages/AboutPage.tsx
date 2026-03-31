@@ -121,11 +121,13 @@ export default function AboutPage() {
               <li className="flex gap-2">
                 <span className="text-blue-600 font-bold mt-0.5">3.</span>
                 <span>
-                  <strong>Institutional tier:</strong> For organisations requiring the
-                  lowest possible confident error rate, we offer Claude Sonnet 4.6
-                  (Anthropic) with dual-run consensus — the only model in our evaluation
-                  to achieve zero confident errors with natural deference behavior.
-                  Contact us for institutional access.
+                  <strong>Institutional tier:</strong> Our evaluation suggests Claude Sonnet 4.6
+                  (Anthropic) for the lowest confident error rate — it was the only model
+                  to achieve zero confident errors with natural deference behavior. For
+                  institutional partnerships, we conduct additional evaluation tailored to
+                  your specific domain, review type, and PICO complexity to identify the
+                  optimal model configuration for your use case.
+                  <a href="mailto:hello@kallidao.com" className="text-blue-600 underline ml-1">Get in touch</a>.
                 </span>
               </li>
             </ul>
