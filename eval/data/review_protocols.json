@@ -40,5 +40,33 @@
     "O": "Baseline characteristics of retransitioned patients, reasons for retransitioning, clinical outcomes after retransitioning",
     "S": "Original research articles published in peer-reviewed journals",
     "E": "Studies not reporting on retransitioning (originator to biosimilar and back); studies without baseline characteristics of transitioned patients; non-peer-reviewed publications"
+  },
+  "Nelson_2002": {
+    "_review_title": "Postmenopausal Hormone Replacement Therapy: Scientific Review",
+    "_review_doi": "https://doi.org/10.1001/jama.288.7.872",
+    "_source": "Extracted from PubMed abstract (PMID 12186605). Verified criteria.",
+    "_total_screened": 366,
+    "_total_included": 80,
+    "_complete_set": true,
+    "P": "Postmenopausal women (primary prevention population — not selected by prior events or pre-existing conditions associated with higher risk for targeted outcomes)",
+    "I": "Hormone replacement therapy (HRT), including estrogen alone and estrogen plus progestin",
+    "C": "HRT nonusers (comparison group required)",
+    "O": "Clinical outcomes: cardiovascular disease, thromboembolism, osteoporosis and fractures, breast cancer, endometrial cancer, colon cancer, dementia, and cholecystitis",
+    "S": "Clinical trials and observational studies with a comparison group of HRT nonusers reporting clinical outcome data",
+    "E": "Studies where population was selected according to prior events or presence of conditions associated with higher risks for targeted outcomes (secondary prevention); studies without a comparison group of nonusers"
+  },
+  "Oud_2018": {
+    "_review_title": "Specialized psychotherapies for adults with borderline personality disorder: A systematic review and meta-analysis",
+    "_review_doi": "https://doi.org/10.1177/0004867418791257",
+    "_source": "Extracted from published paper (PMC6151959). Verified criteria.",
+    "_total_screened": 952,
+    "_total_included": 20,
+    "_complete_set": true,
+    "P": "Adults (18+ years) with borderline personality disorder (BPD); studies must have ≥66% BPD participants or provide disaggregated BPD data",
+    "I": "Specialized psychotherapies designed for BPD: Dialectical Behavior Therapy (DBT), Mentalization-Based Treatment (MBT), Transference-Focused Therapy (TFP), or Schema Therapy (ST); must include individual psychotherapy component and duration ≥16 weeks",
+    "C": "Treatment as usual (TAU), community treatment by experts (CTBE), other protocolized psychological treatments, or head-to-head comparisons between specialized therapies",
+    "O": "Overall BPD severity, individual symptoms (suicidal ideation/behavior, self-injury, anger, affective instability, dissociation, impulsivity), and dropout rates",
+    "S": "Randomized controlled trials (RCTs) only",
+    "E": "Non-randomized study designs; incomplete treatment versions (e.g., skills training without full DBT program); generic treatments like standard CBT; adjunct treatments like STEPPS; studies with <66% BPD participants without disaggregated data; studies including other personality disorders without separation from BPD data"
   }
 }
