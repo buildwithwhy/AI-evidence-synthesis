@@ -175,6 +175,33 @@ export default function AboutPage() {
         </div>
       </div>
 
+      {/* Institutional CTA */}
+      <section className="bg-slate-50 border-t border-slate-200">
+        <div className="max-w-3xl mx-auto px-6 py-12 text-center">
+          <h2 className="text-xl font-bold text-slate-800 mb-3">Running a systematic review team?</h2>
+          <p className="text-sm text-slate-600 mb-6">
+            We're onboarding early institutional pilots with tailored model evaluation
+            and dedicated support.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <a
+              href="https://calendly.com/yuyu-hopperlace/30min"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center bg-slate-800 text-white px-6 py-2.5 rounded-md text-sm font-medium hover:bg-slate-900 transition-colors"
+            >
+              Book a Demo
+            </a>
+            <a
+              href="mailto:hello@hopperlace.ai"
+              className="inline-flex items-center justify-center bg-white text-slate-700 px-6 py-2.5 rounded-md text-sm font-medium border border-slate-200 hover:bg-slate-50 transition-colors"
+            >
+              Or email us
+            </a>
+          </div>
+        </div>
+      </section>
+
       <Footer />
     </div>
   )

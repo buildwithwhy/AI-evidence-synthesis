@@ -173,10 +173,13 @@ export default function LoginPage() {
 
           {mode === 'register' && (
             <p className="text-xs text-slate-400 text-center mt-4">
-              Free plan includes 20 AI screenings per month.{' '}
-              <a href="mailto:hello@hopperlace.ai" className="underline">Contact us</a> for institutional access.
+              Free plan includes 20 AI screenings per month.
             </p>
           )}
+          <p className="text-xs text-slate-400 text-center mt-3 pt-3 border-t border-slate-100">
+            Looking for institutional access?{' '}
+            <a href="https://calendly.com/yuyu-hopperlace/30min" target="_blank" rel="noopener noreferrer" className="text-blue-500 underline">Book a demo</a>
+          </p>
         </div>
       </div>
       </div>
