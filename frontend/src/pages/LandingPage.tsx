@@ -139,15 +139,45 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* CTA */}
+      {/* Institutional CTA */}
+      <section className="bg-slate-50 border-t border-slate-200">
+        <div className="max-w-5xl mx-auto px-6 py-16">
+          <div className="max-w-2xl mx-auto text-center">
+            <h2 className="text-2xl font-bold text-slate-800 mb-3">Running a systematic review team?</h2>
+            <p className="text-slate-600 text-sm mb-6">
+              We're onboarding early institutional pilots. Get tailored model selection
+              for your domain, higher screening volumes, and dedicated evaluation
+              of AI performance on your review types.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <a
+                href="https://calendly.com/yuyu-hopperlace/30min"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center gap-2 bg-slate-800 text-white px-6 py-3 rounded-md text-sm font-medium hover:bg-slate-900 transition-colors"
+              >
+                Book a Demo
+              </a>
+              <a
+                href="mailto:hello@hopperlace.ai"
+                className="inline-flex items-center justify-center gap-2 bg-white text-slate-700 px-6 py-3 rounded-md text-sm font-medium border border-slate-200 hover:bg-slate-50 transition-colors"
+              >
+                Or email us
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Free CTA */}
       <section className="bg-slate-900 text-white">
         <div className="max-w-5xl mx-auto px-6 py-16 text-center">
-          <h2 className="text-2xl font-bold mb-4">Ready to accelerate your systematic review?</h2>
+          <h2 className="text-2xl font-bold mb-4">Try it yourself</h2>
           <p className="text-slate-400 mb-4 max-w-xl mx-auto">
             Start screening studies in minutes. No credit card required.
           </p>
           <p className="text-slate-500 text-sm mb-8">
-            Free plan: 20 AI screenings per month. Contact us for institutional access.
+            Free plan: 20 AI screenings per month.
           </p>
           <Link
             to="/login"
