@@ -99,10 +99,10 @@ export default function ScreeningPage() {
 
   const limitMessage = (reason: string) =>
     reason === 'user_limit'
-      ? 'You have reached your free plan limit of 20 AI screenings this month. Contact hello@kallidao.com for institutional access.'
+      ? 'You have reached your free plan limit of 20 AI screenings this month. Contact hello@hopperlace.ai for institutional access.'
       : reason === 'global_limit'
-      ? 'The free tier screening quota has been reached for this month. Contact hello@kallidao.com for access.'
-      : 'Usage limit reached. Contact hello@kallidao.com for access.'
+      ? 'The free tier screening quota has been reached for this month. Contact hello@hopperlace.ai for access.'
+      : 'Usage limit reached. Contact hello@hopperlace.ai for access.'
 
   const handleScreen = async () => {
     // Check usage limit
@@ -335,7 +335,7 @@ export default function ScreeningPage() {
                 ? `You have used all ${usage.userLimit} free AI screenings for this month. `
                 : 'The platform-wide free tier screening quota has been reached for this month. '}
               For continued access, contact us at{' '}
-              <a href="mailto:hello@kallidao.com" className="underline font-medium">hello@kallidao.com</a>
+              <a href="mailto:hello@hopperlace.ai" className="underline font-medium">hello@hopperlace.ai</a>
               {' '}for institutional pricing.
             </p>
           </div>

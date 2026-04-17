@@ -109,7 +109,7 @@ export default function Layout() {
             {usage.userRemaining === 0 && (
               <p className="text-xs text-red-600 mt-1">
                 Limit reached.{' '}
-                <a href="mailto:hello@kallidao.com" className="underline">Contact us</a> to upgrade.
+                <a href="mailto:hello@hopperlace.ai" className="underline">Contact us</a> to upgrade.
               </p>
             )}
           </div>

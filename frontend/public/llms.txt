@@ -1,6 +1,6 @@
 # AI Evidence Synthesis
 # https://evidencesynthesisai.com
-# By KalliDao Research (https://kallidao.com)
+# By Hopperlace Research (https://hopperlace.ai)
 
 ## About
 AI Evidence Synthesis is an AI-powered systematic review screening tool with full auditability. It uses dual-run consensus screening where each study is screened twice by AI, and uncertain cases are flagged for human review rather than receiving forced decisions. The tool supports Level 1 (title/abstract) and Level 2 (full-text) screening with PICO-structured reasoning and a complete override audit trail.
@@ -8,7 +8,7 @@ AI Evidence Synthesis is an AI-powered systematic review screening tool with ful
 ## Key Innovation: Deference-Aware Evaluation
 We propose a novel evaluation framework for human-in-the-loop AI systems. Standard evaluation penalises AI uncertainty — if the AI says "I'm not sure", it counts as wrong. In our deference-aware (DA) framework, appropriate uncertainty is counted as correct. The only failures are confident wrong answers.
 
-This is formalised in: "Deference-Aware Evaluation for Human-in-the-Loop AI Systems: A Unified Quality Signal for AI Systems Operating Under Human Oversight" (Yuyu Shen, KalliDao Research, March 2026). Available at: https://osf.io/a69yh/files/vj95h
+This is formalised in: "Deference-Aware Evaluation for Human-in-the-Loop AI Systems: A Unified Quality Signal for AI Systems Operating Under Human Oversight" (Yuyu Shen, Hopperlace Research, March 2026). Available at: https://osf.io/a69yh/files/vj95h
 
 ## Three Evaluation Frameworks
 1. Forced Binary (Framework 1): AI must decide INCLUDE or EXCLUDE. Traditional baseline.
@@ -36,12 +36,12 @@ SYNERGY dataset (CC0 licence): Donners et al. 2021 — Pharmacokinetics and Asso
 - Analytics dashboard
 - Meta-miner for citation extraction from systematic reviews
 - Free tier: 20 screenings/month
-- Institutional access: contact hello@kallidao.com
+- Institutional access: contact hello@hopperlace.ai
 
 ## Links
 - Product: https://evidencesynthesisai.com
 - Evaluation: https://evidencesynthesisai.com/evaluation
 - White Paper: https://osf.io/a69yh/files/vj95h
 - About: https://evidencesynthesisai.com/about
-- Contact: hello@kallidao.com
-- Company: https://kallidao.com
+- Contact: hello@hopperlace.ai
+- Company: https://hopperlace.ai

@@ -18,7 +18,7 @@ export default function EvaluationPage() {
           get the ranking wrong.
         </p>
         <p className="text-xs text-slate-400 mb-10">
-          By Yuyu Shen, KalliDao Research. Full methodology in{' '}
+          By Yuyu Shen, Hopperlace Research. Full methodology in{' '}
           <a href={PAPER_URL} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline">
             <em>Deference-Aware Evaluation for Human-in-the-Loop AI Systems</em>
           </a>{' '}
@@ -274,7 +274,7 @@ export default function EvaluationPage() {
               Read the Full Paper
             </a>
             <p className="text-xs text-slate-400 mt-3">
-              Yuyu Shen, KalliDao Research. March 2026. CC BY 4.0.
+              Yuyu Shen, Hopperlace Research. March 2026. CC BY 4.0.
             </p>
           </div>
         </section>

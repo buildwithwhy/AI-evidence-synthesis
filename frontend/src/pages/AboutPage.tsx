@@ -127,7 +127,7 @@ export default function AboutPage() {
                   institutional partnerships, we conduct additional evaluation tailored to
                   your specific domain, review type, and PICO complexity to identify the
                   optimal model configuration for your use case.
-                  <a href="mailto:hello@kallidao.com" className="text-blue-600 underline ml-1">Get in touch</a>.
+                  <a href="mailto:hello@hopperlace.ai" className="text-blue-600 underline ml-1">Get in touch</a>.
                 </span>
               </li>
             </ul>
@@ -167,8 +167,8 @@ export default function AboutPage() {
             </p>
             <p className="mt-3">
               For institutional access with higher screening volumes, contact us at{' '}
-              <a href="mailto:hello@kallidao.com" className="text-blue-600 hover:text-blue-800 underline">
-                hello@kallidao.com
+              <a href="mailto:hello@hopperlace.ai" className="text-blue-600 hover:text-blue-800 underline">
+                hello@hopperlace.ai
               </a>.
             </p>
           </section>

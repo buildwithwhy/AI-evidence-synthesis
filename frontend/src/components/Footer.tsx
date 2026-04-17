@@ -12,20 +12,20 @@ export default function Footer() {
             <p className="text-xs text-slate-400">
               A product of{' '}
               <a
-                href="https://kallidao.com"
+                href="https://hopperlace.ai"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-slate-500 hover:text-slate-700 underline"
               >
-                KalliDao
+                Hopperlace
               </a>
             </p>
             <a
-              href="mailto:hello@kallidao.com"
+              href="mailto:hello@hopperlace.ai"
               className="inline-flex items-center gap-1.5 text-xs text-slate-400 hover:text-slate-600 transition-colors"
             >
               <Mail className="w-3 h-3" />
-              hello@kallidao.com
+              hello@hopperlace.ai
             </a>
           </div>
 
@@ -34,7 +34,7 @@ export default function Footer() {
             <Link to="/about" className="hover:text-slate-600">About</Link>
             <Link to="/evaluation" className="hover:text-slate-600">Evaluation</Link>
             <a
-              href="mailto:hello@kallidao.com"
+              href="mailto:hello@hopperlace.ai"
               className="hover:text-slate-600"
             >
               Contact
