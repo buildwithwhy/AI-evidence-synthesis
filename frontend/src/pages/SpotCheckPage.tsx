@@ -296,11 +296,11 @@ export default function SpotCheckPage() {
             <div className="flex items-center gap-3 flex-wrap">
               <div>
                 <span className="text-xs text-slate-500 mr-2">AI decision:</span>
-                <DecisionBadge decision={current.ai_decision} size="md" />
+                <DecisionBadge decision={current.ai_decision} size="sm" />
               </div>
               <div>
                 <span className="text-xs text-slate-500 mr-2">Current:</span>
-                <DecisionBadge decision={current.decision} size="md" />
+                <DecisionBadge decision={current.decision} size="sm" />
               </div>
             </div>
 

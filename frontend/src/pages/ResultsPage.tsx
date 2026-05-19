@@ -421,11 +421,11 @@ function OverrideModal({
           <div className="grid grid-cols-2 gap-3 text-sm">
             <div className="bg-slate-50 border border-slate-200 rounded-md p-3">
               <p className="text-xs font-medium text-slate-500 mb-1">Current decision</p>
-              <DecisionBadge decision={study.decision} size="md" />
+              <DecisionBadge decision={study.decision} size="sm" />
             </div>
             <div className="bg-blue-50 border border-blue-200 rounded-md p-3">
               <p className="text-xs font-medium text-blue-600 mb-1">Your override</p>
-              <DecisionBadge decision={targetDecision} size="md" />
+              <DecisionBadge decision={targetDecision} size="sm" />
             </div>
           </div>
 
