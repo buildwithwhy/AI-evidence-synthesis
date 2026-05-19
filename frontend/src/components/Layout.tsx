@@ -11,6 +11,7 @@ import {
   Settings,
   LogOut,
   Beaker,
+  ShieldCheck,
 } from 'lucide-react'
 
 export default function Layout() {
@@ -75,6 +76,10 @@ export default function Layout() {
               <NavLink to={`/projects/${projectId}/results`} className={linkClass}>
                 <ClipboardList className="w-4 h-4" />
                 Results
+              </NavLink>
+              <NavLink to={`/projects/${projectId}/spot-check`} className={linkClass}>
+                <ShieldCheck className="w-4 h-4" />
+                Spot Check
               </NavLink>
               <NavLink to={`/projects/${projectId}/analytics`} className={linkClass}>
                 <BarChart3 className="w-4 h-4" />

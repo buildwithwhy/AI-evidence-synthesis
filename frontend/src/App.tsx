@@ -13,6 +13,7 @@ import ScreeningPage from './pages/ScreeningPage'
 import ResultsPage from './pages/ResultsPage'
 import AnalyticsPage from './pages/AnalyticsPage'
 import MiningPage from './pages/MiningPage'
+import SpotCheckPage from './pages/SpotCheckPage'
 
 export default function App() {
   return (
@@ -38,6 +39,7 @@ export default function App() {
             <Route path="/projects/:projectId/protocol" element={<ProtocolPage />} />
             <Route path="/projects/:projectId/screening" element={<ScreeningPage />} />
             <Route path="/projects/:projectId/results" element={<ResultsPage />} />
+            <Route path="/projects/:projectId/spot-check" element={<SpotCheckPage />} />
             <Route path="/projects/:projectId/analytics" element={<AnalyticsPage />} />
             <Route path="/projects/:projectId/mining" element={<MiningPage />} />
           </Route>

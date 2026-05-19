@@ -39,7 +39,17 @@ export interface ScreeningResult {
   e_reas: string
   source: string
   override_history: OverrideEntry[]
+  spot_check_history?: SpotCheckEntry[]
   created_at: string
+}
+
+export interface SpotCheckEntry {
+  by: string
+  at: string
+  action: 'confirmed' | 'overridden'
+  ai_decision_at_check: string
+  ai_confidence_at_check: number
+  current_decision_at_check: string
 }
 
 export interface OverrideEntry {
@@ -47,6 +57,9 @@ export interface OverrideEntry {
   to: string
   by: string
   at: string
+  reason?: string
+  ai_decision_at_override?: string
+  ai_confidence_at_override?: number
   note?: string
 }
 
