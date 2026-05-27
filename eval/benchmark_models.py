@@ -198,6 +198,16 @@ MODEL_CONFIGS = {
         "cost_per_1k_input": 0.003,
         "cost_per_1k_output": 0.015,
     },
+    "or-claude-opus-4.7": {
+        "provider": "openrouter",
+        "model": "anthropic/claude-opus-4.7",
+        "developer": "Anthropic",
+        "open_source": False,
+        "env_key": "OPENROUTER_API_KEY",
+        "base_url": "https://openrouter.ai/api/v1",
+        "cost_per_1k_input": 0.005,
+        "cost_per_1k_output": 0.025,
+    },
     "or-deepseek-r1-32b": {
         "provider": "openrouter",
         "model": "deepseek/deepseek-r1-distill-qwen-32b",
