@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import PublicNav from '../components/PublicNav'
 import Footer from '../components/Footer'
-import { Shield, Eye, Users, BarChart3, FileSearch, Zap } from 'lucide-react'
+import { Shield, Eye, Users, BarChart3, FileSearch, Zap, MessageSquare, Brain, ShieldCheck } from 'lucide-react'
 
 export default function LandingPage() {
   return (
@@ -12,14 +12,15 @@ export default function LandingPage() {
       <section className="max-w-5xl mx-auto px-6 pt-20 pb-16">
         <div className="max-w-3xl">
           <h1 className="text-4xl font-bold text-slate-900 leading-tight">
-            AI-Powered Evidence Synthesis
-            <span className="block text-blue-600 mt-1">with Full Auditability</span>
+            AI Screening Built for
+            <span className="block text-blue-600 mt-1">Where Reviews Silently Break</span>
           </h1>
           <p className="text-lg text-slate-600 mt-6 leading-relaxed">
-            Accelerate systematic reviews without sacrificing rigour. Our dual-run
-            consensus screening catches what single-pass AI misses, and every decision
-            comes with a complete audit trail — from the original AI reasoning to
-            every human override.
+            Most AI screening tools focus on making the AI more accurate. We focus on what
+            happens when AI and human reviewers disagree — the structural failure mode our
+            cross-domain research shows even frontier models cannot eliminate. Mandatory
+            override reasoning, AI logic shown at the override moment, and random spot-checks
+            on confident AI decisions make contested cases visible instead of hiding them.
           </p>
           <div className="flex gap-4 mt-8">
             <Link
@@ -29,10 +30,10 @@ export default function LandingPage() {
               Get Started
             </Link>
             <Link
-              to="/about"
+              to="/evaluation"
               className="bg-white text-slate-700 px-6 py-3 rounded-md text-sm font-medium border border-slate-200 hover:bg-slate-50 transition-colors"
             >
-              Learn More
+              See the Research
             </Link>
           </div>
         </div>
@@ -81,54 +82,126 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Features */}
+      {/* What Makes This Different */}
       <section className="max-w-5xl mx-auto px-6 py-16">
-        <h2 className="text-2xl font-bold text-slate-800 mb-10">How It Works</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {[
-            {
-              icon: FileSearch,
-              title: 'Two-Stage Screening',
-              desc: 'Level 1 abstract screening and Level 2 full-text review, mirroring the standard systematic review workflow.',
-            },
-            {
-              icon: Zap,
-              title: 'Dual-Run Consensus',
-              desc: 'Each study is screened twice. Only when both runs agree with high confidence is the decision accepted. Disagreements are flagged for human review.',
-            },
-            {
-              icon: BarChart3,
-              title: 'Analytics Dashboard',
-              desc: 'Track inclusion rates, override patterns, confidence distributions, and source breakdowns across your review.',
-            },
-            {
-              icon: Shield,
-              title: 'Complete Audit Trail',
-              desc: 'Every decision, override, and reasoning chain is permanently recorded with timestamps and user attribution.',
-            },
-          ].map(({ icon: Icon, title, desc }) => (
-            <div key={title} className="flex gap-4 p-5 bg-slate-50 rounded-lg border border-slate-100">
-              <div className="p-2 bg-white rounded-lg h-fit border border-slate-200">
-                <Icon className="w-5 h-5 text-slate-600" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-slate-800 mb-1">{title}</h3>
-                <p className="text-sm text-slate-600">{desc}</p>
-              </div>
+        <h2 className="text-2xl font-bold text-slate-800 mb-3">What Makes This Different</h2>
+        <p className="text-sm text-slate-500 max-w-2xl mb-10">
+          Other screening tools also log decisions, support PICO criteria, and offer dual-reviewer
+          workflows. Our differentiation is three specific mechanisms — each motivated by an
+          empirically identified failure mode that capability scaling does not fix.
+        </p>
+        <div className="space-y-5">
+          <div className="flex gap-5 p-6 bg-slate-50 rounded-lg border border-slate-100">
+            <div className="p-2.5 bg-white rounded-lg h-fit border border-slate-200">
+              <MessageSquare className="w-5 h-5 text-blue-600" />
             </div>
-          ))}
+            <div>
+              <h3 className="font-semibold text-slate-800 mb-1.5">Mandatory override reasoning</h3>
+              <p className="text-sm text-slate-600 leading-relaxed">
+                Every reviewer override requires a structured, free-text reason — not optional, not
+                skippable. Over the lifetime of a review this becomes a longitudinal signal about
+                where the protocol leaves room for interpretation. Most tools log that an override
+                happened; we capture <em>why</em>.
+              </p>
+            </div>
+          </div>
+          <div className="flex gap-5 p-6 bg-slate-50 rounded-lg border border-slate-100">
+            <div className="p-2.5 bg-white rounded-lg h-fit border border-slate-200">
+              <Brain className="w-5 h-5 text-blue-600" />
+            </div>
+            <div>
+              <h3 className="font-semibold text-slate-800 mb-1.5">AI reasoning surfaced at the override moment</h3>
+              <p className="text-sm text-slate-600 leading-relaxed">
+                Before a reviewer can change a decision, the AI's reasoning, confidence, and
+                per-criterion checks (Population, Intervention, Comparator, Outcome, Study Design,
+                Exclusion) are shown side-by-side with the override choice. This forces engagement
+                with the AI's logic rather than reflexive override — a small friction that converts
+                disagreements into deliberate decisions.
+              </p>
+            </div>
+          </div>
+          <div className="flex gap-5 p-6 bg-slate-50 rounded-lg border border-slate-100">
+            <div className="p-2.5 bg-white rounded-lg h-fit border border-slate-200">
+              <ShieldCheck className="w-5 h-5 text-blue-600" />
+            </div>
+            <div>
+              <h3 className="font-semibold text-slate-800 mb-1.5">Random spot-check on confident AI decisions</h3>
+              <p className="text-sm text-slate-600 leading-relaxed">
+                A dedicated queue samples high-confidence AI decisions for human re-examination —
+                the only mechanism that catches silent failures (cases where the AI is confidently
+                wrong and never flags itself). Most tools route only UNCERTAIN cases to humans;
+                spot-checking confident-correct AI decisions is what surfaces the structural failure
+                class our research documents.
+              </p>
+            </div>
+          </div>
+        </div>
+        <p className="text-sm text-slate-500 mt-8 max-w-2xl">
+          Each of these is the deployment response to a specific empirical finding. The motivation is
+          documented on the{' '}
+          <Link to="/evaluation" className="text-blue-600 hover:text-blue-800 underline">
+            evaluation page
+          </Link>
+          {' '}— including the cross-domain study showing that even Claude Opus 4.7 recovers only 1 of
+          52 structural failures across our test domains.
+        </p>
+      </section>
+
+      {/* Standard features (smaller, supporting) */}
+      <section className="bg-slate-50 border-t border-slate-200">
+        <div className="max-w-5xl mx-auto px-6 py-12">
+          <h2 className="text-base font-semibold text-slate-700 mb-5">
+            Plus the methodology you expect
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {[
+              {
+                icon: FileSearch,
+                title: 'Two-stage screening',
+                desc: 'Level 1 (title/abstract) and Level 2 (full-text), mirroring standard systematic-review workflow.',
+              },
+              {
+                icon: Zap,
+                title: 'Dual-run consensus',
+                desc: 'Each study screened twice. Agreement = decision accepted; disagreement = flagged for human review.',
+              },
+              {
+                icon: BarChart3,
+                title: 'Analytics dashboard',
+                desc: 'Inclusion rates, override patterns, confidence distributions, source breakdowns.',
+              },
+              {
+                icon: Shield,
+                title: 'Immutable audit trail',
+                desc: 'Original AI decision is never modified. Every override is logged with full attribution and timestamp.',
+              },
+            ].map(({ icon: Icon, title, desc }) => (
+              <div key={title} className="bg-white rounded-md p-4 border border-slate-200">
+                <Icon className="w-4 h-4 text-slate-500 mb-2" />
+                <h3 className="text-sm font-semibold text-slate-800 mb-1">{title}</h3>
+                <p className="text-xs text-slate-500 leading-relaxed">{desc}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
       {/* Evaluation highlight */}
       <section className="border-t border-slate-200">
         <div className="max-w-5xl mx-auto px-6 py-16">
-          <h2 className="text-2xl font-bold text-slate-800 mb-4">Openly Evaluated</h2>
-          <p className="text-sm text-slate-600 leading-relaxed max-w-2xl mb-6">
+          <h2 className="text-2xl font-bold text-slate-800 mb-4">Openly Evaluated, Cross-Domain</h2>
+          <p className="text-sm text-slate-600 leading-relaxed max-w-2xl mb-3">
             We benchmark our screening engine across 9 LLM models using published systematic
-            review datasets with verified PICO criteria. We report both standard metrics and
-            our novel deference-aware evaluation framework — which recognises that an AI
-            correctly flagging uncertainty for human review is not an error, but the right behavior.
+            review datasets with verified PICO criteria — and we publish the data, scripts, and
+            findings. Our deference-aware evaluation framework recognises that an AI correctly
+            flagging uncertainty for human review is not an error but the right behaviour.
+          </p>
+          <p className="text-sm text-slate-600 leading-relaxed max-w-2xl mb-6">
+            The May 2026 cross-domain extension covers <strong>2,729 studies</strong> across
+            <strong> 5 medical domains</strong> and <strong>16,374 model decisions</strong>. Three independent
+            metrics (CER, AURC, ECE) rank the models identically; the same study identifies a
+            structural failure class invisible to confidence thresholding that motivates the
+            product features above.
           </p>
           <Link
             to="/evaluation"

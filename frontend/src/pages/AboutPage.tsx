@@ -21,50 +21,64 @@ export default function AboutPage() {
               manual work by trained reviewers.
             </p>
             <p className="mt-3">
-              AI can dramatically accelerate this process. But in a domain where missing
-              a single relevant study can invalidate an entire review, the AI must be
-              transparent, auditable, and conservative in its uncertainty. Most existing
-              tools treat AI screening as a black box. We built something different.
+              AI can dramatically accelerate this process. But our cross-domain research
+              shows that even the most calibrated frontier models share a structural class of
+              failures — cases where the AI confidently disagrees with human reviewers and
+              every other model in the panel does too. These failures are not random; they
+              cluster on inclusion criteria that leave room for interpretation, and they are
+              not addressed by capability scaling. Most screening tools paper over them with
+              confidence scores. We built something designed to surface them instead.
             </p>
           </section>
 
           <section>
             <h2 className="text-xl font-semibold text-slate-800 mb-3">Our Approach</h2>
             <p>
-              AI Evidence Synthesis is designed around the methodological standards set
-              by the Cochrane Collaboration — the world's leading organisation for
-              evidence synthesis. Our tool mirrors the dual-reviewer workflow that
-              Cochrane requires:
+              AI Evidence Synthesis is designed around the methodological standards of the
+              Cochrane Collaboration — and around a specific empirical finding from our own
+              evaluation work: the failures that matter most are the ones the AI does not
+              flag. Three product mechanisms respond to this directly:
             </p>
             <ul className="mt-3 space-y-2">
               <li className="flex gap-2">
                 <span className="text-blue-600 font-bold mt-0.5">1.</span>
                 <span>
-                  <strong>Dual-run consensus:</strong> Every study is screened twice by
-                  the AI with different parameters. Only when both runs agree with high
-                  confidence is the decision accepted. Any disagreement or uncertainty
-                  is flagged for human review.
+                  <strong>Mandatory override reasoning:</strong> When a reviewer changes an
+                  AI decision, a structured reason is required — not optional. Over the
+                  course of a review this becomes a longitudinal record of where the
+                  protocol leaves room for interpretation, and which conventions reviewers
+                  are quietly applying. Standard tools log that an override happened; we
+                  capture <em>why</em>.
                 </span>
               </li>
               <li className="flex gap-2">
                 <span className="text-blue-600 font-bold mt-0.5">2.</span>
                 <span>
-                  <strong>PICO-structured reasoning:</strong> Each decision is broken
-                  down into explicit checks against Population, Intervention, Comparator,
-                  Outcome, Study Design, and Exclusion criteria — the same framework
-                  human reviewers use.
+                  <strong>AI reasoning surfaced at the override moment:</strong> Before the
+                  reviewer can change a decision, the AI's reasoning, confidence, and
+                  per-criterion checks (Population, Intervention, Comparator, Outcome, Study
+                  Design, Exclusion) appear side-by-side with the override choice. This
+                  converts reflexive corrections into deliberate decisions.
                 </span>
               </li>
               <li className="flex gap-2">
                 <span className="text-blue-600 font-bold mt-0.5">3.</span>
                 <span>
-                  <strong>Immutable audit trail:</strong> The original AI decision is
-                  permanently recorded and never modified. Human overrides are logged
-                  with full attribution (who, when, from what, to what). The complete
-                  history is exportable for peer review and regulatory compliance.
+                  <strong>Random spot-check on confident AI decisions:</strong> A dedicated
+                  queue samples high-confidence AI decisions for human re-examination — the
+                  only mechanism that catches silent failures (cases where the AI is
+                  confidently wrong and never flags itself). Most tools route only uncertain
+                  cases to humans; we additionally audit the confident ones.
                 </span>
               </li>
             </ul>
+            <p className="mt-4">
+              Underneath these, the standard methodology you expect is still in place: dual-run
+              consensus screening, PICO-structured per-criterion reasoning, and an immutable
+              audit trail where the original AI decision is permanently recorded and every
+              override is logged with full attribution and timestamp. The full audit history is
+              exportable for peer review and regulatory compliance.
+            </p>
           </section>
 
           <section>
@@ -146,14 +160,24 @@ export default function AboutPage() {
           <section>
             <h2 className="text-xl font-semibold text-slate-800 mb-3">Open Evaluation</h2>
             <p>
-              We evaluate our screening engine against published benchmark datasets
-              including the SYNERGY dataset (26 systematic reviews, 169,000+ studies)
-              and test across 9 LLM models from 7 different developers. Our evaluation
-              methodology, including a novel deference-aware framework for human-in-the-loop
-              systems, and full results are published on our{' '}
+              We evaluate our screening engine against published benchmark datasets including
+              the SYNERGY dataset (26 systematic reviews, 169,000+ studies) and test across
+              9 LLM models from 7 different developers. Our evaluation methodology — including
+              a deference-aware framework for human-in-the-loop systems — and full results are
+              published on our{' '}
               <Link to="/evaluation" className="text-blue-600 hover:text-blue-800 underline">
                 Evaluation page
               </Link>.
+            </p>
+            <p className="mt-3">
+              The May 2026 cross-domain extension covers 2,729 studies across 5 medical
+              domains (16,374 model decisions). Three independent metrics — Confident Error
+              Rate (CER), AURC, and Expected Calibration Error — rank the models identically.
+              The same study identifies a structural failure class invisible to confidence
+              thresholding that remains essentially unchanged when running Claude Opus 4.7
+              (Anthropic's most capable model at the time of writing) in place of Sonnet 4.6:
+              the class is not addressed by capability scaling. This finding is what motivates
+              the product mechanisms above.
             </p>
           </section>
 
